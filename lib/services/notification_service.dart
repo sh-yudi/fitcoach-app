@@ -64,11 +64,16 @@ class NotificationService {
         if (!granted) return false;
       }
     }
-    // iOS
+    // iOS — explicitly request authorization
     final ios = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
     if (ios != null) {
-      final granted = await ios.requestPermissions(alert: true, sound: false, badge: false) ?? true;
-      if (!granted) return false;
+      final settings = await ios.checkPermissions();
+      debugPrint('iOS notification settings: alert=${settings?.isAlertEnabled} badge=${settings?.isBadgeEnabled} sound=${settings?.isSoundEnabled}');
+      final granted = await ios.requestPermissions(alert: true, sound: true, badge: false) ?? true;
+      if (!granted) {
+        debugPrint('iOS notification permission denied by user');
+        return false;
+      }
     }
     return true;
   }
@@ -237,25 +242,32 @@ class NotificationService {
 
   Future<void> sendTestNotification() async {
     await init();
-    await _ensurePermission();
-    await _plugin.show(
-      999999,
-      'FitCoach Test',
-      'Notifications are working! You will receive meal and workout reminders.',
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'fitcoach_reminders',
-          'FitCoach Reminders',
-          channelDescription: 'Meal, workout and gym check-in reminders',
-          importance: Importance.high,
-          priority: Priority.high,
+    final granted = await _ensurePermission();
+    debugPrint('Notification permission granted: $granted');
+    try {
+      await _plugin.show(
+        999999,
+        'FitCoach Test',
+        'Notifications are working! You will receive meal and workout reminders.',
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'fitcoach_reminders',
+            'FitCoach Reminders',
+            channelDescription: 'Meal, workout and gym check-in reminders',
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(
+            presentAlert: true,
+            presentSound: true,
+            presentBanner: true,
+          ),
         ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentSound: true,
-        ),
-      ),
-    );
+      );
+      debugPrint('Test notification sent successfully');
+    } catch (e, st) {
+      debugPrint('sendTestNotification error: $e\n$st');
+    }
   }
 
   // ---------------- Helpers ----------------
