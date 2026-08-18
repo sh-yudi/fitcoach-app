@@ -235,6 +235,29 @@ class NotificationService {
     await _plugin.cancelAll();
   }
 
+  Future<void> sendTestNotification() async {
+    await init();
+    await _ensurePermission();
+    await _plugin.show(
+      999999,
+      'FitCoach Test',
+      'Notifications are working! You will receive meal and workout reminders.',
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'fitcoach_reminders',
+          'FitCoach Reminders',
+          channelDescription: 'Meal, workout and gym check-in reminders',
+          importance: Importance.high,
+          priority: Priority.high,
+        ),
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentSound: true,
+        ),
+      ),
+    );
+  }
+
   // ---------------- Helpers ----------------
 
   String _dateKey(DateTime d) {
