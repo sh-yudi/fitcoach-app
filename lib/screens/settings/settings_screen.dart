@@ -138,7 +138,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   leading: Icon(Icons.send_rounded, color: AppColors.primary, size: 20),
                   title: Text('Send test notification', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
                   subtitle: Text('Verify notifications are working', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                  onTap: () => NotificationService.instance.sendTestNotification(),
+                  onTap: () async {
+                    await NotificationService.instance.sendTestNotification();
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Test notification sent — check your notification center')),
+                      );
+                    }
+                  },
                   dense: true,
                 ),
               ],
