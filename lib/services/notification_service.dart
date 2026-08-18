@@ -214,22 +214,33 @@ class NotificationService {
       norm % 60,
     );
     final now = tz.TZDateTime.now(tz.local);
-    if (scheduled.isBefore(now)) return;
+    debugPrint('[Notif] schedule id=$id "$title" at $scheduled (now=$now)');
+    if (scheduled.isBefore(now)) {
+      debugPrint('[Notif] SKIPPED (past)');
+      return;
+    }
+
+    final details = const NotificationDetails(
+      android: AndroidNotificationDetails(
+        'fitcoach_reminders',
+        'FitCoach Reminders',
+        channelDescription: 'Meal, workout and gym check-in reminders',
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+      iOS: DarwinNotificationDetails(
+        presentAlert: true,
+        presentSound: true,
+        presentBanner: true,
+      ),
+    );
 
     await _plugin.zonedSchedule(
       id,
       title,
       body,
       scheduled,
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'fitcoach_reminders',
-          'FitCoach Reminders',
-          channelDescription: 'Meal, workout and gym check-in reminders',
-          importance: Importance.high,
-          priority: Priority.high,
-        ),
-      ),
+      details,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       payload: payload,
     );
