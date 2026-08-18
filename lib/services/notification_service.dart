@@ -240,11 +240,21 @@ class NotificationService {
     await _plugin.cancelAll();
   }
 
-  Future<void> sendTestNotification() async {
+  Future<String> sendTestNotification() async {
+    final lines = <String>[];
     await init();
+    lines.add('init OK');
+    
     final granted = await _ensurePermission();
-    debugPrint('Notification permission granted: $granted');
+    lines.add('permission: $granted');
+    
     try {
+      final ios = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+      if (ios != null) {
+        final perms = await ios.checkPermissions();
+        lines.add('iOS alert=${perms?.isAlertEnabled} sound=${perms?.isSoundEnabled} badge=${perms?.isBadgeEnabled}');
+      }
+      
       await _plugin.show(
         999999,
         'FitCoach Test',
@@ -264,10 +274,15 @@ class NotificationService {
           ),
         ),
       );
-      debugPrint('Test notification sent successfully');
+      lines.add('show() called OK');
     } catch (e, st) {
-      debugPrint('sendTestNotification error: $e\n$st');
+      lines.add('ERROR: $e');
+      lines.add('$st');
     }
+    
+    final result = lines.join('\n');
+    debugPrint('Notification debug:\n$result');
+    return result;
   }
 
   // ---------------- Helpers ----------------
