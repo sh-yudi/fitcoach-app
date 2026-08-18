@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
@@ -37,7 +38,7 @@ class NotificationService {
     if (_initialized) return;
     const android = AndroidInitializationSettings('@mipmap/ic_launcher');
     const darwin = DarwinInitializationSettings(
-      requestAlertPermission: false,
+      requestAlertPermission: true,
       requestBadgePermission: false,
       requestSoundPermission: false,
     );
@@ -54,10 +55,22 @@ class NotificationService {
 
   Future<bool> _ensurePermission() async {
     await init();
+    // Android
     final android = _plugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
-    final enabled = await android?.areNotificationsEnabled() ?? true;
-    if (enabled) return true;
-    return await android?.requestNotificationsPermission() ?? false;
+    if (android != null) {
+      final enabled = await android.areNotificationsEnabled() ?? true;
+      if (!enabled) {
+        final granted = await android.requestNotificationsPermission() ?? false;
+        if (!granted) return false;
+      }
+    }
+    // iOS
+    final ios = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+    if (ios != null) {
+      final granted = await ios.requestPermissions(alert: true, sound: false, badge: false) ?? true;
+      if (!granted) return false;
+    }
+    return true;
   }
 
   // ---------------- Settings ----------------
@@ -65,7 +78,7 @@ class NotificationService {
   Future<NotificationSettingsData> getSettings() async {
     final prefs = await SharedPreferences.getInstance();
     return NotificationSettingsData(
-      enabled: prefs.getBool(_enabledKey) ?? false,
+      enabled: prefs.getBool(_enabledKey) ?? true,
       mealEnabled: prefs.getBool(_mealEnabledKey) ?? true,
       workoutEnabled: prefs.getBool(_workoutEnabledKey) ?? true,
       mealMinutes: prefs.getInt(_mealMinutesKey) ?? 10,
@@ -96,7 +109,9 @@ class NotificationService {
       final profile = await ApiClient.instance.getProfile();
       final calendar = await ApiClient.instance.getGymCalendar();
       await _scheduleDays(s, schedule, profile.workoutTime, calendar);
-    } catch (_) {}
+    } catch (e, st) {
+      debugPrint('NotificationService.sync error: $e\n$st');
+    }
   }
 
   Future<void> _scheduleDays(
