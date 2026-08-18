@@ -134,20 +134,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   onChanged: (v) => _apply(s.copyWith(enabled: v)),
                 ),
                  Divider(height: 1, color: AppColors.surfaceLight),
-                ListTile(
-                  leading: Icon(Icons.send_rounded, color: AppColors.primary, size: 20),
-                  title: Text('Send test notification', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textPrimary)),
-                  subtitle: Text('Verify notifications are working', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                  onTap: () async {
-                    await NotificationService.instance.sendTestNotification();
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Test notification sent')),
-                      );
-                    }
-                  },
-                  dense: true,
-                ),
+                                
               ],
             ),
             const SizedBox(height: 20),
