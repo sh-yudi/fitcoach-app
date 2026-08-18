@@ -240,49 +240,28 @@ class NotificationService {
     await _plugin.cancelAll();
   }
 
-  Future<String> sendTestNotification() async {
-    final lines = <String>[];
+  Future<void> sendTestNotification() async {
     await init();
-    lines.add('init OK');
-    
-    final granted = await _ensurePermission();
-    lines.add('permission: $granted');
-    
-    try {
-      final ios = _plugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
-      if (ios != null) {
-        final perms = await ios.checkPermissions();
-        lines.add('iOS alert=${perms?.isAlertEnabled} sound=${perms?.isSoundEnabled} badge=${perms?.isBadgeEnabled}');
-      }
-      
-      await _plugin.show(
-        999999,
-        'FitCoach Test',
-        'Notifications are working! You will receive meal and workout reminders.',
-        const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'fitcoach_reminders',
-            'FitCoach Reminders',
-            channelDescription: 'Meal, workout and gym check-in reminders',
-            importance: Importance.high,
-            priority: Priority.high,
-          ),
-          iOS: DarwinNotificationDetails(
-            presentAlert: true,
-            presentSound: true,
-            presentBanner: true,
-          ),
+    await _ensurePermission();
+    await _plugin.show(
+      999999,
+      'FitCoach Test',
+      'Notifications are working! You will receive meal and workout reminders.',
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'fitcoach_reminders',
+          'FitCoach Reminders',
+          channelDescription: 'Meal, workout and gym check-in reminders',
+          importance: Importance.high,
+          priority: Priority.high,
         ),
-      );
-      lines.add('show() called OK');
-    } catch (e, st) {
-      lines.add('ERROR: $e');
-      lines.add('$st');
-    }
-    
-    final result = lines.join('\n');
-    debugPrint('Notification debug:\n$result');
-    return result;
+        iOS: DarwinNotificationDetails(
+          presentAlert: true,
+          presentSound: true,
+          presentBanner: true,
+        ),
+      ),
+    );
   }
 
   // ---------------- Helpers ----------------
