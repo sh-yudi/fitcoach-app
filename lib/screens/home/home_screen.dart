@@ -4,6 +4,7 @@ import '../../models/models.dart';
 import '../../services/api_client.dart';
 import '../../theme.dart';
 import '../../widgets/ad_banner.dart';
+import '../../widgets/personal_training_card.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/stat_card.dart';
 import '../diet/diet_screen.dart';
@@ -192,6 +193,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5),
                   ),
                 ),
+              const SizedBox(height: 24),
+              const PersonalTrainingCard(),
               const SizedBox(height: 24),
               const AdBanner(),
             ],

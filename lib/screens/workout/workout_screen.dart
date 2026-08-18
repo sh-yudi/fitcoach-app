@@ -6,6 +6,7 @@ import '../../models/models.dart';
 import '../../services/api_client.dart';
 import '../../theme.dart';
 import '../../widgets/ad_banner.dart';
+import '../../widgets/personal_training_card.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({super.key, this.refreshToken = 0});
@@ -300,6 +301,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                             );
                           },
                         ),
+                        const SizedBox(height: 20),
+                        const PersonalTrainingCard(),
                         const SizedBox(height: 20),
                         const AdBanner(),
                       ],
