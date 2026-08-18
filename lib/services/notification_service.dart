@@ -40,7 +40,7 @@ class NotificationService {
     const darwin = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: false,
-      requestSoundPermission: false,
+      requestSoundPermission: true,
     );
     await _plugin.initialize(
       const InitializationSettings(android: android, iOS: darwin),
