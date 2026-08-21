@@ -113,7 +113,7 @@ class _DietScreenState extends State<DietScreen> {
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
-                                  'Drink 4-5 L water daily · Target ${_diet!.calories} kcal',
+                                  'Drink ${_diet!.waterLiters} L water daily · Target ${_diet!.calories} kcal · P ${_diet!.protein}g · C ${_diet!.carbs}g · F ${_diet!.fat}g',
                                   style:  TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600),
                                 ),
                               ),
@@ -330,6 +330,28 @@ class _MealCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
+          if (meal.tip.isNotEmpty) ...[
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                   Icon(Icons.lightbulb_outline, size: 14, color: AppColors.primary),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      meal.tip,
+                      style:  TextStyle(color: AppColors.primary, fontSize: 11.5, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
           ...meal.items.map(
             (item) => Padding(
               padding: const EdgeInsets.only(bottom: 8),

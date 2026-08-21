@@ -6,7 +6,6 @@ import '../theme.dart';
 class PersonalTrainingCard extends StatelessWidget {
   const PersonalTrainingCard({super.key});
 
-  // TODO: Replace with real contact details
   static const _whatsappNumber = '918285498845';
   static const _phoneNumber = '+91 82854 98845';
   static const _trainerName = 'Yudi';

@@ -1,10 +1,9 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 import '../../services/api_client.dart';
 import '../../services/session.dart';
 import '../../theme.dart';
+import '../../widgets/profile_avatar.dart';
 import '../home/home_shell.dart';
 import 'one_tap_consent.dart';
 import 'register_screen.dart';
@@ -72,7 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
         result.user.email,
         name: result.user.name,
         rememberToken: token,
-        photo: result.user.profilePhoto,
+        photo: result.user.displayPhoto,
       );
       ApiClient.instance.setToken(result.token);
       if (!mounted) return;
@@ -317,10 +316,11 @@ class _OneTapHero extends StatelessWidget {
                       child: CircularProgressIndicator(strokeWidth: 3, color: Colors.white),
                     )
                   : (photo != null
-                      ? Image.memory(
-                          base64Decode(photo!),
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => _initialText(),
+                      ? ProfileAvatar(
+                          photoUrl: !photo!.startsWith('data:') ? photo : null,
+                          base64: photo!.startsWith('data:') ? photo : null,
+                          size: 30,
+                          fallbackIcon: Icons.person,
                         )
                       : _initialText()),
             ),

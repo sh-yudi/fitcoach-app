@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 import '../../services/api_client.dart';
 import '../../services/profile_photo.dart';
 import '../../services/session.dart';
 import '../../theme.dart';
+import '../../widgets/profile_avatar.dart';
 import '../home/home_shell.dart';
 import 'one_tap_consent.dart';
 
@@ -219,10 +218,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     height: 96,
                     color: AppColors.primary.withValues(alpha: 0.12),
                     child: _profilePhoto != null
-                        ? Image.memory(
-                            base64Decode(_profilePhoto!),
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, _, _) => _noPhotoAvatar(),
+                        ? ProfileAvatar(
+                            base64: _profilePhoto,
+                            size: 96,
                           )
                         : _noPhotoAvatar(),
                   ),

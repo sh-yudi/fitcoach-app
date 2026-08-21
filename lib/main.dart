@@ -1,6 +1,4 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 import 'config.dart';
 import 'screens/auth/login_screen.dart';
@@ -15,7 +13,6 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  _initAds();
   NotificationService.instance.init(onTap: _handleNotificationTap);
   ThemeController.instance.load();
   runApp(const FitCoachApp());
@@ -62,12 +59,6 @@ class _AppLifecycleObserver with WidgetsBindingObserver {
       );
     }
     _loggingOut = false;
-  }
-}
-
-void _initAds() {
-  if (!kIsWeb && AppConfig.adsEnabled) {
-    MobileAds.instance.initialize();
   }
 }
 

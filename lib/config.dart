@@ -12,13 +12,12 @@ class AppConfig {
   }
 
   // AdMob settings --------------------------------------------------------
-  // Generate your real IDs from https://apps.admob.com after creating an
-  // AdMob account. Empty string = ads disabled (no banner shown).
-  static const String adMobAppIdAndroid = 'ca-app-pub-3940256099942544~3347511713';
-  static const String adMobAppIdIos = 'ca-app-pub-3940256099942544~1458002511';
-  // Banner unit IDs (the 3940... IDs are Google's test units).
-  static const String bannerAdUnitAndroid = 'ca-app-pub-3940256099942544/6300978111';
-  static const String bannerAdUnitIos = 'ca-app-pub-3940256099942544/2934735716';
+  // Set adsEnabled to true and replace these with real IDs from
+  // https://apps.admob.com before publishing to app stores.
+  static const String adMobAppIdAndroid = '';
+  static const String adMobAppIdIos = '';
+  static const String bannerAdUnitAndroid = '';
+  static const String bannerAdUnitIos = '';
 
-  static bool get adsEnabled => true;
+  static bool get adsEnabled => false;
 }

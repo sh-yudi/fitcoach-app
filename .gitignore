@@ -47,6 +47,9 @@ app.*.map.json
 # Widget Preview related
 .widget_preview/
 
+# Android build artifacts
+android/build/
+
 # Android release signing (keep private, back it up!)
 android/key.properties
 android/keystore-password.txt

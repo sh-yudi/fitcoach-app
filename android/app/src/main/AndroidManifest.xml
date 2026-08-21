@@ -9,13 +9,11 @@
     <application
         android:label="FitCoach"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
-        android:usesCleartextTraffic="true">
-        <!-- AdMob application ID. Replace with your real ID from apps.admob.com
-             before publishing. -->
-        <meta-data
+        android:icon="@mipmap/ic_launcher">
+        <!-- AdMob application ID — add when you have real IDs from apps.admob.com -->
+        <!-- <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
+            android:value="ca-app-pub-XXXXXXXXXXXXXXXX~XXXXXXXXXX"/> -->
         <activity
             android:name=".MainActivity"
             android:exported="true"

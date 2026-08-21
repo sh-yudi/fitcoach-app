@@ -1,5 +1,4 @@
-import 'dart:convert';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../services/api_client.dart';
@@ -8,6 +7,7 @@ import '../../services/profile_photo.dart';
 import '../../services/session.dart';
 import '../../theme.dart';
 import '../../widgets/ad_banner.dart';
+import '../../widgets/profile_avatar.dart';
 import '../../widgets/section_header.dart';
 import 'developer_screen.dart';
 class SettingsScreen extends StatefulWidget {
@@ -54,7 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           email,
           name: result.user.name,
           rememberToken: result.rememberToken,
-          photo: result.user.profilePhoto,
+          photo: result.user.displayPhoto,
         );
       } else {
         await ApiClient.instance.disableOneTap();
@@ -83,10 +83,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _saving = true);
     try {
       final user = await ApiClient.instance.updateProfile({'profilePhoto': base64});
-      await Session.setRememberPhoto(user.profilePhoto);
+      await Session.setRememberPhoto(user.displayPhoto);
       if (!mounted) return;
       setState(() {
-        _profilePhoto = user.profilePhoto;
+        _profilePhoto = user.displayPhoto;
         _saving = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -221,22 +221,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            const SectionHeader(title: 'Developer'),
-            const SizedBox(height: 10),
-            _SettingsCard(
-              children: [
-                _NavRow(
-                  icon: Icons.code,
-                  title: 'Developer Information',
-                  subtitle: 'About the app developer',
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(builder: (_) => const DeveloperScreen()),
-                    );
-                  },
-                ),
-              ],
-            ),
+            if (!kReleaseMode) ...[
+              const SectionHeader(title: 'Developer'),
+              const SizedBox(height: 10),
+              _SettingsCard(
+                children: [
+                  _NavRow(
+                    icon: Icons.code,
+                    title: 'Developer Information',
+                    subtitle: 'About the app developer',
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const DeveloperScreen()),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 20),
             const AdBanner(),
           ],
@@ -267,13 +269,12 @@ class _PhotoRow extends StatelessWidget {
                 width: 56,
                 height: 56,
                 color: AppColors.primary.withValues(alpha: 0.12),
-                child: photo != null
-                    ? Image.memory(
-                        base64Decode(photo!),
-                        fit: BoxFit.cover,
-                        errorBuilder: (_, _, _) => _noPhotoIcon(),
-                      )
-                    : _noPhotoIcon(),
+                child: ProfileAvatar(
+                  photoUrl: photo != null && !photo!.startsWith('data:') ? photo : null,
+                  base64: photo != null && photo!.startsWith('data:') ? photo : null,
+                  size: 56,
+                  fallbackIcon: Icons.person,
+                ),
               ),
             ),
             const SizedBox(width: 14),

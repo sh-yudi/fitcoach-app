@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 import '../../models/models.dart';
@@ -8,6 +6,7 @@ import '../../services/profile_photo.dart';
 import '../../services/session.dart';
 import '../../theme.dart';
 import '../../widgets/ad_banner.dart';
+import '../../widgets/profile_avatar.dart';
 import '../auth/login_screen.dart';
 import '../settings/settings_screen.dart';
 
@@ -26,6 +25,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late String _fitnessLevel;
   late String _workoutTime;
   late bool _veg;
+  String? _wakeTime;
+  String? _sleepTime;
+  String? _gymTime;
 
   late final TextEditingController _weight;
   late final TextEditingController _waist;
@@ -66,6 +68,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _fitnessLevel = u?.fitnessLevel ?? _fitnessLevel;
     _workoutTime = u?.workoutTime ?? _workoutTime;
     _veg = u?.veg ?? _veg;
+    _wakeTime = u?.wakeTime;
+    _sleepTime = u?.sleepTime;
+    _gymTime = u?.gymTime;
   }
 
   Future<void> _changePhoto() async {
@@ -74,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() => _saving = true);
     try {
       final user = await ApiClient.instance.updateProfile({'profilePhoto': base64});
-      await Session.setRememberPhoto(user.profilePhoto);
+      await Session.setRememberPhoto(user.displayPhoto);
       if (!mounted) return;
       setState(() => _saving = false);
       widget.onUpdated(user);
@@ -486,6 +491,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  String _fmtTime24(String v) {
+    if (v.isEmpty) return '--:--';
+    return v;
+  }
+
+  Future<void> _pickTime(String field, String? current) async {
+    TimeOfDay initial;
+    if (current != null && current.contains(':')) {
+      final parts = current.split(':');
+      initial = TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+    } else {
+      initial = TimeOfDay.now();
+    }
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: initial,
+      builder: (ctx, child) {
+        return MediaQuery(
+          data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
+          child: child!,
+        );
+      },
+    );
+    if (picked != null) {
+      final hh = picked.hour.toString().padLeft(2, '0');
+      final mm = picked.minute.toString().padLeft(2, '0');
+      final val = '$hh:$mm';
+      setState(() {
+        if (field == 'wakeTime') _wakeTime = val;
+        if (field == 'sleepTime') _sleepTime = val;
+        if (field == 'gymTime') _gymTime = val;
+      });
+      _patchProfile({field: val}, successMsg: '${field.replaceAll('Time', ' time')} saved');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final u = widget.user;
@@ -536,13 +577,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 color: AppColors.primary,
                                 borderRadius: BorderRadius.circular(18),
                               ),
-                              child: u.profilePhoto != null && u.profilePhoto!.isNotEmpty
-                                  ? Image.memory(
-                                      base64Decode(u.profilePhoto!),
-                                      fit: BoxFit.cover,
-                                      errorBuilder: (_, _, _) => _genderIcon(u),
-                                    )
-                                  : _genderIcon(u),
+                              child: ProfileAvatar(
+                                photoUrl: u.isPhotoUrl ? u.profilePhotoUrl : null,
+                                base64: u.isPhotoUrl ? null : u.profilePhoto,
+                                size: 56,
+                                fallbackIcon: u.gender == 'female' ? Icons.female : Icons.male,
+                              ),
                             ),
                             Positioned(
                               bottom: 0,
@@ -718,6 +758,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               _patchProfile({'workoutTime': v}, successMsg: 'Workout time saved');
                             },
                           ),
+                        ),
+                        Divider(height: 1, color: AppColors.surfaceLight),
+                        _EditRow(
+                          label: 'Wake up',
+                          value: _wakeTime != null && _wakeTime!.isNotEmpty ? _fmtTime24(_wakeTime!) : 'Not set',
+                          onTap: () => _pickTime('wakeTime', _wakeTime),
+                        ),
+                        _EditRow(
+                          label: 'Gym time',
+                          value: _gymTime != null && _gymTime!.isNotEmpty ? _fmtTime24(_gymTime!) : 'Not set',
+                          onTap: () => _pickTime('gymTime', _gymTime),
+                        ),
+                        _EditRow(
+                          label: 'Sleep time',
+                          value: _sleepTime != null && _sleepTime!.isNotEmpty ? _fmtTime24(_sleepTime!) : 'Not set',
+                          onTap: () => _pickTime('sleepTime', _sleepTime),
                         ),
                       ],
                     ),

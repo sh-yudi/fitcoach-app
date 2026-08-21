@@ -19,6 +19,10 @@ class User {
   final Map<String, bool> gymPlans;
   final Map<String, bool> attendance;
   final String? profilePhoto;
+  final String? profilePhotoUrl;
+  final String? wakeTime;
+  final String? sleepTime;
+  final String? gymTime;
 
   User({
     required this.id,
@@ -41,6 +45,10 @@ class User {
     this.gymPlans = const {},
     this.attendance = const {},
     this.profilePhoto,
+    this.profilePhotoUrl,
+    this.wakeTime,
+    this.sleepTime,
+    this.gymTime,
   });
 
   factory User.fromJson(Map<String, dynamic> j) {
@@ -65,6 +73,10 @@ class User {
       gymPlans: _boolMap(j['gymPlans']),
       attendance: _boolMap(j['attendance']),
       profilePhoto: j['profilePhoto'] as String?,
+      profilePhotoUrl: j['profilePhotoUrl'] as String?,
+      wakeTime: j['wakeTime'] as String?,
+      sleepTime: j['sleepTime'] as String?,
+      gymTime: j['gymTime'] as String?,
     );
   }
 
@@ -72,6 +84,11 @@ class User {
     if (v is! Map) return const {};
     return v.map((k, val) => MapEntry(k.toString(), val == true));
   }
+
+  /// Returns the best available photo: server-stored URL or legacy base64.
+  /// If [fullUrl] is true, prepends the API base URL for network loading.
+  String? get displayPhoto => profilePhotoUrl ?? profilePhoto;
+  bool get isPhotoUrl => profilePhotoUrl != null && profilePhotoUrl!.isNotEmpty;
 
   Map<String, dynamic> toJson() => {
         'name': name,
@@ -180,12 +197,14 @@ class Meal {
   final String name;
   final String time;
   final int kcal;
+  final String tip;
   final List<MealItem> items;
 
   Meal.fromJson(Map<String, dynamic> j)
       : name = j['meal'] as String? ?? '',
         time = j['time'] as String? ?? '',
         kcal = (j['kcal'] as num?)?.toInt() ?? 0,
+        tip = j['tip'] as String? ?? '',
         items = ((j['items'] as List?) ?? [])
             .map((e) => MealItem.fromJson(e as Map<String, dynamic>))
             .toList();
@@ -194,6 +213,8 @@ class Meal {
 class DietPlan {
   final int calories;
   final int protein;
+  final int carbs;
+  final int fat;
   final double waterLiters;
   final String note;
   final String workoutTime;
@@ -203,6 +224,8 @@ class DietPlan {
   DietPlan.fromJson(Map<String, dynamic> j)
       : calories = (j['calories'] as num?)?.toInt() ?? 0,
         protein = (j['protein'] as num?)?.toInt() ?? 0,
+        carbs = (j['carbs'] as num?)?.toInt() ?? 0,
+        fat = (j['fat'] as num?)?.toInt() ?? 0,
         waterLiters = (j['waterLiters'] as num?)?.toDouble() ?? 0,
         note = j['note'] as String? ?? '',
         workoutTime = j['workoutTime'] as String? ?? '',

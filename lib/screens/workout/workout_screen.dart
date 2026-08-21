@@ -242,6 +242,46 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     setState(() => _expandedDay = _expandedDay == day ? null : day);
   }
 
+  void _onUndoComplete(int day) async {
+    final proceed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Undo completion?'),
+        content: Text(
+          'This will reopen Day $day so you can modify your exercises.',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
+            child: const Text('Reopen'),
+          ),
+        ],
+      ),
+    );
+    if (proceed != true || !mounted) return;
+
+    _saveChain = _saveChain.then((_) async {
+      try {
+        await ApiClient.instance.uncompleteWorkout(day);
+      } on ApiException catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      }
+    });
+    _saveChain.then((_) async {
+      if (!mounted) return;
+      await _load();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -295,6 +335,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                               ticked: _ticked[i + 1] ?? {},
                               expanded: _expandedDay == i + 1,
                               onToggle: (name) => _toggleExercise(i + 1, name),
+                              onUndo: wd.done ? () => _onUndoComplete(wd.day) : null,
                               onHeaderTap: wd.done
                                   ? () => _toggleExpand(wd.day)
                                   : () => setState(() => _expandedDay = null),
@@ -388,12 +429,14 @@ class _WorkoutDayCard extends StatelessWidget {
   final bool expanded;
   final ValueChanged<String> onToggle;
   final VoidCallback? onHeaderTap;
+  final VoidCallback? onUndo;
   const _WorkoutDayCard({
     required this.day,
     required this.ticked,
     required this.expanded,
     required this.onToggle,
     this.onHeaderTap,
+    this.onUndo,
   });
 
   @override
@@ -496,7 +539,7 @@ class _WorkoutDayCard extends StatelessWidget {
               )
             else if (expanded) ...[
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const.all(12),
                 decoration: BoxDecoration(
                   color: AppColors.surfaceLight.withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(12),
@@ -549,6 +592,24 @@ class _WorkoutDayCard extends StatelessWidget {
                         ),
                       ),
                     ],
+                  ],
+                ),
+              ),
+            ],
+            if (onUndo != null) ...[
+              const SizedBox(height: 8),
+              GestureDetector(
+                onTap: onUndo,
+                behavior: HitTestBehavior.opaque,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.undo, color: AppColors.textSecondary, size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Undo completion',
+                      style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
+                    ),
                   ],
                 ),
               ),

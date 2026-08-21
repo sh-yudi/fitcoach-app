@@ -88,7 +88,7 @@ Future<void> maybePromptOneTapConsent(BuildContext context) async {
       email,
       name: result.user.name,
       rememberToken: result.rememberToken,
-      photo: result.user.profilePhoto,
+      photo: result.user.displayPhoto,
     );
   } catch (_) {
     // Non-fatal: one-tap login simply stays off.

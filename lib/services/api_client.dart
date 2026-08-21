@@ -191,6 +191,10 @@ class ApiClient {
     await _request('POST', '/api/plans/workout/complete', body: {'day': day});
   }
 
+  Future<void> uncompleteWorkout(int day) async {
+    await _request('POST', '/api/plans/workout/uncomplete', body: {'day': day});
+  }
+
   Future<void> saveWorkoutTicks(int day, List<String> names) async {
     await _request('POST', '/api/plans/workout/ticks', body: {'day': day, 'names': names});
   }

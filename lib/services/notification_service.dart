@@ -50,6 +50,25 @@ class NotificationService {
       },
     );
     tzdata.initializeTimeZones();
+    try {
+      final localName = tz.local.name;
+      if (localName == 'UTC' || localName.isEmpty) {
+        final now = DateTime.now();
+        final offset = now.timeZoneOffset;
+        String? match;
+        for (final entry in tz.timeZoneDatabase.locations.entries) {
+          final loc = entry.value;
+          final locOffsetMs = loc.currentTimeZone.offset;
+          if (locOffsetMs == offset.inMilliseconds) {
+            match = entry.key;
+            break;
+          }
+        }
+        if (match != null) tz.setLocalLocation(tz.getLocation(match));
+      }
+    } catch (e) {
+      debugPrint('[Notif] could not detect local timezone: $e');
+    }
     _initialized = true;
   }
 
@@ -249,30 +268,6 @@ class NotificationService {
   Future<void> _cancelAll() async {
     await init();
     await _plugin.cancelAll();
-  }
-
-  Future<void> sendTestNotification() async {
-    await init();
-    await _ensurePermission();
-    await _plugin.show(
-      999999,
-      'FitCoach Test',
-      'Notifications are working! You will receive meal and workout reminders.',
-      const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'fitcoach_reminders',
-          'FitCoach Reminders',
-          channelDescription: 'Meal, workout and gym check-in reminders',
-          importance: Importance.high,
-          priority: Priority.high,
-        ),
-        iOS: DarwinNotificationDetails(
-          presentAlert: true,
-          presentSound: true,
-          presentBanner: true,
-        ),
-      ),
-    );
   }
 
   // ---------------- Helpers ----------------
