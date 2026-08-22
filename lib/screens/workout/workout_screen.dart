@@ -24,21 +24,13 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   String _split = '';
   bool _changingSplit = false;
 
-  // Ticked exercises per day (day -> set of exercise names), persisted
-  // server-side so ticks survive scrolling, split changes, refreshes and
-  // app restarts.
   final Map<int, Set<String>> _ticked = {};
-
-  // Serializes tick saves so rapid toggles never write out of order.
   Future<void> _saveChain = Future.value();
-
-  // Which archived (done) day is expanded to peek at its completed exercises.
-  // Only one previous day can be expanded at a time.
   int? _expandedDay;
 
   static const _splits = [
     (value: 'upperlower', label: 'Upper / Lower', subtitle: '4 days/week'),
-    (value: 'ppl', label: 'Push / Pull / Legs', subtitle: 'Push → Pull → Legs → Repeat'),
+    (value: 'ppl', label: 'Push / Pull / Legs', subtitle: 'Push \u2192 Pull \u2192 Legs \u2192 Repeat'),
     (value: 'single', label: 'Single Body Part', subtitle: '6 days/week'),
     (value: 'two', label: 'Two Body Parts', subtitle: '4 days/week'),
   ];
@@ -57,10 +49,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     }
   }
 
+  int get _currentDayOfWeek => DateTime.now().weekday;
+
   Future<void> _load({bool awaitPending = true}) async {
-    // Wait for in-flight tick saves to flush first so a refresh doesn't
-    // clobber locally ticked exercises with stale server state. When called
-    // from inside the save chain itself, skip the await to avoid a deadlock.
     if (awaitPending) await _saveChain;
     if (_workout == null) {
       setState(() {
@@ -96,21 +87,18 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     setState(() {
       final set = _ticked.putIfAbsent(day, () => {});
       if (!set.remove(name)) set.add(name);
-      _expandedDay = null;
     });
     final names = List<String>.from(_ticked[day] ?? const []);
     _saveChain = _saveChain.then((_) async {
       try {
         await ApiClient.instance.saveWorkoutTicks(day, names);
       } on ApiException {
-        // Best-effort: next toggle or refresh will resync from the server.
+        // Best-effort: next refresh will resync from server.
       }
     });
     _maybeAutoComplete(day);
   }
 
-  // When every exercise of a day is ticked, the day completes automatically
-  // and a motivational message celebrates the progress.
   void _maybeAutoComplete(int day) {
     final dayPlan = _workout?.weekly.where((d) => d.day == day).firstOrNull;
     final exercises = dayPlan?.workout ?? const <Exercise>[];
@@ -128,8 +116,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
       }
     });
-    // Reload AFTER the chain resolves (not inside it) so the refresh can safely
-    // await the chain without deadlocking, then celebrate the completed day.
     _saveChain.then((_) async {
       if (!mounted) return;
       await _load();
@@ -142,14 +128,14 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     'Another day checked off! Every workout is a brick in the foundation of the stronger, fitter you.',
     'That is one more step forward on your fitness journey. Small days done consistently build big results.',
     'Day complete! Your future self is thanking you for showing up and putting in the work.',
-    'You just got stronger — both in body and in discipline. Keep stacking these wins!',
+    'You just got stronger \u2014 both in body and in discipline. Keep stacking these wins!',
     'One workout down. The version of you that reaches the goal is built by days exactly like this one.',
-    'Progress is not a sprint, it is a journey — and today you walked further on it. Well done!',
+    'Progress is not a sprint, it is a journey \u2014 and today you walked further on it. Well done!',
     'The hardest rep was showing up. You did. Celebrate today, come back stronger tomorrow.',
     'Every completed day adds up. You are not just working out, you are becoming a new person.',
-    'Today\'s effort is tomorrow\'s strength. Great session — your journey is moving forward!',
+    'Today\'s effort is tomorrow\'s strength. Great session \u2014 your journey is moving forward!',
     'Consistency beats intensity. Another consistent day means another step toward your goal.',
-    'You showed up for yourself today — that is what a real fitness journey is made of. Keep going!',
+    'You showed up for yourself today \u2014 that is what a real fitness journey is made of. Keep going!',
     'Perfect is not the goal, progress is. And today, you made progress. Fantastic work!',
   ];
 
@@ -170,19 +156,16 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 color: AppColors.success.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child:  Icon(Icons.emoji_events, color: AppColors.success, size: 26),
+              child: Icon(Icons.emoji_events, color: AppColors.success, size: 26),
             ),
             const SizedBox(height: 14),
-             Text(
+            Text(
               'Day $day complete!',
               style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800, fontSize: 20),
             ),
           ],
         ),
-        content:  Text(
-          msg,
-          style: TextStyle(color: AppColors.textSecondary, height: 1.5),
-        ),
+        content: Text(msg, style: TextStyle(color: AppColors.textSecondary, height: 1.5)),
         actions: [
           FilledButton(
             onPressed: () => Navigator.of(ctx).pop(),
@@ -196,9 +179,6 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   Future<void> _changeSplit(String value) async {
     if (value == _split) return;
-
-    // Only warn when a ticked exercise is actually part of the current plan
-    // (stale ticks from an older plan or a previous week should not trigger it).
     final planNames = <String>{
       for (final day in _workout?.weekly ?? const <WorkoutDay>[])
         for (final ex in day.workout ?? const <Exercise>[]) ex.name,
@@ -214,20 +194,13 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
             'Changing the split will replace today\'s workout and your ticked progress may be lost.',
           ),
           actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel'),
-            ),
-            FilledButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Change Anyway'),
-            ),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Cancel')),
+            FilledButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Change Anyway')),
           ],
         ),
       );
       if (proceed != true || !mounted) return;
     }
-
     setState(() => _changingSplit = true);
     try {
       await ApiClient.instance.updateProfile({'workoutSplit': value});
@@ -244,53 +217,13 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     setState(() => _expandedDay = _expandedDay == day ? null : day);
   }
 
-  void _onUndoComplete(int day) async {
-    final proceed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Undo completion?'),
-        content: Text(
-          'This will reopen Day $day so you can modify your exercises.',
-          style: TextStyle(color: AppColors.textSecondary),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: const Text('Cancel'),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: FilledButton.styleFrom(backgroundColor: AppColors.primary),
-            child: const Text('Reopen'),
-          ),
-        ],
-      ),
-    );
-    if (proceed != true || !mounted) return;
-
-    _saveChain = _saveChain.then((_) async {
-      try {
-        await ApiClient.instance.uncompleteWorkout(day);
-      } on ApiException catch (e) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
-      }
-    });
-    _saveChain.then((_) async {
-      if (!mounted) return;
-      await _load();
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Training Program')),
       body: SafeArea(
         child: _loading
-            ?  Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
+            ? Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
             : _error != null
                 ? _ErrorView(message: _error!, onRetry: _load)
                 : RefreshIndicator(
@@ -309,13 +242,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                         Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Expanded(
-                              child: _ProgramCard(workout: _workout!),
-                            ),
+                            Expanded(child: _ProgramCard(workout: _workout!)),
                             const SizedBox(width: 12),
-                            Expanded(
-                              child: _CardioCard(workout: _workout!),
-                            ),
+                            Expanded(child: _CardioCard(workout: _workout!)),
                           ],
                         ),
                         const SizedBox(height: 12),
@@ -323,27 +252,29 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                         const SizedBox(height: 10),
                         _InfoBox(icon: Icons.sports_gymnastics, text: 'Cool-down: ${_workout!.cooldown}'),
                         const SizedBox(height: 16),
-                         Text(
+                        Text(
                           'Weekly Schedule',
                           style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
                         ),
                         const SizedBox(height: 12),
-                        ...List.generate(
-                          7,
-                          (i) {
-                            final wd = _workout!.weekly[i];
-                            return _WorkoutDayCard(
-                              day: wd,
-                              ticked: _ticked[i + 1] ?? {},
-                              expanded: _expandedDay == i + 1,
-                              onToggle: (name) => _toggleExercise(i + 1, name),
-                              onUndo: wd.done ? () => _onUndoComplete(wd.day) : null,
-                              onHeaderTap: wd.done
-                                  ? () => _toggleExpand(wd.day)
-                                  : () => setState(() => _expandedDay = null),
-                            );
-                          },
-                        ),
+                        ...List.generate(7, (i) {
+                          final wd = _workout!.weekly[i];
+                          final dayNum = i + 1;
+                          final isToday = dayNum == _currentDayOfWeek;
+                          final isDone = wd.done == true;
+                          final isFuture = !isToday && !isDone && dayNum > _currentDayOfWeek;
+
+                          return _WorkoutDayCard(
+                            day: wd,
+                            ticked: _ticked[dayNum] ?? {},
+                            expanded: _expandedDay == dayNum,
+                            isToday: isToday,
+                            isDone: isDone,
+                            isFuture: isFuture,
+                            onToggle: (name) => _toggleExercise(dayNum, name),
+                            onHeaderTap: () => _toggleExpand(dayNum),
+                          );
+                        }),
                         const SizedBox(height: 20),
                         const PersonalTrainingCard(),
                         const SizedBox(height: 20),
@@ -372,17 +303,11 @@ class _ProgramCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Icon(Icons.fitness_center, color: AppColors.primary, size: 20),
+          Icon(Icons.fitness_center, color: AppColors.primary, size: 20),
           const SizedBox(height: 8),
-          Text(
-            workout.program,
-            style:  TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
-          ),
+          Text(workout.program, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.textPrimary)),
           const SizedBox(height: 4),
-          Text(
-            '${toTitleCase(workout.level)} · ${workout.cycle + 1}/4 week',
-            style:  TextStyle(color: AppColors.textSecondary, fontSize: 11.5),
-          ),
+          Text('${toTitleCase(workout.level)} \u00b7 ${workout.cycle + 1}/4 week', style: TextStyle(color: AppColors.textSecondary, fontSize: 11.5)),
         ],
       ),
     );
@@ -408,17 +333,11 @@ class _CardioCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-           Icon(Icons.directions_run, color: AppColors.primary, size: 20),
+          Icon(Icons.directions_run, color: AppColors.primary, size: 20),
           const SizedBox(height: 8),
-          Text(
-            '$sessions×$minutes min',
-            style:  TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
-          ),
+          Text('$sessions\u00d7$minutes min', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: AppColors.textPrimary)),
           const SizedBox(height: 4),
-          Text(
-            pick['name'] as String? ?? 'Treadmill',
-            style:  TextStyle(color: AppColors.textSecondary, fontSize: 11.5),
-          ),
+          Text(pick['name'] as String? ?? 'Treadmill', style: TextStyle(color: AppColors.textSecondary, fontSize: 11.5)),
         ],
       ),
     );
@@ -429,21 +348,25 @@ class _WorkoutDayCard extends StatelessWidget {
   final WorkoutDay day;
   final Set<String> ticked;
   final bool expanded;
+  final bool isToday;
+  final bool isDone;
+  final bool isFuture;
   final ValueChanged<String> onToggle;
-  final VoidCallback? onHeaderTap;
-  final VoidCallback? onUndo;
+  final VoidCallback onHeaderTap;
+
   const _WorkoutDayCard({
     required this.day,
     required this.ticked,
     required this.expanded,
+    required this.isToday,
+    required this.isDone,
+    required this.isFuture,
     required this.onToggle,
-    this.onHeaderTap,
-    this.onUndo,
+    required this.onHeaderTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    final day = this.day;
     final exercises = day.workout ?? [];
     final absExercises = day.abs ?? [];
     final cardio = day.cardio ?? [];
@@ -451,38 +374,45 @@ class _WorkoutDayCard extends StatelessWidget {
     final allExercises = [...exercises, ...absExercises];
     final doneCount = allExercises.where((e) => ticked.contains(e.name)).length;
 
+    final borderColor = isDone
+        ? AppColors.success.withValues(alpha: 0.5)
+        : isToday
+            ? AppColors.primary.withValues(alpha: 0.5)
+            : AppColors.surfaceLight;
+
+    final headerLabel = day.label.isEmpty ? (day.day == 7 ? 'Rest / Recovery' : 'Workout') : day.label;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: day.done
-              ? AppColors.success.withValues(alpha: 0.5)
-              : AppColors.surfaceLight,
-        ),
+        border: Border.all(color: borderColor),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           InkWell(
             onTap: onHeaderTap,
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(16),
             child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
+              padding: const EdgeInsets.all(16),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: isRest ? AppColors.surfaceLight : AppColors.primary.withValues(alpha: 0.15),
+                      color: isRest
+                          ? AppColors.surfaceLight
+                          : isDone
+                              ? AppColors.success.withValues(alpha: 0.15)
+                              : AppColors.primary.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
                       'Day ${day.day}',
                       style: TextStyle(
-                        color: isRest ? AppColors.textSecondary : AppColors.primary,
+                        color: isRest ? AppColors.textSecondary : isDone ? AppColors.success : AppColors.primary,
                         fontSize: 12,
                         fontWeight: FontWeight.w800,
                       ),
@@ -491,16 +421,16 @@ class _WorkoutDayCard extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      day.label.isEmpty ? (day.day == 7 ? 'Rest / Recovery' : 'Workout') : day.label,
-                      style:  TextStyle(
+                      headerLabel,
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w800,
-                        color: day.done ? AppColors.success : AppColors.textPrimary,
-                        decoration: day.done ? TextDecoration.lineThrough : null,
+                        color: isDone ? AppColors.success : AppColors.textPrimary,
+                        decoration: isDone ? TextDecoration.lineThrough : null,
                       ),
                     ),
                   ),
-                  if (day.done) ...[
+                  if (isDone)
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
@@ -510,283 +440,161 @@ class _WorkoutDayCard extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                           Icon(Icons.check_circle, color: AppColors.success, size: 14),
+                          Icon(Icons.check_circle, color: AppColors.success, size: 14),
                           const SizedBox(width: 4),
-                          Text(
-                            'Done',
-                            style: TextStyle(color: AppColors.success, fontSize: 12, fontWeight: FontWeight.w800),
-                          ),
+                          Text('Done', style: TextStyle(color: AppColors.success, fontSize: 12, fontWeight: FontWeight.w800)),
                         ],
                       ),
                     ),
-                    const SizedBox(width: 6),
-                     Icon(
-                      expanded ? Icons.expand_less : Icons.expand_more,
-                      color: AppColors.textSecondary,
-                      size: 20,
-                    ),
-                  ] else if (!isRest && allExercises.isNotEmpty)
+                  if (isToday && !isDone && !isRest && allExercises.isNotEmpty) ...[
+                    const SizedBox(width: 8),
                     Text(
                       '$doneCount/${allExercises.length}',
-                      style:  TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w700),
+                      style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w700),
                     ),
+                  ],
+                  const SizedBox(width: 4),
+                  Icon(
+                    expanded ? Icons.expand_less : Icons.expand_more,
+                    color: AppColors.textSecondary,
+                    size: 22,
+                  ),
                 ],
               ),
             ),
           ),
-          if (day.done) ...[
-            const SizedBox(height: 8),
-            if (exercises.isEmpty && (day.abs ?? []).isEmpty)
-              Text(
-                'Completed — archived for this week. Fresh sets next week.',
-                style:  TextStyle(color: AppColors.textSecondary, fontSize: 12),
-              )
-            else if (expanded) ...[
-              Container(
-                padding: const.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceLight.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(12),
+          if (expanded) ...[
+            if (isRest)
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                child: Text(
+                  'Rest day \u2014 recover and come back stronger.',
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
                 ),
+              )
+            else
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    ...exercises.map(
-                      (e) => Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Row(
-                          children: [
-                             Icon(Icons.check, color: AppColors.success, size: 16),
-                            const SizedBox(width: 8),
-                            Expanded(
-                              child: Text(
-                                e.name,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  color: AppColors.textPrimary,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                            Text(
-                              '${e.sets}×${e.reps}',
-                              style:  TextStyle(color: AppColors.success, fontSize: 12, fontWeight: FontWeight.w800),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    if ((day.abs ?? []).isNotEmpty) ...[
+                    ...exercises.map((e) => _ExerciseRow(
+                          exercise: e,
+                          ticked: ticked.contains(e.name),
+                          tickable: isToday && !isDone,
+                          onToggle: () => onToggle(e.name),
+                        )),
+                    if (absExercises.isNotEmpty) ...[
                       const Divider(height: 16),
-                      Text(
-                        'Abs',
-                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.primary),
-                      ),
+                      Text('Abs', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.primary)),
                       const SizedBox(height: 4),
-                      ...day.abs!.map(
-                        (e) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 4),
-                          child: Row(
-                            children: [
-                               Icon(Icons.check, color: AppColors.success, size: 16),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  e.name,
-                                  style: TextStyle(
-                                    fontSize: 13,
-                                    color: AppColors.textPrimary,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                              Text(
-                                '${e.sets}×${e.reps}',
-                                style:  TextStyle(color: AppColors.success, fontSize: 12, fontWeight: FontWeight.w800),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                      ...absExercises.map((e) => _ExerciseRow(
+                            exercise: e,
+                            ticked: ticked.contains(e.name),
+                            tickable: isToday && !isDone,
+                            onToggle: () => onToggle(e.name),
+                          )),
                     ],
                     if (cardio.isNotEmpty) ...[
                       const Divider(height: 16),
-                      ...cardio.map(
-                        (c) => Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 2),
-                          child: Row(
-                            children: [
-                               Icon(Icons.directions_run, color: AppColors.success, size: 16),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  '${c.name} (${c.reps})',
-                                  style:  TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600),
+                      ...cardio.map((c) => Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2),
+                            child: Row(
+                              children: [
+                                Icon(Icons.directions_run, color: isDone ? AppColors.success : AppColors.primary, size: 16),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    '${c.name} \u2014 ${c.reps}',
+                                    style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
+                              ],
+                            ),
+                          )),
                     ],
                   ],
                 ),
               ),
-            ],
-            if (onUndo != null) ...[
-              const SizedBox(height: 8),
-              GestureDetector(
-                onTap: onUndo,
-                behavior: HitTestBehavior.opaque,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.undo, color: AppColors.textSecondary, size: 14),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Undo completion',
-                      style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ] else if (exercises.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            ...exercises.map(
-              (e) => InkWell(
-                onTap: () => onToggle(e.name),
-                borderRadius: BorderRadius.circular(8),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 20,
-                        height: 20,
-                        decoration: BoxDecoration(
-                          color: ticked.contains(e.name) ? AppColors.primary : Colors.transparent,
-                          borderRadius: BorderRadius.circular(6),
-                          border: Border.all(
-                            color: ticked.contains(e.name) ? AppColors.primary : AppColors.textSecondary,
-                            width: 1.5,
-                          ),
-                        ),
-                        child: ticked.contains(e.name)
-                            ?  Icon(Icons.check, color: AppColors.onPrimary, size: 14)
-                            : null,
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              e.name,
-                              style: TextStyle(
-                                fontSize: 13.5,
-                                color: AppColors.textPrimary,
-                                fontWeight: FontWeight.w600,
-                                decoration: ticked.contains(e.name) ? TextDecoration.lineThrough : null,
-                              ),
-                            ),
-                            const SizedBox(height: 2),
-                            Text(
-                              '${e.muscle} · ${e.rest}s rest',
-                              style:  TextStyle(color: AppColors.textSecondary, fontSize: 11.5),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        '${e.sets}×${e.reps}',
-                        style:  TextStyle(color: AppColors.primary, fontSize: 13, fontWeight: FontWeight.w800),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            if ((day.abs ?? []).isNotEmpty) ...[
-              const Divider(height: 16),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(
-                  'Abs',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.primary),
-                ),
-              ),
-              ...day.abs!.map(
-                (e) => InkWell(
-                  onTap: () => onToggle(e.name),
-                  borderRadius: BorderRadius.circular(8),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Row(
-                      children: [
-                        Container(
-                          width: 20,
-                          height: 20,
-                          decoration: BoxDecoration(
-                            color: ticked.contains(e.name) ? AppColors.primary : Colors.transparent,
-                            borderRadius: BorderRadius.circular(6),
-                            border: Border.all(
-                              color: ticked.contains(e.name) ? AppColors.primary : AppColors.textSecondary,
-                              width: 1.5,
-                            ),
-                          ),
-                          child: ticked.contains(e.name)
-                              ?  Icon(Icons.check, color: AppColors.onPrimary, size: 14)
-                              : null,
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                e.name,
-                                style: TextStyle(
-                                  fontSize: 13.5,
-                                  color: AppColors.textPrimary,
-                                  fontWeight: FontWeight.w600,
-                                  decoration: ticked.contains(e.name) ? TextDecoration.lineThrough : null,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                '${e.muscle} · ${e.rest}s rest',
-                                style:  TextStyle(color: AppColors.textSecondary, fontSize: 11.5),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Text(
-                          '${e.sets}×${e.reps}',
-                          style:  TextStyle(color: AppColors.primary, fontSize: 13, fontWeight: FontWeight.w800),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ],
-          if (cardio.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            ...cardio.map(
-              (c) => Row(
-                children: [
-                   Icon(Icons.directions_run, color: AppColors.primary, size: 18),
-                  const SizedBox(width: 8),
-                  Text('Cardio: ${c.name} (${c.reps})', style:  TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600)),
-                ],
-              ),
-            ),
           ],
         ],
       ),
     );
+  }
+}
+
+class _ExerciseRow extends StatelessWidget {
+  final Exercise exercise;
+  final bool ticked;
+  final bool tickable;
+  final VoidCallback onToggle;
+
+  const _ExerciseRow({
+    required this.exercise,
+    required this.ticked,
+    required this.tickable,
+    required this.onToggle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final content = Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Container(
+            width: 20,
+            height: 20,
+            decoration: BoxDecoration(
+              color: tickable
+                  ? (ticked ? AppColors.primary : Colors.transparent)
+                  : (ticked ? AppColors.success.withValues(alpha: 0.2) : Colors.transparent),
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(
+                color: tickable
+                    ? (ticked ? AppColors.primary : AppColors.textSecondary)
+                    : (ticked ? AppColors.success : AppColors.surfaceLight),
+                width: 1.5,
+              ),
+            ),
+            child: ticked
+                ? Icon(Icons.check, color: tickable ? AppColors.onPrimary : AppColors.success, size: 14)
+                : null,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  exercise.name,
+                  style: TextStyle(
+                    fontSize: 13.5,
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    decoration: ticked ? TextDecoration.lineThrough : null,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${exercise.muscle} \u00b7 ${exercise.rest}s rest',
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 11.5),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            '${exercise.sets}\u00d7${exercise.reps}',
+            style: TextStyle(color: AppColors.primary, fontSize: 13, fontWeight: FontWeight.w800),
+          ),
+        ],
+      ),
+    );
+
+    if (tickable) {
+      return InkWell(onTap: onToggle, borderRadius: BorderRadius.circular(8), child: content);
+    }
+    return content;
   }
 }
 
@@ -808,7 +616,7 @@ class _InfoBox extends StatelessWidget {
         children: [
           Icon(icon, color: AppColors.textSecondary, size: 20),
           const SizedBox(width: 12),
-          Expanded(child: Text(text, style:  TextStyle(color: AppColors.textSecondary, fontSize: 12.5, height: 1.4))),
+          Expanded(child: Text(text, style: TextStyle(color: AppColors.textSecondary, fontSize: 12.5, height: 1.4))),
         ],
       ),
     );
@@ -828,9 +636,9 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-             Icon(Icons.cloud_off, color: AppColors.textSecondary, size: 48),
+            Icon(Icons.cloud_off, color: AppColors.textSecondary, size: 48),
             const SizedBox(height: 16),
-            Text(message, textAlign: TextAlign.center, style:  TextStyle(color: AppColors.textSecondary, fontSize: 14)),
+            Text(message, textAlign: TextAlign.center, style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
             const SizedBox(height: 20),
             FilledButton(onPressed: onRetry, child: const Text('Retry')),
           ],
@@ -867,20 +675,14 @@ class _SplitSelector extends StatelessWidget {
         children: [
           Row(
             children: [
-               Icon(Icons.tune, color: AppColors.primary, size: 20),
+              Icon(Icons.tune, color: AppColors.primary, size: 20),
               const SizedBox(width: 8),
               Flexible(
                 child: Text.rich(
                   TextSpan(
                     children: [
-                      TextSpan(
-                        text: 'Workout Split',
-                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
-                      ),
-                      TextSpan(
-                        text: ' · Your weekly training split',
-                        style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w400, color: AppColors.textSecondary),
-                      ),
+                      TextSpan(text: 'Workout Split', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
+                      TextSpan(text: ' \u00b7 Your weekly training split', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w400, color: AppColors.textSecondary)),
                     ],
                   ),
                   maxLines: 1,
@@ -900,29 +702,22 @@ class _SplitSelector extends StatelessWidget {
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
             items: splits
-                .map(
-                  (s) => DropdownMenuItem(
-                    value: s.value,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(s.label, style:  TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w700)),
-                        Text(s.subtitle, style:  TextStyle(color: AppColors.textSecondary, fontSize: 11)),
-                      ],
-                    ),
-                  ),
-                )
+                .map((s) => DropdownMenuItem(
+                      value: s.value,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(s.label, style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w700)),
+                          Text(s.subtitle, style: TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                        ],
+                      ),
+                    ))
                 .toList(),
             selectedItemBuilder: (ctx) => splits
-                .map(
-                  (s) => Align(
-                    alignment: Alignment.centerLeft,
-                    child: Text(
-                      s.label,
-                      style:  TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w700),
-                    ),
-                  ),
-                )
+                .map((s) => Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(s.label, style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w700)),
+                    ))
                 .toList(),
             onChanged: busy ? null : (v) {
               if (v != null) onSelect(v);
@@ -933,13 +728,9 @@ class _SplitSelector extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(
-                  width: 16,
-                  height: 16,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
-                ),
+                SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary)),
                 const SizedBox(width: 8),
-                 Text('Saving split…', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                Text('Saving split\u2026', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
               ],
             ),
           ],
