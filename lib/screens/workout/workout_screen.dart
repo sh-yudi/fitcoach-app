@@ -49,7 +49,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
     }
   }
 
-  int get _currentDayOfWeek => DateTime.now().weekday;
+  int get _currentDay => _workout?.currentDay ?? DateTime.now().weekday;
 
   Future<void> _load({bool awaitPending = true}) async {
     if (awaitPending) await _saveChain;
@@ -73,6 +73,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
               ((e.value as List?) ?? []).whereType<String>().toSet(),
             ),
           ));
+        _expandedDay = _currentDay;
         _loading = false;
       });
     } on ApiException catch (e) {
@@ -260,9 +261,9 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                         ...List.generate(7, (i) {
                           final wd = _workout!.weekly[i];
                           final dayNum = i + 1;
-                          final isToday = dayNum == _currentDayOfWeek;
+                          final isToday = dayNum == _currentDay;
                           final isDone = wd.done == true;
-                          final isFuture = !isToday && !isDone && dayNum > _currentDayOfWeek;
+                          final isFuture = !isToday && !isDone && dayNum > _currentDay;
 
                           return _WorkoutDayCard(
                             day: wd,

@@ -304,6 +304,7 @@ class WorkoutPlan {
   final String cooldown;
   final Map<String, dynamic> cardioGuidance;
   final List<WorkoutDay> weekly;
+  final int currentDay;
 
   WorkoutPlan.fromJson(Map<String, dynamic> j)
       : split = j['split'] as String? ?? '',
@@ -315,7 +316,8 @@ class WorkoutPlan {
         cardioGuidance = (j['cardioGuidance'] as Map<String, dynamic>?) ?? {},
         weekly = ((j['weekly'] as List?) ?? [])
             .map((e) => WorkoutDay.fromJson(e as Map<String, dynamic>))
-            .toList();
+            .toList(),
+        currentDay = (j['currentDay'] as num?)?.toInt() ?? 1;
 }
 
 String toTitleCase(String input) {
