@@ -39,14 +39,14 @@
 			</dict>
 		</dict>
 	</dict>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>This app shows ads from Google. This requires using the device ID to deliver personalized ads.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>FitCoach needs access to your photo library so you can set a profile picture.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>FitCoach uses the camera so you can take a profile picture.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>FitCoach uses the microphone only if you record a video.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>FitCoach needs access to your photo library so you can set a profile picture.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This app shows ads from Google. This requires using the device ID to deliver personalized ads.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

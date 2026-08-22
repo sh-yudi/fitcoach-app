@@ -75,10 +75,13 @@ Future<bool> promptOneTapConsent(BuildContext context) async {
 // dialog once (only the first time on this device), and if accepted, issues
 // and stores the one-tap token.
 Future<void> maybePromptOneTapConsent(BuildContext context) async {
-  if (await oneTapPrompted()) return;
-  await markOneTapPrompted();
+  final prompted = await oneTapPrompted();
+  final hasToken = (await Session.rememberToken()) != null;
+  // If flagged as prompted but one-tap is not actually enabled, re-prompt.
+  if (prompted && hasToken) return;
   if (!context.mounted) return;
   final agreed = await promptOneTapConsent(context);
+  await markOneTapPrompted();
   if (!agreed) return;
   try {
     final result = await ApiClient.instance.enableOneTap();

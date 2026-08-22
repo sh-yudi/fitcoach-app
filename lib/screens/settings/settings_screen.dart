@@ -58,7 +58,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         );
       } else {
         await ApiClient.instance.disableOneTap();
-        await Session.clearAll();
+        await Session.clearOneTap();
       }
     } on ApiException catch (e) {
       if (!mounted) return;

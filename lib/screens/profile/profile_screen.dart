@@ -464,7 +464,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       } else {
         await ApiClient.instance.disableOneTap();
-        await Session.clearAll();
+        await Session.clearOneTap();
       }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

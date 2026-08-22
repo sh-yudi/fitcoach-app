@@ -122,6 +122,15 @@ class Session {
     await prefs.remove(_nameKey);
   }
 
+  // Clears only the one-tap login token (keeps the active session).
+  static Future<void> clearOneTap() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_rememberTokenKey);
+    await prefs.remove(_rememberEmailKey);
+    await prefs.remove(_rememberNameKey);
+    await prefs.remove(_rememberPhotoKey);
+  }
+
   // Fully forgets the user including the one-tap login token.
   static Future<void> clearAll() async {
     final prefs = await SharedPreferences.getInstance();
