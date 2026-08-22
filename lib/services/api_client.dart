@@ -210,6 +210,24 @@ class ApiClient {
     return DeveloperInfo.fromJson(j['developer'] as Map<String, dynamic>);
   }
 
+  // ---- Diet scanning ----
+  Future<Map<String, dynamic>> scanFood(String base64Image, {String? mealName}) async {
+    final j = await _request('POST', '/api/diet/scan', body: {
+      'image': base64Image,
+      if (mealName != null) 'mealName': mealName,
+    });
+    return j;
+  }
+
+  Future<void> logScannedFood(String mealName, Map<String, dynamic> item) async {
+    await _request('POST', '/api/diet/log', body: {'mealName': mealName, 'item': item});
+  }
+
+  Future<Map<String, dynamic>> getLoggedFood() async {
+    final j = await _request('GET', '/api/diet/logged');
+    return j;
+  }
+
   // ---- Gym calendar ----
   Future<User> setGymPlan(String date, bool going) async {
     final j = await _request('PUT', '/api/gym', body: {'date': date, 'going': going});

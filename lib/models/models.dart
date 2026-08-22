@@ -134,7 +134,7 @@ class Assessment {
   final int tdee;
   final int calories;
   final int protein;
-  final int fat;
+  final int fiber;
   final int carbs;
   final int? weeksToTarget;
 
@@ -149,7 +149,7 @@ class Assessment {
     required this.tdee,
     required this.calories,
     required this.protein,
-    required this.fat,
+    required this.fiber,
     required this.carbs,
     this.weeksToTarget,
   });
@@ -167,7 +167,7 @@ class Assessment {
       tdee: (j['tdee'] as num?)?.toInt() ?? 0,
       calories: (j['calories'] as num?)?.toInt() ?? 0,
       protein: (macros['protein'] as num?)?.toInt() ?? 0,
-      fat: (macros['fat'] as num?)?.toInt() ?? 0,
+      fiber: (macros['fiber'] as num?)?.toInt() ?? 0,
       carbs: (macros['carbs'] as num?)?.toInt() ?? 0,
       weeksToTarget: (j['weeksToTarget'] as num?)?.toInt(),
     );
@@ -214,7 +214,7 @@ class DietPlan {
   final int calories;
   final int protein;
   final int carbs;
-  final int fat;
+  final int fiber;
   final double waterLiters;
   final String note;
   final String workoutTime;
@@ -225,7 +225,7 @@ class DietPlan {
       : calories = (j['calories'] as num?)?.toInt() ?? 0,
         protein = (j['protein'] as num?)?.toInt() ?? 0,
         carbs = (j['carbs'] as num?)?.toInt() ?? 0,
-        fat = (j['fat'] as num?)?.toInt() ?? 0,
+        fiber = (j['fiber'] as num?)?.toInt() ?? 0,
         waterLiters = (j['waterLiters'] as num?)?.toDouble() ?? 0,
         note = j['note'] as String? ?? '',
         workoutTime = j['workoutTime'] as String? ?? '',
@@ -276,6 +276,7 @@ class WorkoutDay {
   final int day;
   final String label;
   final List<Exercise>? workout;
+  final List<Exercise>? abs;
   final List<Exercise>? cardio;
   final bool done;
 
@@ -283,6 +284,9 @@ class WorkoutDay {
       : day = (j['day'] as num?)?.toInt() ?? 0,
         label = j['label'] as String? ?? '',
         workout = ((j['workout'] as List?) ?? [])
+            .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
+            .toList(),
+        abs = ((j['abs'] as List?) ?? [])
             .map((e) => Exercise.fromJson(e as Map<String, dynamic>))
             .toList(),
         cardio = ((j['cardio'] as List?) ?? [])

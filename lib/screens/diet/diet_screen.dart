@@ -6,6 +6,7 @@ import '../../services/notification_service.dart';
 import '../../theme.dart';
 import '../../widgets/ad_banner.dart';
 import '../../widgets/section_header.dart';
+import 'diet_scan_screen.dart';
 
 class DietScreen extends StatefulWidget {
   const DietScreen({super.key, this.refreshToken = 0});
@@ -84,7 +85,18 @@ class _DietScreenState extends State<DietScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Daily Diet Plan')),
+      appBar: AppBar(
+        title: const Text('Daily Diet Plan'),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.camera_alt, color: AppColors.primary),
+            tooltip: 'Scan food',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const DietScanScreen()),
+            ),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: _loading
             ?  Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
@@ -113,7 +125,7 @@ class _DietScreenState extends State<DietScreen> {
                               const SizedBox(width: 10),
                               Expanded(
                                 child: Text(
-                                  'Drink ${_diet!.waterLiters} L water daily · Target ${_diet!.calories} kcal · P ${_diet!.protein}g · C ${_diet!.carbs}g · F ${_diet!.fat}g',
+                                  'Drink ${_diet!.waterLiters} L water daily · Target ${_diet!.calories} kcal · P ${_diet!.protein}g · C ${_diet!.carbs}g · F ${_diet!.fiber}g',
                                   style:  TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600),
                                 ),
                               ),
@@ -177,7 +189,7 @@ class _MacroSummary extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(child: _MacroBar(label: 'Carbs', grams: a.carbs, color: const Color(0xFFFFB020))),
               const SizedBox(width: 10),
-              Expanded(child: _MacroBar(label: 'Fat', grams: a.fat, color: const Color(0xFF6C8CFF))),
+              Expanded(child: _MacroBar(label: 'Fiber', grams: a.fiber, color: const Color(0xFF6C8CFF))),
             ],
           ),
         ],
@@ -381,7 +393,7 @@ class _MealCard extends StatelessWidget {
           ),
            Divider(color: AppColors.surfaceLight, height: 16),
           Text(
-            'P ${meal.items.fold<int>(0, (s, i) => s + i.protein.round()).toString()}g · C ${meal.items.fold<int>(0, (s, i) => s + i.carbs.round()).toString()}g · F ${meal.items.fold<int>(0, (s, i) => s + i.fat.round()).toString()}g',
+            'P ${meal.items.fold<int>(0, (s, i) => s + i.protein.round()).toString()}g · C ${meal.items.fold<int>(0, (s, i) => s + i.carbs.round()).toString()}g',
             style:  TextStyle(color: AppColors.textSecondary, fontSize: 12),
           ),
         ],

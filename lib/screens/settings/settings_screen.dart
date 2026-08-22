@@ -183,6 +183,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ],
             ),
+            const SizedBox(height: 20),
+            _SettingsCard(
+              children: [
+                _SwitchRow(
+                  icon: Icons.water_drop_outlined,
+                  title: 'Water reminders',
+                  subtitle: 'Remind before & after each meal',
+                  value: s.enabled && s.waterEnabled,
+                  onChanged: (v) => _apply(s.copyWith(waterEnabled: v)),
+                ),
+              ],
+            ),
             if (_saving)
                 Padding(
                 padding: EdgeInsets.only(top: 14),

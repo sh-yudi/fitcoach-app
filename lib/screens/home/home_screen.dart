@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: StatCard(
                         label: 'Daily Calories',
                         value: a.calories > 0 ? '${a.calories} kcal' : '—',
-                        sub: '${a.protein}g P · ${a.carbs}g C · ${a.fat}g F',
+                        sub: '${a.protein}g P · ${a.carbs}g C · ${a.fiber}g F',
                         icon: Icons.local_fire_department_outlined,
                         accent: const Color(0xFFFFB020),
                       ),

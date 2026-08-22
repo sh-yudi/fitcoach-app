@@ -28,6 +28,7 @@ class NotificationService {
   static const _enabledKey = 'notif_enabled';
   static const _mealEnabledKey = 'notif_meal_enabled';
   static const _workoutEnabledKey = 'notif_workout_enabled';
+  static const _waterEnabledKey = 'notif_water_enabled';
   static const _mealMinutesKey = 'notif_meal_minutes';
   static const _workoutMinutesKey = 'notif_workout_minutes';
 
@@ -105,6 +106,7 @@ class NotificationService {
       enabled: prefs.getBool(_enabledKey) ?? true,
       mealEnabled: prefs.getBool(_mealEnabledKey) ?? true,
       workoutEnabled: prefs.getBool(_workoutEnabledKey) ?? true,
+      waterEnabled: prefs.getBool(_waterEnabledKey) ?? true,
       mealMinutes: prefs.getInt(_mealMinutesKey) ?? 10,
       workoutMinutes: prefs.getInt(_workoutMinutesKey) ?? 20,
     );
@@ -115,6 +117,7 @@ class NotificationService {
     await prefs.setBool(_enabledKey, s.enabled);
     await prefs.setBool(_mealEnabledKey, s.mealEnabled);
     await prefs.setBool(_workoutEnabledKey, s.workoutEnabled);
+    await prefs.setBool(_waterEnabledKey, s.waterEnabled);
     await prefs.setInt(_mealMinutesKey, s.mealMinutes);
     await prefs.setInt(_workoutMinutesKey, s.workoutMinutes);
   }
@@ -129,10 +132,12 @@ class NotificationService {
     if (!await _ensurePermission()) return;
 
     try {
+      final dietResult = await ApiClient.instance.getDiet();
       final schedule = await ApiClient.instance.getSchedule();
       final profile = await ApiClient.instance.getProfile();
       final calendar = await ApiClient.instance.getGymCalendar();
-      await _scheduleDays(s, schedule, profile.workoutTime, calendar);
+      final waterMl = (dietResult.diet.waterLiters * 1000).toInt();
+      await _scheduleDays(s, schedule, profile.workoutTime, calendar, waterMl);
     } catch (e, st) {
       debugPrint('NotificationService.sync error: $e\n$st');
     }
@@ -143,9 +148,13 @@ class NotificationService {
     MealSchedule schedule,
     String workoutTime,
     ({Map<String, bool> gymPlans, Map<String, bool> attendance}) calendar,
+    int waterMl,
   ) async {
     final now = tz.TZDateTime.now(tz.local);
     final todayKey = _dateKey(now);
+
+    // Exclude preworkout and postworkout from water reminder times.
+    final waterExclude = {'preworkout', 'postworkout'};
 
     for (var offset = 0; offset < 7; offset++) {
       final day = now.add(Duration(days: offset));
@@ -165,6 +174,36 @@ class NotificationService {
                 : '${_mealTitle(meal.meal)} at ${meal.time}.',
             hour: t.hour,
             minute: t.minute - s.mealMinutes,
+            day: day,
+          );
+        }
+      }
+
+      // Water reminders: 30 min before and 25 min after each meal (except pre/post workout).
+      if (s.waterEnabled && waterMl > 0) {
+        final meals = gymDay ? schedule.gym : schedule.rest;
+        final visibleMeals = meals.where((m) => !waterExclude.contains(m.meal)).toList();
+        final perDrinkMl = visibleMeals.isEmpty ? 0 : waterMl ~/ (visibleMeals.length * 2);
+        for (final meal in visibleMeals) {
+          final t = _parseTime(meal.time);
+          if (t == null) continue;
+          final mealIdx = visibleMeals.indexOf(meal);
+          // 30 min before meal
+          await _scheduleOneShot(
+            id: 300000 + (day.difference(DateTime(day.year)).inDays * 100) + mealIdx * 2,
+            title: 'Water reminder',
+            body: 'Drink ~${perDrinkMl}ml water before your ${_mealTitle(meal.meal)} (${meal.time}).',
+            hour: t.hour,
+            minute: t.minute - 30,
+            day: day,
+          );
+          // 25 min after meal
+          await _scheduleOneShot(
+            id: 300000 + (day.difference(DateTime(day.year)).inDays * 100) + mealIdx * 2 + 1,
+            title: 'Water reminder',
+            body: 'Drink ~${perDrinkMl}ml water after your ${_mealTitle(meal.meal)} to stay hydrated.',
+            hour: t.hour,
+            minute: t.minute + 25,
             day: day,
           );
         }
@@ -317,6 +356,7 @@ class NotificationSettingsData {
   final bool enabled;
   final bool mealEnabled;
   final bool workoutEnabled;
+  final bool waterEnabled;
   final int mealMinutes;
   final int workoutMinutes;
 
@@ -324,6 +364,7 @@ class NotificationSettingsData {
     this.enabled = false,
     this.mealEnabled = true,
     this.workoutEnabled = true,
+    this.waterEnabled = true,
     this.mealMinutes = 10,
     this.workoutMinutes = 20,
   });
@@ -332,6 +373,7 @@ class NotificationSettingsData {
     bool? enabled,
     bool? mealEnabled,
     bool? workoutEnabled,
+    bool? waterEnabled,
     int? mealMinutes,
     int? workoutMinutes,
   }) =>
@@ -339,6 +381,7 @@ class NotificationSettingsData {
         enabled: enabled ?? this.enabled,
         mealEnabled: mealEnabled ?? this.mealEnabled,
         workoutEnabled: workoutEnabled ?? this.workoutEnabled,
+        waterEnabled: waterEnabled ?? this.waterEnabled,
         mealMinutes: mealMinutes ?? this.mealMinutes,
         workoutMinutes: workoutMinutes ?? this.workoutMinutes,
       );

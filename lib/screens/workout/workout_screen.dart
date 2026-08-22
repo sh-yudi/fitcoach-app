@@ -114,9 +114,11 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   void _maybeAutoComplete(int day) {
     final dayPlan = _workout?.weekly.where((d) => d.day == day).firstOrNull;
     final exercises = dayPlan?.workout ?? const <Exercise>[];
-    if (exercises.isEmpty || dayPlan?.done == true) return;
+    final absExercises = dayPlan?.abs ?? const <Exercise>[];
+    final allExercises = [...exercises, ...absExercises];
+    if (allExercises.isEmpty || dayPlan?.done == true) return;
     final ticked = _ticked[day] ?? const <String>{};
-    if (!exercises.every((e) => ticked.contains(e.name))) return;
+    if (!allExercises.every((e) => ticked.contains(e.name))) return;
 
     _saveChain = _saveChain.then((_) async {
       try {
@@ -443,9 +445,11 @@ class _WorkoutDayCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final day = this.day;
     final exercises = day.workout ?? [];
+    final absExercises = day.abs ?? [];
     final cardio = day.cardio ?? [];
-    final isRest = exercises.isEmpty && cardio.isEmpty;
-    final doneCount = exercises.where((e) => ticked.contains(e.name)).length;
+    final isRest = exercises.isEmpty && absExercises.isEmpty && cardio.isEmpty;
+    final allExercises = [...exercises, ...absExercises];
+    final doneCount = allExercises.where((e) => ticked.contains(e.name)).length;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -521,9 +525,9 @@ class _WorkoutDayCard extends StatelessWidget {
                       color: AppColors.textSecondary,
                       size: 20,
                     ),
-                  ] else if (!isRest && exercises.isNotEmpty)
+                  ] else if (!isRest && allExercises.isNotEmpty)
                     Text(
-                      '$doneCount/${exercises.length}',
+                      '$doneCount/${allExercises.length}',
                       style:  TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w700),
                     ),
                 ],
@@ -532,7 +536,7 @@ class _WorkoutDayCard extends StatelessWidget {
           ),
           if (day.done) ...[
             const SizedBox(height: 8),
-            if (exercises.isEmpty)
+            if (exercises.isEmpty && (day.abs ?? []).isEmpty)
               Text(
                 'Completed — archived for this week. Fresh sets next week.',
                 style:  TextStyle(color: AppColors.textSecondary, fontSize: 12),
@@ -572,6 +576,39 @@ class _WorkoutDayCard extends StatelessWidget {
                         ),
                       ),
                     ),
+                    if ((day.abs ?? []).isNotEmpty) ...[
+                      const Divider(height: 16),
+                      Text(
+                        'Abs',
+                        style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.primary),
+                      ),
+                      const SizedBox(height: 4),
+                      ...day.abs!.map(
+                        (e) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Row(
+                            children: [
+                               Icon(Icons.check, color: AppColors.success, size: 16),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  e.name,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textPrimary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                '${e.sets}×${e.reps}',
+                                style:  TextStyle(color: AppColors.success, fontSize: 12, fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
                     if (cardio.isNotEmpty) ...[
                       const Divider(height: 16),
                       ...cardio.map(
@@ -670,6 +707,70 @@ class _WorkoutDayCard extends StatelessWidget {
                 ),
               ),
             ),
+            if ((day.abs ?? []).isNotEmpty) ...[
+              const Divider(height: 16),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  'Abs',
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: AppColors.primary),
+                ),
+              ),
+              ...day.abs!.map(
+                (e) => InkWell(
+                  onTap: () => onToggle(e.name),
+                  borderRadius: BorderRadius.circular(8),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 20,
+                          height: 20,
+                          decoration: BoxDecoration(
+                            color: ticked.contains(e.name) ? AppColors.primary : Colors.transparent,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: ticked.contains(e.name) ? AppColors.primary : AppColors.textSecondary,
+                              width: 1.5,
+                            ),
+                          ),
+                          child: ticked.contains(e.name)
+                              ?  Icon(Icons.check, color: AppColors.onPrimary, size: 14)
+                              : null,
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                e.name,
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  color: AppColors.textPrimary,
+                                  fontWeight: FontWeight.w600,
+                                  decoration: ticked.contains(e.name) ? TextDecoration.lineThrough : null,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                '${e.muscle} · ${e.rest}s rest',
+                                style:  TextStyle(color: AppColors.textSecondary, fontSize: 11.5),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Text(
+                          '${e.sets}×${e.reps}',
+                          style:  TextStyle(color: AppColors.primary, fontSize: 13, fontWeight: FontWeight.w800),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ],
           if (cardio.isNotEmpty) ...[
             const SizedBox(height: 8),
