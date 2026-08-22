@@ -27,6 +27,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   final Map<int, Set<String>> _ticked = {};
   Future<void> _saveChain = Future.value();
   int? _expandedDay;
+  final ScrollController _scrollController = ScrollController();
+  final Map<int, GlobalKey> _dayKeys = {};
 
   static const _splits = [
     (value: 'upperlower', label: 'Upper / Lower', subtitle: '4 days/week'),
@@ -39,6 +41,12 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -216,6 +224,17 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
 
   void _toggleExpand(int day) {
     setState(() => _expandedDay = _expandedDay == day ? null : day);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final key = _dayKeys[day];
+      if (key?.currentContext != null) {
+        Scrollable.ensureVisible(
+          key!.currentContext!,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          alignment: 0.0,
+        );
+      }
+    });
   }
 
   @override
@@ -230,6 +249,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                 : RefreshIndicator(
                     onRefresh: _load,
                     child: ListView(
+                      controller: _scrollController,
                       physics: const AlwaysScrollableScrollPhysics(),
                       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                       children: [
@@ -264,8 +284,10 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                           final isToday = dayNum == _currentDay;
                           final isDone = wd.done == true;
                           final isFuture = !isToday && !isDone && dayNum > _currentDay;
+                          _dayKeys.putIfAbsent(dayNum, () => GlobalKey());
 
                           return _WorkoutDayCard(
+                            key: _dayKeys[dayNum],
                             day: wd,
                             ticked: _ticked[dayNum] ?? {},
                             expanded: _expandedDay == dayNum,
@@ -356,6 +378,7 @@ class _WorkoutDayCard extends StatelessWidget {
   final VoidCallback onHeaderTap;
 
   const _WorkoutDayCard({
+    super.key,
     required this.day,
     required this.ticked,
     required this.expanded,

@@ -17,18 +17,26 @@ class DietScreen extends StatefulWidget {
   State<DietScreen> createState() => _DietScreenState();
 }
 
-class _DietScreenState extends State<DietScreen> {
+class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateMixin {
   DietPlan? _diet;
   Assessment? _assessment;
   bool _gymToday = true;
   bool _toggling = false;
   bool _loading = true;
   String? _error;
+  late AnimationController _scanAnimController;
 
   @override
   void initState() {
     super.initState();
+    _scanAnimController = AnimationController(vsync: this, duration: const Duration(seconds: 3))..repeat(reverse: true);
     _load();
+  }
+
+  @override
+  void dispose() {
+    _scanAnimController.dispose();
+    super.dispose();
   }
 
   @override
@@ -87,15 +95,6 @@ class _DietScreenState extends State<DietScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daily Diet Plan'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.camera_alt, color: AppColors.primary),
-            tooltip: 'Scan food',
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const DietScanScreen()),
-            ),
-          ),
-        ],
       ),
       body: SafeArea(
         child: _loading
@@ -109,6 +108,8 @@ class _DietScreenState extends State<DietScreen> {
                       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                       children: [
                         _MacroSummary(assessment: _assessment!),
+                        const SizedBox(height: 16),
+                        _ScanFoodBanner(animController: _scanAnimController),
                         const SizedBox(height: 16),
                         _GymDayBanner(gymDay: _gymToday, toggling: _toggling, onToggle: _toggleGymDay),
                         const SizedBox(height: 16),
@@ -249,6 +250,86 @@ class _GymDayBanner extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _ScanFoodBanner extends StatelessWidget {
+  final AnimationController animController;
+  const _ScanFoodBanner({required this.animController});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: animController,
+      builder: (context, child) {
+        final glow = 0.15 + (animController.value * 0.25);
+        return GestureDetector(
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => const DietScanScreen()),
+          ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  AppColors.primary.withValues(alpha: 0.9),
+                  AppColors.primary.withValues(alpha: 0.65),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(18),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: glow),
+                  blurRadius: 20,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Icon(Icons.camera_alt_rounded, color: Colors.white, size: 28),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Scan Your Food',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        'Take a photo to log calories instantly',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Icon(Icons.arrow_forward_ios_rounded, color: Colors.white.withValues(alpha: 0.7), size: 18),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
