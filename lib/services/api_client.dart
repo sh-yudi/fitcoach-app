@@ -33,23 +33,25 @@ class ApiClient {
     String method,
     String path, {
     Map<String, dynamic>? body,
+    Duration? timeout,
   }) async {
     final uri = Uri.parse('${AppConfig.apiBaseUrl}$path');
+    final t = timeout ?? const Duration(seconds: 15);
     late http.Response res;
     try {
       switch (method) {
         case 'GET':
-          res = await http.get(uri, headers: _headers).timeout(const Duration(seconds: 15));
+          res = await http.get(uri, headers: _headers).timeout(t);
           break;
         case 'POST':
           res = await http
               .post(uri, headers: _headers, body: jsonEncode(body ?? {}))
-              .timeout(const Duration(seconds: 15));
+              .timeout(t);
           break;
         case 'PUT':
           res = await http
               .put(uri, headers: _headers, body: jsonEncode(body ?? {}))
-              .timeout(const Duration(seconds: 15));
+              .timeout(t);
           break;
         default:
           throw ApiException('Unsupported method $method');
@@ -210,12 +212,12 @@ class ApiClient {
     return DeveloperInfo.fromJson(j['developer'] as Map<String, dynamic>);
   }
 
-  // ---- Diet scanning ----
+  // ---- Diet scanning (needs longer timeout — Gemini API takes 10-30s) ----
   Future<Map<String, dynamic>> scanFood(String base64Image, {String? mealName}) async {
     final j = await _request('POST', '/api/diet/scan', body: {
       'image': base64Image,
       if (mealName != null) 'mealName': mealName,
-    });
+    }, timeout: const Duration(seconds: 60));
     return j;
   }
 
