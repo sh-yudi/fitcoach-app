@@ -325,7 +325,7 @@ class _DietScanScreenState extends State<DietScanScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Take a photo, scan a barcode or search by name. AI will estimate calories and macros.',
+                      'Take a photo, scan a barcode or search by name. We will estimate calories and macros.',
                       style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
                     ),
                   ),

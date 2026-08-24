@@ -1,6 +1,6 @@
-# FitCoach — AI Fitness Trainer App
+# FitCoach — Smart Fitness Trainer App
 
-A full-stack fitness application with AI-powered food scanning, personalized diet & workout plans, and progress tracking.
+A full-stack fitness application with smart food scanning, personalized diet & workout plans, and progress tracking.
 
 **Live:** https://fitcoach.veridianabode.in  
 **Status:** Production (iOS + Android)
@@ -15,18 +15,15 @@ A full-stack fitness application with AI-powered food scanning, personalized die
 4. [Server Structure](#server-structure-nodejs)
 5. [API Endpoints](#api-endpoints)
 6. [Database Schema](#database-schema)
-7. [Deployment & Infrastructure](#deployment--infrastructure)
-8. [Build & Release](#build--release)
-9. [Git Workflow](#git-workflow)
-10. [Security](#security)
-11. [Environment Variables](#environment-variables)
+7. [Git Workflow](#git-workflow)
+8. [Known Limitations & Future Work](#known-limitations--future-work)
 
 ---
 
 ## Product Requirements (PRD)
 
 ### Vision
-An all-in-one fitness trainer app that combines AI food scanning, Indian diet plans, gym workout tracking, progress monitoring, and gamification — fully free, no subscription walls.
+An all-in-one fitness trainer app that combines smart food scanning, Indian diet plans, gym workout tracking, progress monitoring, and gamification — fully free, no subscription walls.
 
 ### Target Users
 - Indian gym-goers and fitness enthusiasts (18–35 age group)
@@ -38,7 +35,7 @@ An all-in-one fitness trainer app that combines AI food scanning, Indian diet pl
 | Feature | Description | Status |
 |---|---|---|
 | **Auth** | Register, login, one-tap login, password change | ✅ Done |
-| **AI Diet Scan** | Camera photo → Gemini AI identifies food, returns calories/protein/carbs/fiber | ✅ Done |
+| **Diet Scan** | Camera photo → identifies food, returns calories/protein/carbs/fiber | ✅ Done |
 | **Barcode Scanner** | Scan Indian food barcodes for instant nutrition data | ✅ Done |
 | **Food Search** | Search 50+ Indian foods by name | ✅ Done |
 | **Personalized Diet Plan** | Veg/non-veg, cut/bulk/maintain, carb cycling, fiber targets | ✅ Done |
@@ -55,7 +52,7 @@ An all-in-one fitness trainer app that combines AI food scanning, Indian diet pl
 ### Competitors
 | App | Users | FitCoach Advantage |
 |---|---|---|
-| MyFitnessPal | 100M+ | Indian foods, AI scan, no subscription |
+| MyFitnessPal | 100M+ | Indian foods, smart scan, no subscription |
 | HealthifyMe | 42M+ | Free, no coach upsell |
 | Cal AI | 15M+ | Barcode + food search + workout plans |
 | YAZIO | 100M+ | Indian diet focus, gym tracking |
@@ -97,7 +94,7 @@ Home Screen
 │
 Diet Tab
 ├── View today's meals (breakfast/lunch/dinner/snacks)
-├── Diet Scan → Camera → AI identifies food → Log meal
+├── Diet Scan → Camera → identifies food → Log meal
 ├── Barcode Scan → Instant nutrition lookup
 ├── Food Search → Search Indian foods
 ├── Daily totals (calories, protein, carbs, fiber)
@@ -133,7 +130,7 @@ Profile Tab
 
 ### Auth Flow
 ```
-Login → Token stored in SharedPreferences
+Login → Token stored locally
     ↓
 Token sent with every API request (Authorization: Bearer <token>)
     ↓
@@ -173,7 +170,7 @@ app/
 │   │   │
 │   │   ├── diet/
 │   │   │   ├── diet_screen.dart     # Today's meals + daily totals
-│   │   │   └── diet_scan_screen.dart # AI scan + barcode + food search
+│   │   │   └── diet_scan_screen.dart # Smart scan + barcode + food search
 │   │   │
 │   │   ├── workout/
 │   │   │   └── workout_screen.dart  # Exercises with checkboxes + calendar
@@ -239,7 +236,7 @@ server/
 ├── .env.example                    # Template
 │
 ├── src/
-│   ├── storage.js                  # SQLite (better-sqlite3) — users, activity, CRUD
+│   ├── storage.js                  # SQLite — users, activity, CRUD
 │   ├── validation.js               # requireAuth middleware, input validation
 │   ├── rateLimit.js                # In-memory rate limiter
 │   ├── photoStorage.js             # Base64 photo save/serve
@@ -249,7 +246,7 @@ server/
 │   │   ├── profile.js              # Get/update profile
 │   │   ├── plans.js                # Diet plan, workout plan, schedule, ticks, complete
 │   │   ├── gym.js                  # Gym check-in/out, attendance
-│   │   ├── dietScan.js             # AI food scanning (Gemini), diet logging
+│   │   ├── dietScan.js             # Food scanning (Gemini), diet logging
 │   │   ├── barcode.js              # Barcode lookup, food search, categories
 │   │   ├── progress.js             # Weight/measurement CRUD + summary
 │   │   ├── streaks.js              # Current/longest streak, badges, stats
@@ -266,12 +263,8 @@ server/
 │       ├── foods.js                # Basic food nutrition data
 │       └── foodDatabase.js         # 50+ Indian foods + 30 barcoded items with micronutrients
 │
-├── data/
-│   └── fitcoach.db                 # SQLite database (users, activity tables)
-│
-└── logs/
-    ├── pm2-out.log                 # PM2 stdout
-    └── pm2-error.log               # PM2 stderr
+└── data/
+    └── fitcoach.db                 # SQLite database
 ```
 
 ### Server Dependencies
@@ -324,7 +317,7 @@ server/
 ### Diet Scan (`/api/diet`)
 | Method | Path | Description |
 |---|---|---|
-| POST | `/scan` | AI food scan (Gemini Vision) |
+| POST | `/scan` | Food scan (Gemini Vision) |
 | POST | `/log` | Log a food item |
 | GET | `/logged` | Today's logged meals + totals |
 
@@ -364,18 +357,15 @@ server/
 | Method | Path | Description |
 |---|---|---|
 | GET | `/health` | Health check |
-| GET | `/status` | Server status page |
 | GET | `/download` | Download page (APK + IPA) |
 | GET | `/download.apk` | Android APK |
 | GET | `/download.ipa` | iOS IPA |
-| GET | `/database` | Admin dashboard (password-protected) |
-| GET | `/logs` | Server logs viewer |
 
 ---
 
 ## Database Schema
 
-### SQLite (`data/fitcoach.db`)
+### SQLite
 
 **users** table:
 | Column | Type | Description |
@@ -403,91 +393,13 @@ server/
 
 ---
 
-## Deployment & Infrastructure
-
-### Architecture
-```
-iPhone/Android App
-    ↓ (HTTPS)
-Cloudflare Tunnel (token-based)
-    ↓
-Windows Laptop (192.168.1.44)
-    ↓
-PM2 (fitcoach) → Node.js:8080 → SQLite
-    ↓
-Git Auto-Deploy (FitCoachDeploy task, every 5 min)
-```
-
-### Windows Server
-- **Machine:** Windows 11 Home, user `yudi`
-- **Path:** `C:\fitcoach\fitcoach-server`
-- **Process:** PM2 (ecosystem.config.cjs — fork mode, 512MB max)
-- **Database:** SQLite WAL mode (`better-sqlite3`)
-
-### Scheduled Tasks
-| Task | Schedule | Purpose |
-|---|---|---|
-| FitCoachDeploy | Every 5 min | `git pull` + `npm install` + `pm2 restart` |
-| FitCoachWatchdog | Every 5 min | PM2 health check + restart |
-| FitCoachServer | Boot | `pm2 resurrect` |
-| FitCoachPM2Boot | Boot | `pm2 resurrect` |
-| FitCoachKeepalive | Boot | WiFi keepalive service |
-| FitCoachTunnel | Boot | Cloudflare tunnel (token-based) |
-
-### SSH Access
-- **Method:** Key-based only (password auth disabled)
-- **Mac config:** `~/.ssh/config` — ED25519 primary, RSA backup
-- **Keepalive:** `ServerAliveInterval 30`, `ServerAliveCountMax 5`
-
-### Cloudflare Tunnel
-- **URL:** https://fitcoach.veridianabode.in
-- **Type:** Token-based (not localhost:3000)
-- **Idle timeout:** Server sends keepalive pings every 8s for long requests
-
----
-
-## Build & Release
-
-### Android
-```bash
-cd app
-flutter build apk --release
-# Output: build/app/outputs/flutter-apk/app-release.apk
-# Deploy: scp to server, available at /download.apk
-```
-
-### iOS
-```bash
-cd app
-flutter build ipa --release
-# Bundle ID: com.fitcoach.yudi
-# Team: 9S8HP2YN5N (Apple ID: udutkarsh49@gmail.com)
-# Deploy: Xcode → wireless to iPhone "Yudi"
-```
-
-### Deploy Server Changes
-```bash
-# Automatic (every 5 min):
-# FitCoachDeploy pulls from main, runs npm install, pm2 restart
-
-# Immediate:
-ssh yudi@192.168.1.44 "schtasks /Run /TN FitCoachDeploy"
-```
-
-### Test Devices
-| Device | Platform | ID |
-|---|---|---|
-| iPhone "Yudi" | iOS 27.0 | 00008110-000241C63C82401E |
-
----
-
 ## Git Workflow
 
 ### Repositories
-| Repo | URL | Branch |
-|---|---|---|
-| App | https://github.com/sh-yudi/fitcoach-app.git | main |
-| Server | https://github.com/sh-yudi/fitcoach-server.git | main |
+| Repo | Branch |
+|---|---|
+| fitcoach-app | main |
+| fitcoach-server | main |
 
 ### Commit Convention
 ```
@@ -495,21 +407,14 @@ feat: <description>      — New feature
 fix: <description>       — Bug fix
 security: <description>  — Security improvement
 chore: <description>     — Maintenance, config changes
-```
-
-### Deploy Flow
-```
-1. Make changes locally
-2. git add -A && git commit -m "feat: description"
-3. git push origin main
-4. Auto-deploy pulls within 5 min OR run:
-   ssh yudi@192.168.1.44 "schtasks /Run /TN FitCoachDeploy"
+docs: <description>      — Documentation
 ```
 
 ### What to Commit
 | Location | Commit To | Notes |
 |---|---|---|
 | `app/lib/**` | fitcoach-app | Flutter source |
+| `app/pubspec.yaml` | fitcoach-app | Dependencies |
 | `server/app.js` | fitcoach-server | Routes, dashboard, config |
 | `server/src/**` | fitcoach-server | Business logic, routes |
 | `server/package.json` | fitcoach-server | Dependencies |
@@ -520,71 +425,10 @@ chore: <description>     — Maintenance, config changes
 |---|---|
 | `.env` | Secrets (API keys, auth tokens) |
 | `data/fitcoach.db` | User data |
-| `node_modules/` | Dependencies (installed by deploy) |
+| `node_modules/` | Dependencies |
 | `build/` | Flutter build artifacts |
 | `.dart_tool/` | Dart cache |
 | `ios/Pods/` | CocoaPods cache |
-
-### Common Git Commands
-```bash
-# Push app changes
-cd app && git add -A && git commit -m "feat: description" && git push origin main
-
-# Push server changes
-cd server && git add -A && git commit -m "feat: description" && git push origin main
-
-# Force deploy now
-ssh yudi@192.168.1.44 "schtasks /Run /TN FitCoachDeploy"
-
-# Check server status
-ssh yudi@192.168.1.44 "pm2 status"
-
-# Restart server manually
-ssh yudi@192.168.1.44 "pm2 restart fitcoach"
-
-# View server logs
-ssh yudi@192.168.1.44 "pm2 logs fitcoach --nostream --lines 50"
-
-# SSH to server
-ssh yudi@192.168.1.44
-```
-
----
-
-## Security
-
-### Implemented
-- **Token expiry:** Session tokens expire in 30 days, remember tokens in 90 days
-- **One-tap token rotation:** Rotated on each login, old token invalidated
-- **Password change:** Revokes all active sessions
-- **CORS:** Only allows `fitcoach.veridianabode.in` + localhost
-- **CSP + Security Headers:** X-Content-Type-Options, X-Frame-Options, HSTS, X-XSS-Protection
-- **Rate limiting:** Auth endpoints rate-limited (50 req/min)
-- **Body limit:** 1MB max request size
-- **Admin sessions:** 24h expiry, secrets stripped from responses
-- **Input validation:** Email length cap (254), name cap (100), meal name whitelist
-- **Gemini API key:** Sent via header (not query string)
-- **Image validation:** 5MB max, JPEG format only
-- **Diet scan input:** Meal name whitelist, numeric rounding, string sanitization
-
-### Auth Tokens
-- Session token: JWT-like, 30-day expiry, stored in SQLite
-- Remember token: Device-bound, 90-day expiry, rotates on use
-- Admin password: `fitcoach_admin_2024`
-
----
-
-## Environment Variables
-
-### `.env` (server)
-```bash
-PORT=8080
-AUTH_SECRET=<random-64-char-hex>
-DATA_DIR=data
-ADMIN_PASSWORD=<admin-password>
-TZ=Asia/Kolkata
-GEMINI_API_KEY=<gemini-api-key>
-```
 
 ---
 
