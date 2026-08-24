@@ -25,6 +25,9 @@ class _DietScanScreenState extends State<DietScanScreen> {
   bool _logged = false;
   Assessment? _assessment;
   Map<String, dynamic> _totals = {};
+  final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> _searchResults = [];
+  bool _searching = false;
 
   static const _meals = [
     'breakfast', 'snack1', 'lunch', 'preworkout', 'postworkout', 'dinner', 'snack2',
@@ -34,6 +37,125 @@ class _DietScanScreenState extends State<DietScanScreen> {
   void initState() {
     super.initState();
     _loadLogged();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  /// Normalises different server payloads into a single food map.
+  Map<String, dynamic>? _extractFood(Map<String, dynamic> j) {
+    final f = j['food'] ?? j['product'] ?? j['item'];
+    if (f is Map) return Map<String, dynamic>.from(f);
+    if (j['found'] == false) return null;
+    if (j.containsKey('name') || j.containsKey('calories')) return j;
+    return null;
+  }
+
+  Future<void> _scanBarcode() async {
+    final controller = TextEditingController();
+    var busy = false;
+    var dialogError = '';
+    final food = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          backgroundColor: AppColors.surface,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: Row(
+            children: [
+              Icon(Icons.qr_code_scanner, color: AppColors.primary, size: 24),
+              const SizedBox(width: 8),
+              Text('Scan Barcode', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800)),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Type the digits printed under the product barcode.',
+                  style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
+              const SizedBox(height: 14),
+              TextField(
+                controller: controller,
+                autofocus: true,
+                keyboardType: TextInputType.number,
+                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, letterSpacing: 1.2),
+                decoration: const InputDecoration(hintText: 'e.g. 5449000000996'),
+                onSubmitted: (_) {},
+              ),
+              if (dialogError.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text(dialogError, style: TextStyle(color: AppColors.danger, fontSize: 12.5)),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(),
+              child: Text('Cancel', style: TextStyle(color: AppColors.textSecondary)),
+            ),
+            FilledButton(
+              onPressed: busy
+                  ? null
+                  : () async {
+                      final code = controller.text.trim();
+                      if (code.isEmpty) return;
+                      setDialogState(() { busy = true; dialogError = ''; });
+                      try {
+                        final j = await ApiClient.instance.lookupBarcode(code);
+                        final f = _extractFood(j);
+                        if (!ctx.mounted) return;
+                        if (f == null) {
+                          setDialogState(() { busy = false; dialogError = 'No product found for this barcode.'; });
+                        } else {
+                          Navigator.of(ctx).pop(f);
+                        }
+                      } on ApiException catch (e) {
+                        setDialogState(() { busy = false; dialogError = e.message; });
+                      }
+                    },
+              child: busy
+                  ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.onPrimary))
+                  : const Text('Find'),
+            ),
+          ],
+        ),
+      ),
+    );
+    controller.dispose();
+    if (food == null || !mounted) return;
+    _useResult(food);
+  }
+
+  Future<void> _runSearch(String query) async {
+    final q = query.trim();
+    if (q.isEmpty) return;
+    setState(() => _searching = true);
+    try {
+      final results = await ApiClient.instance.searchFood(q);
+      if (!mounted) return;
+      setState(() {
+        _searchResults = results;
+        _searching = false;
+      });
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() => _searching = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+    }
+  }
+
+  void _useResult(Map<String, dynamic> food) {
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _result = food;
+      _imageFile = null;
+      _error = null;
+      _logged = false;
+    });
   }
 
   Future<void> _loadLogged() async {
@@ -203,7 +325,7 @@ class _DietScanScreenState extends State<DietScanScreen> {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      'Take a photo or pick from gallery. AI will estimate calories and macros.',
+                      'Take a photo, scan a barcode or search by name. AI will estimate calories and macros.',
                       style: TextStyle(color: AppColors.textPrimary, fontSize: 13),
                     ),
                   ),
@@ -232,15 +354,7 @@ class _DietScanScreenState extends State<DietScanScreen> {
               }).toList(),
             ),
             const SizedBox(height: 20),
-            if (_imageFile == null) ...[
-              Row(
-                children: [
-                  Expanded(child: _ActionButton(icon: Icons.camera_alt, label: 'Camera', onTap: () => _pickImage(ImageSource.camera))),
-                  const SizedBox(width: 12),
-                  Expanded(child: _ActionButton(icon: Icons.photo_library, label: 'Gallery', onTap: () => _pickImage(ImageSource.gallery))),
-                ],
-              ),
-            ] else ...[
+            if (_imageFile != null) ...[
               ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Stack(
@@ -261,47 +375,101 @@ class _DietScanScreenState extends State<DietScanScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              if (_scanning)
-                Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
-              else if (_result != null) ...[
-                _ResultCard(result: _result!),
-                const SizedBox(height: 16),
-                if (!_logged)
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton.icon(
-                      onPressed: _logging ? null : _logFood,
-                      icon: _logging
-                          ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.onPrimary))
-                          : Icon(Icons.check),
-                      label: Text(_logging ? 'Logging...' : 'Log to ${_mealLabel(_selectedMeal)}'),
-                    ),
-                  )
-                else
-                  Container(
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(color: AppColors.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.check_circle, color: AppColors.success, size: 18),
-                        const SizedBox(width: 8),
-                        Text('Logged to ${_mealLabel(_selectedMeal)}',
-                            style: TextStyle(color: AppColors.success, fontWeight: FontWeight.w700, fontSize: 14)),
-                      ],
-                    ),
-                  ),
-              ] else if (_error != null)
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(color: AppColors.danger.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                  child: Text(_error!, style: TextStyle(color: AppColors.danger, fontSize: 13)),
-                )
-              else
+            ],
+            if (_scanning)
+              Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
+            else if (_result != null) ...[
+              _ResultCard(result: _result!),
+              const SizedBox(height: 16),
+              if (!_logged)
                 SizedBox(
                   width: double.infinity,
-                  child: FilledButton.icon(onPressed: _analyze, icon: Icon(Icons.auto_awesome), label: const Text('Analyze Food')),
+                  child: FilledButton.icon(
+                    onPressed: _logging ? null : _logFood,
+                    icon: _logging
+                        ? SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.onPrimary))
+                        : Icon(Icons.check),
+                    label: Text(_logging ? 'Logging...' : 'Log to ${_mealLabel(_selectedMeal)}'),
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(color: AppColors.success.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.check_circle, color: AppColors.success, size: 18),
+                      const SizedBox(width: 8),
+                      Text('Logged to ${_mealLabel(_selectedMeal)}',
+                          style: TextStyle(color: AppColors.success, fontWeight: FontWeight.w700, fontSize: 14)),
+                    ],
+                  ),
                 ),
+            ] else if (_error != null)
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: AppColors.danger.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
+                child: Text(_error!, style: TextStyle(color: AppColors.danger, fontSize: 13)),
+              )
+            else if (_imageFile != null)
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(onPressed: _analyze, icon: Icon(Icons.auto_awesome), label: const Text('Analyze Food')),
+              )
+            else ...[
+              Row(
+                children: [
+                  Expanded(child: _ActionButton(icon: Icons.camera_alt, label: 'Camera', onTap: () => _pickImage(ImageSource.camera))),
+                  const SizedBox(width: 10),
+                  Expanded(child: _ActionButton(icon: Icons.photo_library, label: 'Gallery', onTap: () => _pickImage(ImageSource.gallery))),
+                  const SizedBox(width: 10),
+                  Expanded(child: _ActionButton(icon: Icons.qr_code_scanner, label: 'Barcode', onTap: _scanBarcode)),
+                ],
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _searchController,
+                textInputAction: TextInputAction.search,
+                onSubmitted: _runSearch,
+                style: TextStyle(color: AppColors.textPrimary),
+                decoration: InputDecoration(
+                  hintText: 'Search food by name…',
+                  prefixIcon: Icon(Icons.search, color: AppColors.textSecondary),
+                  suffixIcon: _searching
+                      ? Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary)),
+                        )
+                      : (_searchResults.isNotEmpty
+                          ? IconButton(
+                              icon: Icon(Icons.clear, color: AppColors.textSecondary, size: 20),
+                              onPressed: () => setState(() {
+                                _searchController.clear();
+                                _searchResults = [];
+                              }),
+                            )
+                          : null),
+                ),
+              ),
+              if (_searchResults.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Text('${_searchResults.length} result${_searchResults.length == 1 ? '' : 's'}',
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+                const SizedBox(height: 8),
+                ..._searchResults.map((r) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: _SearchResultTile(food: r, onTap: () => _useResult(r)),
+                    )),
+              ] else if (!_searching && _searchController.text.trim().isNotEmpty) ...[
+                const SizedBox(height: 12),
+                Center(
+                  child: Text(
+                    'No matches — try another name.',
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 12.5),
+                  ),
+                ),
+              ],
             ],
             const SizedBox(height: 20),
             if (_totals.isNotEmpty) ...[
@@ -353,13 +521,74 @@ class _ActionButton extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 28),
+        padding: const EdgeInsets.symmetric(vertical: 18),
         decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.surfaceLight)),
         child: Column(
           children: [
-            Icon(icon, color: AppColors.primary, size: 32),
+            Icon(icon, color: AppColors.primary, size: 28),
             const SizedBox(height: 8),
-            Text(label, style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w700)),
+            Text(label, style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w700)),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SearchResultTile extends StatelessWidget {
+  final Map<String, dynamic> food;
+  final VoidCallback onTap;
+  const _SearchResultTile({required this.food, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final brand = food['brand']?.toString() ?? '';
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.surfaceLight),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(Icons.lunch_dining_outlined, color: AppColors.primary, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    food['name']?.toString() ?? 'Unknown food',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: AppColors.textPrimary, fontSize: 13.5, fontWeight: FontWeight.w800),
+                  ),
+                  if (brand.isNotEmpty)
+                    Text(brand,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: AppColors.textSecondary, fontSize: 11)),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              '${food['calories'] ?? 0} kcal',
+              style: TextStyle(color: const Color(0xFFFFB020), fontSize: 12.5, fontWeight: FontWeight.w800),
+            ),
+            Icon(Icons.add_circle_outline, color: AppColors.primary, size: 18),
           ],
         ),
       ),

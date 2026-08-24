@@ -7,6 +7,7 @@ import '../../widgets/ad_banner.dart';
 import '../../widgets/personal_training_card.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/stat_card.dart';
+import '../../widgets/streak_card.dart';
 import '../diet/diet_screen.dart';
 import '../workout/workout_screen.dart';
 
@@ -24,6 +25,21 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   bool _blinked = false;
+  Map<String, dynamic>? _streaks;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadStreaks();
+  }
+
+  Future<void> _loadStreaks() async {
+    try {
+      final s = await ApiClient.instance.getStreaks();
+      if (!mounted) return;
+      setState(() => _streaks = s);
+    } catch (_) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +57,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
-          onRefresh: widget.onRefresh,
+          onRefresh: () async {
+            await widget.onRefresh();
+            await _loadStreaks();
+          },
           child: ListView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
@@ -96,6 +115,10 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 20),
               _GoalBanner(assessment: a),
               const SizedBox(height: 20),
+              if (_streaks != null) ...[
+                StreakCard(data: _streaks),
+                const SizedBox(height: 20),
+              ],
               if (a != null) ...[
                 Row(
                   children: [

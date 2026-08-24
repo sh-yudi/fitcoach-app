@@ -53,6 +53,9 @@ class ApiClient {
               .put(uri, headers: _headers, body: jsonEncode(body ?? {}))
               .timeout(t);
           break;
+        case 'DELETE':
+          res = await http.delete(uri, headers: _headers).timeout(t);
+          break;
         default:
           throw ApiException('Unsupported method $method');
       }
@@ -251,5 +254,67 @@ class ApiClient {
       gymPlans: toBool(j['gymPlans']),
       attendance: toBool(j['attendance']),
     );
+  }
+
+  // ---- Progress tracking ----
+  Future<List<Map<String, dynamic>>> getProgress() async {
+    final r = await _request('GET', '/api/progress');
+    return List<Map<String, dynamic>>.from(r['entries'] ?? []);
+  }
+
+  Future<Map<String, dynamic>> getProgressSummary() async {
+    return await _request('GET', '/api/progress/summary');
+  }
+
+  Future<void> logProgress({
+    double? weightKg,
+    double? waistCm,
+    double? neckCm,
+    double? hipCm,
+    double? chestCm,
+    double? armCm,
+    double? bodyFatPct,
+  }) async {
+    final body = <String, dynamic>{};
+    if (weightKg != null) body['weightKg'] = weightKg;
+    if (waistCm != null) body['waistCm'] = waistCm;
+    if (neckCm != null) body['neckCm'] = neckCm;
+    if (hipCm != null) body['hipCm'] = hipCm;
+    if (chestCm != null) body['chestCm'] = chestCm;
+    if (armCm != null) body['armCm'] = armCm;
+    if (bodyFatPct != null) body['bodyFatPct'] = bodyFatPct;
+    await _request('POST', '/api/progress', body: body);
+  }
+
+  Future<void> deleteProgress(String id) async {
+    await _request('DELETE', '/api/progress/$id');
+  }
+
+  // ---- Intermittent fasting ----
+  Future<Map<String, dynamic>> getFasting() async {
+    return await _request('GET', '/api/fasting');
+  }
+
+  Future<void> startFasting(String protocol) async {
+    await _request('POST', '/api/fasting/start', body: {'protocol': protocol});
+  }
+
+  Future<void> stopFasting() async {
+    await _request('POST', '/api/fasting/stop');
+  }
+
+  // ---- Streaks / gamification ----
+  Future<Map<String, dynamic>> getStreaks() async {
+    return await _request('GET', '/api/streaks');
+  }
+
+  // ---- Barcode lookup & food search ----
+  Future<Map<String, dynamic>> lookupBarcode(String barcode) async {
+    return await _request('GET', '/api/barcode/lookup/$barcode');
+  }
+
+  Future<List<Map<String, dynamic>>> searchFood(String query) async {
+    final r = await _request('GET', '/api/barcode/search?q=${Uri.encodeComponent(query)}');
+    return List<Map<String, dynamic>>.from(r['results'] ?? []);
   }
 }

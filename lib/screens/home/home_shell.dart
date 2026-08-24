@@ -5,7 +5,9 @@ import '../../services/api_client.dart';
 import '../../services/notification_service.dart';
 import '../calendar/calendar_screen.dart';
 import '../diet/diet_screen.dart';
+import '../fasting/fasting_screen.dart';
 import '../profile/profile_screen.dart';
+import '../progress/progress_screen.dart';
 import '../workout/workout_screen.dart';
 import 'home_screen.dart';
 
@@ -69,10 +71,12 @@ class _HomeShellState extends State<HomeShell> {
       body: IndexedStack(
         index: _index,
         children: [
-          HomeScreen(user: _user, assessment: _assessment, onRefresh: _load, onOpenProfile: () => _selectTab(4)),
+          HomeScreen(user: _user, assessment: _assessment, onRefresh: _load, onOpenProfile: () => _selectTab(6)),
           DietScreen(refreshToken: _refreshToken),
           WorkoutScreen(refreshToken: _refreshToken),
           CalendarScreen(refreshToken: _refreshToken),
+          const ProgressScreen(),
+          const FastingScreen(),
           ProfileScreen(user: _user, onUpdated: _refreshProfile),
         ],
       ),
@@ -84,6 +88,8 @@ class _HomeShellState extends State<HomeShell> {
           NavigationDestination(icon: Icon(Icons.restaurant_outlined), selectedIcon: Icon(Icons.restaurant), label: 'Diet'),
           NavigationDestination(icon: Icon(Icons.fitness_center_outlined), selectedIcon: Icon(Icons.fitness_center), label: 'Workout'),
           NavigationDestination(icon: Icon(Icons.calendar_month_outlined), selectedIcon: Icon(Icons.calendar_month), label: 'Calendar'),
+          NavigationDestination(icon: Icon(Icons.show_chart_outlined), selectedIcon: Icon(Icons.show_chart), label: 'Progress'),
+          NavigationDestination(icon: Icon(Icons.timer_outlined), selectedIcon: Icon(Icons.timer), label: 'Fasting'),
           NavigationDestination(icon: Icon(Icons.person_outline), selectedIcon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
