@@ -49,14 +49,6 @@ An all-in-one fitness trainer app that combines smart food scanning, Indian diet
 | **Diet Logging** | Log scanned/manual meals, daily totals | ✅ Done |
 | **Profile** | Photo, body metrics, fitness level, goals | ✅ Done |
 
-### Competitors
-| App | Users | FitCoach Advantage |
-|---|---|---|
-| MyFitnessPal | 100M+ | Indian foods, smart scan, no subscription |
-| HealthifyMe | 42M+ | Free, no coach upsell |
-| Cal AI | 15M+ | Barcode + food search + workout plans |
-| YAZIO | 100M+ | Indian diet focus, gym tracking |
-
 ### Success Metrics
 - Diet scan accuracy > 85%
 - App crash rate < 1%
