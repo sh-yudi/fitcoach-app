@@ -4,9 +4,11 @@ import '../../models/models.dart';
 import '../../services/api_client.dart';
 import '../../services/notification_service.dart';
 import '../../theme.dart';
+import '../../utils/helpers.dart';
 import '../../widgets/ad_banner.dart';
 import '../../widgets/section_header.dart';
 import 'diet_scan_screen.dart';
+import 'today_progress_screen.dart';
 
 class DietScreen extends StatefulWidget {
   const DietScreen({super.key, this.refreshToken = 0});
@@ -25,6 +27,7 @@ class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateM
   bool _loading = true;
   String? _error;
   late AnimationController _scanAnimController;
+  Set<String> _waterDone = {};
 
   @override
   void initState() {
@@ -63,6 +66,7 @@ class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateM
         _gymToday = r.gymToday;
         _loading = false;
       });
+      await _loadWaterDone();
     } on ApiException catch (e) {
       setState(() {
         _error = e.message;
@@ -74,12 +78,8 @@ class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateM
   Future<void> _toggleGymDay() async {
     if (_toggling) return;
     setState(() => _toggling = true);
-    final now = DateTime.now();
-    final m = now.month.toString().padLeft(2, '0');
-    final d = now.day.toString().padLeft(2, '0');
-    final dateKey = '${now.year}-$m-$d';
     try {
-      await ApiClient.instance.setGymPlan(dateKey, !_gymToday);
+      await ApiClient.instance.setGymPlan(todayKey(), !_gymToday);
       await _load();
       NotificationService.instance.sync();
     } on ApiException catch (e) {
@@ -88,6 +88,61 @@ class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateM
     }
     if (!mounted) return;
     setState(() => _toggling = false);
+  }
+
+  Future<void> _loadWaterDone() async {
+    final done = await loadWaterDone();
+    if (!mounted) return;
+    setState(() { _waterDone = done; });
+  }
+
+  Future<void> _toggleWater(String id) async {
+    final updated = await toggleWaterDone(_waterDone, id);
+    setState(() { _waterDone = updated; });
+  }
+
+  List<Widget> _buildMealsWithWater() {
+    if (_diet == null) return [];
+    final totalMl = (_diet!.waterLiters * 1000).toInt();
+    final visible = _diet!.meals.where((m) => !kWaterExclude.contains(m.name)).toList();
+    final perDrinkMl = visible.isEmpty ? 0 : totalMl ~/ (visible.length * 2);
+    final beforeMap = <String, int>{};
+    final afterMap = <String, int>{};
+    for (final m in visible) {
+      beforeMap[m.name] = perDrinkMl;
+      afterMap[m.name] = perDrinkMl;
+    }
+
+    final widgets = <Widget>[];
+    for (final meal in _diet!.meals) {
+      final before = beforeMap[meal.name];
+      if (before != null && before > 0) {
+        final id = '${meal.name}_before';
+        widgets.add(_WaterChip(
+          time: shiftTime(meal.time, -30),
+          ml: before,
+          label: 'Before ${mealTitle(meal.name)}',
+          done: _waterDone.contains(id),
+          onToggle: () => _toggleWater(id),
+        ));
+        widgets.add(const SizedBox(height: 10));
+      }
+      widgets.add(_MealCard(meal: meal));
+      widgets.add(const SizedBox(height: 12));
+      final after = afterMap[meal.name];
+      if (after != null && after > 0) {
+        final id = '${meal.name}_after';
+        widgets.add(_WaterChip(
+          time: shiftTime(meal.time, 25),
+          ml: after,
+          label: 'After ${mealTitle(meal.name)}',
+          done: _waterDone.contains(id),
+          onToggle: () => _toggleWater(id),
+        ));
+        widgets.add(const SizedBox(height: 10));
+      }
+    }
+    return widgets;
   }
 
   @override
@@ -100,7 +155,7 @@ class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateM
         child: _loading
             ?  Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
             : _error != null
-                ? _ErrorView(message: _error!, onRetry: _load)
+                ? ErrorView(message: _error!, onRetry: _load)
                 : RefreshIndicator(
                     onRefresh: _load,
                     child: ListView(
@@ -111,31 +166,58 @@ class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateM
                         const SizedBox(height: 16),
                         _ScanFoodBanner(animController: _scanAnimController),
                         const SizedBox(height: 16),
-                        _GymDayBanner(gymDay: _gymToday, toggling: _toggling, onToggle: _toggleGymDay),
-                        const SizedBox(height: 16),
-                        Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
-                          ),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.water_drop, color: Color(0xFF3DA5FF)),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Text(
-                                  'Drink ${_diet!.waterLiters} L water daily · Target ${_diet!.calories} kcal · P ${_diet!.protein}g · C ${_diet!.carbs}g · F ${_diet!.fiber}g',
-                                  style:  TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w600),
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: _GymDayBanner(gymDay: _gymToday, toggling: _toggling, onToggle: _toggleGymDay)),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () => Navigator.of(context).push(
+                                  MaterialPageRoute(builder: (_) => const TodayProgressScreen()),
+                                ),
+                                child: Container(
+                                  padding: const EdgeInsets.all(14),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.primary.withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(14),
+                                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.water_drop, color: Color(0xFF3DA5FF), size: 18),
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            '${_diet!.waterLiters} L',
+                                            style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w800),
+                                          ),
+                                          const Spacer(),
+                                          Icon(Icons.arrow_forward_ios_rounded, color: AppColors.textSecondary, size: 12),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        '${_diet!.calories} kcal',
+                                        style: TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w700),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'P ${_diet!.protein}g · C ${_diet!.carbs}g · F ${_diet!.fiber}g',
+                                        style: TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w600),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
                         const SectionHeader(title: 'Meals'),
-                        ..._diet!.meals.map((m) => _MealCard(meal: m)),
+                        ..._buildMealsWithWater(),
                         const SizedBox(height: 12),
                         Text(
                           _diet!.note,
@@ -186,11 +268,11 @@ class _MacroSummary extends StatelessWidget {
           const SizedBox(height: 14),
           Row(
             children: [
-              Expanded(child: _MacroBar(label: 'Protein', grams: a.protein, color: const Color(0xFF3DD68C))),
+              Expanded(child: _MacroBar(label: 'Protein', grams: a.protein, color: AppColors.macroProtein)),
               const SizedBox(width: 10),
-              Expanded(child: _MacroBar(label: 'Carbs', grams: a.carbs, color: const Color(0xFFFFB020))),
+              Expanded(child: _MacroBar(label: 'Carbs', grams: a.carbs, color: AppColors.macroCarbs)),
               const SizedBox(width: 10),
-              Expanded(child: _MacroBar(label: 'Fiber', grams: a.fiber, color: const Color(0xFF6C8CFF))),
+              Expanded(child: _MacroBar(label: 'Fiber', grams: a.fiber, color: AppColors.macroFiber)),
             ],
           ),
         ],
@@ -215,38 +297,42 @@ class _GymDayBanner extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: color.withValues(alpha: 0.35)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(gymDay ? Icons.fitness_center : Icons.self_improvement, color: color),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  gymDay ? 'Gym day today' : 'Rest day today',
+          Row(
+            children: [
+              Icon(gymDay ? Icons.fitness_center : Icons.self_improvement, color: color, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  gymDay ? 'Gym Day' : 'Rest Day',
                   style: TextStyle(color: color, fontSize: 13.5, fontWeight: FontWeight.w800),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  gymDay
-                      ? 'Plan includes pre & post-workout meals'
-                      : 'Plan skips pre & post-workout meals',
-                  style:  TextStyle(color: AppColors.textSecondary, fontSize: 11.5),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: toggling ? null : onToggle,
-            style: TextButton.styleFrom(foregroundColor: color),
-            child: toggling
-                ? SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: color),
-                  )
-                : Text(gymDay ? 'Switch to rest' : 'Switch to gym day'),
+          const SizedBox(height: 4),
+          Text(
+            gymDay ? 'Pre & post-workout meals' : 'No workout meals',
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
+          ),
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: toggling ? null : onToggle,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: toggling
+                  ? SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: color))
+                  : Text(
+                      gymDay ? 'Switch to rest' : 'Switch to gym',
+                      style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.w700),
+                    ),
+            ),
           ),
         ],
       ),
@@ -365,24 +451,15 @@ class _MealCard extends StatelessWidget {
   final Meal meal;
   const _MealCard({required this.meal});
 
-  String _iconFor(String meal) {
-    switch (meal) {
-      case 'breakfast':
-        return '🌅';
-      case 'snack1':
-        return '🥜';
-      case 'lunch':
-        return '🍽️';
-      case 'preworkout':
-        return '⚡';
-      case 'postworkout':
-        return '🏋️';
-      case 'dinner':
-        return '🌙';
-      default:
-        return '🍴';
-    }
-  }
+  static String _iconFor(String meal) => switch (meal) {
+    'breakfast' => '🌅',
+    'snack1' => '🥜',
+    'lunch' => '🍽️',
+    'preworkout' => '⚡',
+    'postworkout' => '🏋️',
+    'dinner' => '🌙',
+    _ => '🍴',
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -483,24 +560,60 @@ class _MealCard extends StatelessWidget {
   }
 }
 
-class _ErrorView extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-  const _ErrorView({required this.message, required this.onRetry});
+class _WaterChip extends StatelessWidget {
+  final String time;
+  final int ml;
+  final String label;
+  final bool done;
+  final VoidCallback? onToggle;
+  const _WaterChip({required this.time, required this.ml, required this.label, this.done = false, this.onToggle});
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
+    return GestureDetector(
+      onTap: onToggle,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: done
+              ? AppColors.water.withValues(alpha: 0.12)
+              : AppColors.water.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: done
+                ? AppColors.water.withValues(alpha: 0.45)
+                : AppColors.water.withValues(alpha: 0.25),
+          ),
+        ),
+        child: Row(
           children: [
-             Icon(Icons.cloud_off, color: AppColors.textSecondary, size: 48),
-            const SizedBox(height: 16),
-            Text(message, textAlign: TextAlign.center, style:  TextStyle(color: AppColors.textSecondary, fontSize: 14)),
-            const SizedBox(height: 20),
-            FilledButton(onPressed: onRetry, child: const Text('Retry')),
+            Icon(
+              done ? Icons.check_circle : Icons.water_drop,
+              color: AppColors.water,
+              size: 16,
+            ),
+            const SizedBox(width: 8),
+            Text(
+              time,
+              style: TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                decoration: done ? TextDecoration.lineThrough : null,
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '$ml ml \u00B7 $label',
+                style: TextStyle(
+                  color: AppColors.textPrimary,
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w600,
+                  decoration: done ? TextDecoration.lineThrough : null,
+                ),
+              ),
+            ),
           ],
         ),
       ),

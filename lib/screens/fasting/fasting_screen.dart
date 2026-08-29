@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../services/api_client.dart';
 import '../../theme.dart';
+import '../../utils/helpers.dart';
 
 class FastingScreen extends StatefulWidget {
   const FastingScreen({super.key});
@@ -504,13 +505,7 @@ class _HistoryTile extends StatelessWidget {
   final Map<String, dynamic> entry;
   const _HistoryTile({required this.entry});
 
-  double? _num(dynamic v) {
-    if (v == null) return null;
-    if (v is num) return v.toDouble();
-    return double.tryParse(v.toString());
-  }
-
-  DateTime? _date(dynamic v) {
+  DateTime? _parseDate(dynamic v) {
     if (v is num) return DateTime.fromMillisecondsSinceEpoch(v.toInt() * (v > 1e12 ? 1 : 1000));
     if (v is String && v.isNotEmpty) return DateTime.tryParse(v)?.toLocal();
     return null;
@@ -519,11 +514,10 @@ class _HistoryTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final completed = entry['completed'] == true || entry['completed'] == 1;
-    final hours = _num(entry['durationHours']) ?? _num(entry['duration']) ?? _num(entry['hours']);
-    final start = _date(entry['startedAt'] ?? entry['startTime'] ?? entry['date']);
+    final hours = parseNum(entry['durationHours']) ?? parseNum(entry['duration']) ?? parseNum(entry['hours']);
+    final start = _parseDate(entry['startedAt'] ?? entry['startTime'] ?? entry['date']);
     final protocol = entry['protocol']?.toString() ?? '';
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    final dateLabel = start != null ? '${start.day} ${months[start.month - 1]}, ${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')}' : '';
+    final dateLabel = start != null ? '${start.day} ${kMonths[start.month - 1]}, ${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')}' : '';
 
     return Container(
       padding: const EdgeInsets.all(14),

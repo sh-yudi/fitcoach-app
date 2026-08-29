@@ -160,12 +160,14 @@ class _DietScanScreenState extends State<DietScanScreen> {
 
   Future<void> _loadLogged() async {
     try {
-      final a = await ApiClient.instance.getAssessment();
-      final logged = await ApiClient.instance.getLoggedFood();
+      final results = await Future.wait([
+        ApiClient.instance.getAssessment(),
+        ApiClient.instance.getLoggedFood(),
+      ]);
       if (!mounted) return;
       setState(() {
-        _assessment = a;
-        _totals = (logged['totals'] as Map<String, dynamic>?) ?? {};
+        _assessment = results[0] as Assessment;
+        _totals = (results[1] as Map<String, dynamic>)['totals'] as Map<String, dynamic>? ?? {};
       });
     } catch (_) {}
   }
@@ -243,10 +245,10 @@ class _DietScanScreenState extends State<DietScanScreen> {
           children: [
             Text('Daily Progress ($pct% of target)', style: TextStyle(color: AppColors.textSecondary, fontSize: 13)),
             const SizedBox(height: 12),
-            _progressRow('Calories', consumedCal, a.calories, 'kcal', const Color(0xFFFFB020)),
-            _progressRow('Protein', consumedP, a.protein, 'g', const Color(0xFF3DD68C)),
-            _progressRow('Carbs', consumedC, a.carbs, 'g', const Color(0xFFFFB020)),
-            _progressRow('Fiber', consumedF, a.fiber, 'g', const Color(0xFF6C8CFF)),
+            _progressRow('Calories', consumedCal, a.calories, 'kcal', AppColors.macroCarbs),
+            _progressRow('Protein', consumedP, a.protein, 'g', AppColors.macroProtein),
+            _progressRow('Carbs', consumedC, a.carbs, 'g', AppColors.macroCarbs),
+            _progressRow('Fiber', consumedF, a.fiber, 'g', AppColors.macroFiber),
             const SizedBox(height: 12),
             if (remainCal > 0)
               Text('You can still eat ~$remainCal kcal today.',
@@ -586,7 +588,7 @@ class _SearchResultTile extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               '${food['calories'] ?? 0} kcal',
-              style: TextStyle(color: const Color(0xFFFFB020), fontSize: 12.5, fontWeight: FontWeight.w800),
+              style: TextStyle(color: AppColors.macroCarbs, fontSize: 12.5, fontWeight: FontWeight.w800),
             ),
             Icon(Icons.add_circle_outline, color: AppColors.primary, size: 18),
           ],
@@ -622,13 +624,13 @@ class _ResultCard extends StatelessWidget {
           const SizedBox(height: 12),
           Row(
             children: [
-              _MacroPill(label: 'Cal', value: '${result['calories'] ?? 0}', color: const Color(0xFFFFB020)),
+              _MacroPill(label: 'Cal', value: '${result['calories'] ?? 0}', color: AppColors.macroCarbs),
               const SizedBox(width: 8),
-              _MacroPill(label: 'P', value: '${result['protein'] ?? 0}g', color: const Color(0xFF3DD68C)),
+              _MacroPill(label: 'P', value: '${result['protein'] ?? 0}g', color: AppColors.macroProtein),
               const SizedBox(width: 8),
-              _MacroPill(label: 'C', value: '${result['carbs'] ?? 0}g', color: const Color(0xFFFFB020)),
+              _MacroPill(label: 'C', value: '${result['carbs'] ?? 0}g', color: AppColors.macroCarbs),
               const SizedBox(width: 8),
-              _MacroPill(label: 'F', value: '${result['fiber'] ?? 0}g', color: const Color(0xFF6C8CFF)),
+              _MacroPill(label: 'F', value: '${result['fiber'] ?? 0}g', color: AppColors.macroFiber),
             ],
           ),
         ],

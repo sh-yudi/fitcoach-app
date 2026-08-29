@@ -25,6 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   late String _fitnessLevel;
   late String _workoutTime;
   late bool _veg;
+  late bool _eggFree;
   String? _wakeTime;
   String? _sleepTime;
   String? _gymTime;
@@ -68,6 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _fitnessLevel = u?.fitnessLevel ?? _fitnessLevel;
     _workoutTime = u?.workoutTime ?? _workoutTime;
     _veg = u?.veg ?? _veg;
+    _eggFree = u?.eggFree ?? false;
     _wakeTime = u?.wakeTime;
     _sleepTime = u?.sleepTime;
     _gymTime = u?.gymTime;
@@ -178,14 +180,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _patchProfile({'heightCm': int.parse(v)}, successMsg: 'Height updated');
         },
       ),
-    );
-  }
-
-  Widget _genderIcon(User u) {
-    return Icon(
-      u.gender == 'male' ? Icons.man : Icons.woman,
-      color: AppColors.onPrimary,
-      size: 30,
     );
   }
 
@@ -727,17 +721,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         _EditRow(
                           label: 'Diet',
-                          value: _veg ? 'Vegetarian' : 'Mixed',
+                          value: _veg ? (_eggFree ? 'Egg-free veg' : 'Eggetarian') : 'Mixed',
                           onTap: () => _showOptionPicker(
                             title: 'Diet',
-                            current: _veg ? 'veg' : 'mixed',
+                            current: _veg ? (_eggFree ? 'eggfree' : 'eggetarian') : 'mixed',
                             options: const [
                               (value: 'mixed', label: 'Mixed diet'),
-                              (value: 'veg', label: 'Vegetarian diet'),
+                              (value: 'eggetarian', label: 'Vegetarian (with eggs)'),
+                              (value: 'eggfree', label: 'Vegetarian (egg-free)'),
                             ],
                             onSelect: (v) {
-                              setState(() => _veg = v == 'veg');
-                              _patchProfile({'veg': v == 'veg'});
+                              final isVeg = v != 'mixed';
+                              final isEggFree = v == 'eggfree';
+                              setState(() {
+                                _veg = isVeg;
+                                _eggFree = isEggFree;
+                              });
+                              _patchProfile({'veg': isVeg, 'eggFree': isEggFree});
                             },
                           ),
                         ),

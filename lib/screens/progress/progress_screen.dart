@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../services/api_client.dart';
 import '../../theme.dart';
+import '../../utils/helpers.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -31,12 +32,14 @@ class _ProgressScreenState extends State<ProgressScreen> {
       _error = null;
     });
     try {
-      final entries = await ApiClient.instance.getProgress();
-      final summary = await ApiClient.instance.getProgressSummary();
+      final results = await Future.wait([
+        ApiClient.instance.getProgress(),
+        ApiClient.instance.getProgressSummary(),
+      ]);
       if (!mounted) return;
       setState(() {
-        _entries = _sorted(entries);
-        _summary = summary;
+        _entries = _sorted(results[0] as List<Map<String, dynamic>>);
+        _summary = results[1] as Map<String, dynamic>;
         _loading = false;
       });
     } on ApiException catch (e) {
@@ -50,21 +53,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   List<Map<String, dynamic>> _sorted(List<Map<String, dynamic>> entries) {
     final list = [...entries];
-    list.sort((a, b) => _dateOf(b).compareTo(_dateOf(a)));
+    list.sort((a, b) => parseDate(b).compareTo(parseDate(a)));
     return list;
-  }
-
-  DateTime _dateOf(Map<String, dynamic> e) {
-    final d = e['date'];
-    if (d is String) return DateTime.tryParse(d) ?? DateTime.fromMillisecondsSinceEpoch(0);
-    if (d is num) return DateTime.fromMillisecondsSinceEpoch(d.toInt());
-    return DateTime.fromMillisecondsSinceEpoch(0);
-  }
-
-  double? _num(dynamic v) {
-    if (v == null) return null;
-    if (v is num) return v.toDouble();
-    return double.tryParse(v.toString().replaceAll(',', '.'));
   }
 
   Future<void> _openLogSheet() async {
@@ -187,8 +177,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   List<double> _weightSeries() {
     final values = <double>[];
-    for (final e in _sorted([..._entries].reversed.toList())) {
-      final w = _num(e['weightKg']);
+    for (final e in _entries.reversed) {
+      final w = parseNum(e['weightKg']);
       if (w != null && w > 0) values.add(w);
     }
     return values.length > 14 ? values.sublist(values.length - 14) : values;
@@ -196,7 +186,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
 
   Widget _buildEmpty() {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.7,
+      height: MediaQuery.sizeOf(context).height * 0.7,
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -241,20 +231,14 @@ class _SummaryCard extends StatelessWidget {
   final Map<String, dynamic>? summary;
   const _SummaryCard({this.summary});
 
-  double? _num(dynamic v) {
-    if (v == null) return null;
-    if (v is num) return v.toDouble();
-    return double.tryParse(v.toString());
-  }
-
   @override
   Widget build(BuildContext context) {
     final s = summary ?? {};
-    final hasData = s['hasData'] == true || _num(s['currentWeight']) != null;
-    final start = _num(s['startWeight']);
-    final current = _num(s['currentWeight']);
-    final change = _num(s['weightChange']) ?? ((start != null && current != null) ? current - start : null);
-    final bf = _num(s['bodyFatPct']) ?? _num(s['latestBodyFat']);
+    final hasData = s['hasData'] == true || parseNum(s['currentWeight']) != null;
+    final start = parseNum(s['startWeight']);
+    final current = parseNum(s['currentWeight']);
+    final change = parseNum(s['weightChange']) ?? ((start != null && current != null) ? current - start : null);
+    final bf = parseNum(s['bodyFatPct']) ?? parseNum(s['latestBodyFat']);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -326,7 +310,7 @@ class _SummaryCard extends StatelessWidget {
     final c = change ?? 0.0;
     final lost = c < 0;
     final neutral = c.abs() < 0.05;
-    final color = neutral ? AppColors.textPrimary : (lost ? AppColors.success : const Color(0xFFFFB020));
+    final color = neutral ? AppColors.textPrimary : (lost ? AppColors.success : AppColors.macroCarbs);
     final arrow = neutral ? '→' : (lost ? '↓' : '↑');
     return Container(
       padding: const EdgeInsets.all(12),
@@ -456,38 +440,19 @@ class _EntryTile extends StatelessWidget {
   final VoidCallback onDelete;
   const _EntryTile({required this.entry, required this.onDelete});
 
-  static const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-  DateTime _date() {
-    final d = entry['date'];
-    if (d is String) return DateTime.tryParse(d) ?? DateTime.now();
-    if (d is num) return DateTime.fromMillisecondsSinceEpoch(d.toInt());
-    return DateTime.now();
-  }
-
-  double? _num(dynamic v) {
-    if (v == null) return null;
-    if (v is num) return v.toDouble();
-    return double.tryParse(v.toString());
-  }
-
-  String _fmt(double? v, {String unit = ''}) {
-    if (v == null || v <= 0) return '—';
-    final s = v % 1 == 0 ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
-    return '$s$unit';
-  }
+  static const _months = kMonths;
 
   @override
   Widget build(BuildContext context) {
-    final date = _date();
+    final date = parseDate(entry);
     final rows = <(String, String)>[
-      ('Weight', _fmt(_num(entry['weightKg']), unit: ' kg')),
-      ('Waist', _fmt(_num(entry['waistCm']), unit: ' cm')),
-      ('Neck', _fmt(_num(entry['neckCm']), unit: ' cm')),
-      ('Hip', _fmt(_num(entry['hipCm']), unit: ' cm')),
-      ('Chest', _fmt(_num(entry['chestCm']), unit: ' cm')),
-      ('Arm', _fmt(_num(entry['armCm']), unit: ' cm')),
-      ('Body fat', _fmt(_num(entry['bodyFatPct']), unit: '%')),
+      ('Weight', formatValue(parseNum(entry['weightKg']), unit: ' kg')),
+      ('Waist', formatValue(parseNum(entry['waistCm']), unit: ' cm')),
+      ('Neck', formatValue(parseNum(entry['neckCm']), unit: ' cm')),
+      ('Hip', formatValue(parseNum(entry['hipCm']), unit: ' cm')),
+      ('Chest', formatValue(parseNum(entry['chestCm']), unit: ' cm')),
+      ('Arm', formatValue(parseNum(entry['armCm']), unit: ' cm')),
+      ('Body fat', formatValue(parseNum(entry['bodyFatPct']), unit: '%')),
     ];
 
     return InkWell(
@@ -630,7 +595,7 @@ class _LogProgressSheetState extends State<_LogProgressSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).viewInsets.bottom;
+    final bottomInset = MediaQuery.viewInsetsOf(context).bottom;
     return SafeArea(
       child: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(24, 8, 24, 24 + bottomInset),

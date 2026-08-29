@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import '../../models/models.dart';
 import '../../services/api_client.dart';
 import '../../theme.dart';
+import '../../utils/helpers.dart';
 import '../../widgets/ad_banner.dart';
+import '../../widgets/exercise_demo_sheet.dart';
 import '../../widgets/personal_training_card.dart';
 
 class WorkoutScreen extends StatefulWidget {
@@ -245,7 +247,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
         child: _loading
             ? Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
             : _error != null
-                ? _ErrorView(message: _error!, onRetry: _load)
+                ? ErrorView(message: _error!, onRetry: _load)
                 : RefreshIndicator(
                     onRefresh: _load,
                     child: ListView(
@@ -507,6 +509,7 @@ class _WorkoutDayCard extends StatelessWidget {
                           ticked: ticked.contains(e.name),
                           tickable: isToday && !isDone,
                           onToggle: () => onToggle(e.name),
+                          onDemo: () => showExerciseDemo(context, e.name),
                         )),
                     if (absExercises.isNotEmpty) ...[
                       const Divider(height: 16),
@@ -517,6 +520,7 @@ class _WorkoutDayCard extends StatelessWidget {
                             ticked: ticked.contains(e.name),
                             tickable: isToday && !isDone,
                             onToggle: () => onToggle(e.name),
+                            onDemo: () => showExerciseDemo(context, e.name),
                           )),
                     ],
                     if (cardio.isNotEmpty) ...[
@@ -552,12 +556,14 @@ class _ExerciseRow extends StatelessWidget {
   final bool ticked;
   final bool tickable;
   final VoidCallback onToggle;
+  final VoidCallback onDemo;
 
   const _ExerciseRow({
     required this.exercise,
     required this.ticked,
     required this.tickable,
     required this.onToggle,
+    required this.onDemo,
   });
 
   @override
@@ -566,24 +572,27 @@ class _ExerciseRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Container(
-            width: 20,
-            height: 20,
-            decoration: BoxDecoration(
-              color: tickable
-                  ? (ticked ? AppColors.primary : Colors.transparent)
-                  : (ticked ? AppColors.success.withValues(alpha: 0.2) : Colors.transparent),
-              borderRadius: BorderRadius.circular(6),
-              border: Border.all(
+          GestureDetector(
+            onTap: tickable ? onToggle : null,
+            child: Container(
+              width: 20,
+              height: 20,
+              decoration: BoxDecoration(
                 color: tickable
-                    ? (ticked ? AppColors.primary : AppColors.textSecondary)
-                    : (ticked ? AppColors.success : AppColors.surfaceLight),
-                width: 1.5,
+                    ? (ticked ? AppColors.primary : Colors.transparent)
+                    : (ticked ? AppColors.success.withValues(alpha: 0.2) : Colors.transparent),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: tickable
+                      ? (ticked ? AppColors.primary : AppColors.textSecondary)
+                      : (ticked ? AppColors.success : AppColors.surfaceLight),
+                  width: 1.5,
+                ),
               ),
+              child: ticked
+                  ? Icon(Icons.check, color: tickable ? AppColors.onPrimary : AppColors.success, size: 14)
+                  : null,
             ),
-            child: ticked
-                ? Icon(Icons.check, color: tickable ? AppColors.onPrimary : AppColors.success, size: 14)
-                : null,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -615,10 +624,11 @@ class _ExerciseRow extends StatelessWidget {
       ),
     );
 
-    if (tickable) {
-      return InkWell(onTap: onToggle, borderRadius: BorderRadius.circular(8), child: content);
-    }
-    return content;
+    return InkWell(
+      onTap: onDemo,
+      borderRadius: BorderRadius.circular(8),
+      child: content,
+    );
   }
 }
 
@@ -642,31 +652,6 @@ class _InfoBox extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(child: Text(text, style: TextStyle(color: AppColors.textSecondary, fontSize: 12.5, height: 1.4))),
         ],
-      ),
-    );
-  }
-}
-
-class _ErrorView extends StatelessWidget {
-  final String message;
-  final VoidCallback onRetry;
-  const _ErrorView({required this.message, required this.onRetry});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.cloud_off, color: AppColors.textSecondary, size: 48),
-            const SizedBox(height: 16),
-            Text(message, textAlign: TextAlign.center, style: TextStyle(color: AppColors.textSecondary, fontSize: 14)),
-            const SizedBox(height: 20),
-            FilledButton(onPressed: onRetry, child: const Text('Retry')),
-          ],
-        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../services/api_client.dart';
 import '../../services/notification_service.dart';
 import '../../theme.dart';
+import '../../utils/helpers.dart';
 import '../../widgets/ad_banner.dart';
 import '../../widgets/gym_check_in_sheet.dart';
 
@@ -165,7 +166,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         gradient:  LinearGradient(
-          colors: [Color(0xFF24321A), AppColors.primaryDark],
+          colors: [AppColors.darkGreen, AppColors.primaryDark],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -205,7 +206,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                           ? (_attendance[today]! ? 'You attended today' : 'You skipped today')
                           : 'Tap a day to mark attendance after training')
                       : 'Tap a day to plan or answer',
-                  style: const TextStyle(color: Color(0xFFD8E4C2), fontSize: 12.5),
+                  style: const TextStyle(color: AppColors.darkGreenLight, fontSize: 12.5),
                 ),
               ],
             ),
@@ -216,7 +217,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
   }
 
   Widget _buildMonthHeader() {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = kMonths;
     return Row(
       children: [
         IconButton(
@@ -287,7 +288,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               planned: planned,
               attended: attended,
               isToday: isToday,
-              dimmed: isFuture || date.isBefore(DateTime(_year, _month, 1)),
+              dimmed: isFuture,
               onTap: () => _openCheckIn(key),
             ),
           ),

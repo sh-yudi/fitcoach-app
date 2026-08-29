@@ -319,12 +319,6 @@ class _PhotoRow extends StatelessWidget {
       ),
     );
   }
-
-  Widget _noPhotoIcon() {
-    return Center(
-      child: Icon(Icons.person, color: AppColors.primary, size: 30),
-    );
-  }
 }
 
 class _NavRow extends StatelessWidget {
@@ -505,27 +499,17 @@ class _ThemeModeRow extends StatelessWidget {
 
   const _ThemeModeRow({required this.mode});
 
-  IconData get _icon {
-    switch (mode) {
-      case ThemeMode.system:
-        return Icons.brightness_auto;
-      case ThemeMode.light:
-        return Icons.light_mode_outlined;
-      case ThemeMode.dark:
-        return Icons.dark_mode_outlined;
-    }
-  }
+  IconData get _icon => switch (mode) {
+    ThemeMode.system => Icons.brightness_auto,
+    ThemeMode.light => Icons.light_mode_outlined,
+    ThemeMode.dark => Icons.dark_mode_outlined,
+  };
 
-  String get _label {
-    switch (mode) {
-      case ThemeMode.system:
-        return 'Follow device';
-      case ThemeMode.light:
-        return 'Light';
-      case ThemeMode.dark:
-        return 'Dark';
-    }
-  }
+  String get _label => switch (mode) {
+    ThemeMode.system => 'Follow device',
+    ThemeMode.light => 'Light',
+    ThemeMode.dark => 'Dark',
+  };
 
   @override
   Widget build(BuildContext context) {

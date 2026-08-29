@@ -76,6 +76,35 @@ class AppColors {
   static Color get textSecondary => _p.textSecondary;
   static Color get danger => _p.danger;
   static Color get success => _p.success;
+
+  // Semantic colors — used across multiple screens
+  static const Color water = Color(0xFF3DA5FF);
+  static const Color macroProtein = Color(0xFF3DD68C);
+  static const Color macroCarbs = Color(0xFFFFB020);
+  static const Color macroFiber = Color(0xFF6C8CFF);
+  static const Color whatsapp = Color(0xFF25D366);
+  static const Color avatarFallback = Color(0xFF2A2A3E);
+  static const Color darkGreen = Color(0xFF24321A);
+  static const Color darkGreenLight = Color(0xFFD8E4C2);
+  static const Color cream = Color(0xFFFFF7E2);
+
+  // Muscle group colors
+  static const Map<String, Color> muscleColors = {
+    'chest': Color(0xFFE74C3C),
+    'back': Color(0xFF3498DB),
+    'shoulders': Color(0xFF9B59B6),
+    'arms': Color(0xFFE67E22),
+    'biceps': Color(0xFFE67E22),
+    'triceps': Color(0xFFE67E22),
+    'core': Color(0xFFF1C40F),
+    'abs': Color(0xFFF1C40F),
+    'legs': Color(0xFF2ECC71),
+    'quads': Color(0xFF2ECC71),
+    'hamstrings': Color(0xFF27AE60),
+    'glutes': Color(0xFF1ABC9C),
+    'calves': Color(0xFF16A085),
+    'cardio': Color(0xFFE91E63),
+  };
 }
 
 class ThemeController extends ChangeNotifier {

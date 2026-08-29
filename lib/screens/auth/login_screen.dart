@@ -44,16 +44,18 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _loadOneTap() async {
-    final token = await Session.rememberToken();
-    final email = await Session.rememberEmail();
-    final name = await Session.rememberName();
-    final photo = await Session.rememberPhoto();
+    final results = await Future.wait<dynamic>([
+      Session.rememberToken(),
+      Session.rememberEmail(),
+      Session.rememberName(),
+      Session.rememberPhoto(),
+    ]);
     if (!mounted) return;
     setState(() {
-      _oneTapToken = token;
-      _oneTapEmail = email;
-      _oneTapName = name;
-      _oneTapPhoto = photo;
+      _oneTapToken = results[0];
+      _oneTapEmail = results[1];
+      _oneTapName = results[2];
+      _oneTapPhoto = results[3];
     });
   }
 
@@ -70,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
         result.token,
         result.user.email,
         name: result.user.name,
-        rememberToken: token,
+        rememberToken: result.rememberToken,
         photo: result.user.displayPhoto,
       );
       ApiClient.instance.setToken(result.token);
@@ -296,7 +298,7 @@ class _OneTapHero extends StatelessWidget {
               alignment: Alignment.center,
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFF24321A), Color(0xFF4A6B1E)],
+                  colors: [AppColors.darkGreen, Color(0xFF4A6B1E)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -319,7 +321,7 @@ class _OneTapHero extends StatelessWidget {
                       ? ProfileAvatar(
                           photoUrl: !photo!.startsWith('data:') ? photo : null,
                           base64: photo!.startsWith('data:') ? photo : null,
-                          size: 30,
+                          size: 110,
                           fallbackIcon: Icons.person,
                         )
                       : _initialText()),
@@ -347,7 +349,7 @@ class _OneTapHero extends StatelessWidget {
       child: Text(
         _initial,
         style: const TextStyle(
-          color: Color(0xFFFFF7E2),
+          color: AppColors.cream,
           fontSize: 48,
           fontWeight: FontWeight.w900,
         ),

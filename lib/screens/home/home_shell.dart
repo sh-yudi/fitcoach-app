@@ -32,26 +32,20 @@ class _HomeShellState extends State<HomeShell> {
 
   Future<void> _load() async {
     try {
-      final user = await ApiClient.instance.getProfile();
-      final assessment = await ApiClient.instance.getAssessment();
+      final results = await Future.wait([
+        ApiClient.instance.getProfile(),
+        ApiClient.instance.getAssessment(),
+      ]);
       if (!mounted) return;
       setState(() {
-        _user = user;
-        _assessment = assessment;
+        _user = results[0] as User;
+        _assessment = results[1] as Assessment;
       });
       NotificationService.instance.sync();
     } catch (_) {}
   }
 
-  void _selectTab(int i) {
-    setState(() {
-      _index = i;
-      if (i != 0) {
-        _refreshToken++;
-        _load();
-      }
-    });
-  }
+  void _selectTab(int i) => setState(() => _index = i);
 
   void _refreshProfile(User user) {
     setState(() => _user = user);

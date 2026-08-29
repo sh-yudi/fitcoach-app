@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../theme.dart';
+
 /// Lets the user pick a profile photo from the camera or gallery, crop it to
 /// a locked 1:1 square (the same shape as the one-tap login avatar) and return
 /// it as a base64 string. Returns null if cancelled.
@@ -49,7 +51,7 @@ Future<String?> pickProfilePhoto(BuildContext context) async {
     uiSettings: [
       AndroidUiSettings(
         toolbarTitle: 'Crop photo',
-        toolbarColor: const Color(0xFF24321A),
+        toolbarColor: AppColors.darkGreen,
         toolbarWidgetColor: Colors.white,
         activeControlsWidgetColor: const Color(0xFF4A6B1E),
         lockAspectRatio: true,

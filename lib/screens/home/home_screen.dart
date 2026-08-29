@@ -162,7 +162,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         value: a.calories > 0 ? '${a.calories} kcal' : '—',
                         sub: '${a.protein}g P · ${a.carbs}g C · ${a.fiber}g F',
                         icon: Icons.local_fire_department_outlined,
-                        accent: const Color(0xFFFFB020),
+                        accent: AppColors.macroCarbs,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -174,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? '~${a.weeksToTarget} weeks to target'
                             : 'On target',
                         icon: Icons.flag_outlined,
-                        accent: const Color(0xFF6C8CFF),
+                        accent: AppColors.macroFiber,
                         onTap: () => _showGoalPicker(context, u, a),
                       ),
                     ),
@@ -189,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         icon: Icons.restaurant,
                         title: 'Diet Plan',
                         subtitle: '${a.calories} kcal · ${a.protein}g protein',
-                        color: const Color(0xFFFFB020),
+                        color: AppColors.macroCarbs,
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const DietScreen()),
                         ),
@@ -542,7 +542,7 @@ class _GoalBanner extends StatelessWidget {
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF24321A), Color(0xFF4A6B1E)],
+          colors: [AppColors.darkGreen, Color(0xFF4A6B1E)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -569,7 +569,7 @@ class _GoalBanner extends StatelessWidget {
               children: [
                 Text(
                   a != null ? _title(a.goal) : 'Preparing your plan…',
-                  style: const TextStyle(color: Color(0xFFFFF7E2), fontSize: 16, fontWeight: FontWeight.w800),
+                  style: TextStyle(color: AppColors.cream, fontSize: 16, fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 3),
                 Text(

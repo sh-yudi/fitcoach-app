@@ -20,6 +20,7 @@ class ApiClient {
   static final ApiClient instance = ApiClient._();
 
   String? _token;
+  final http.Client _client = http.Client();
 
   void setToken(String? token) => _token = token;
   String? get token => _token;
@@ -41,21 +42,17 @@ class ApiClient {
     try {
       switch (method) {
         case 'GET':
-          res = await http.get(uri, headers: _headers).timeout(t);
-          break;
+          res = await _client.get(uri, headers: _headers).timeout(t);
         case 'POST':
-          res = await http
+          res = await _client
               .post(uri, headers: _headers, body: jsonEncode(body ?? {}))
               .timeout(t);
-          break;
         case 'PUT':
-          res = await http
+          res = await _client
               .put(uri, headers: _headers, body: jsonEncode(body ?? {}))
               .timeout(t);
-          break;
         case 'DELETE':
-          res = await http.delete(uri, headers: _headers).timeout(t);
-          break;
+          res = await _client.delete(uri, headers: _headers).timeout(t);
         default:
           throw ApiException('Unsupported method $method');
       }
@@ -120,9 +117,13 @@ class ApiClient {
     );
   }
 
-  Future<({String token, User user})> oneTapLogin(String rememberToken) async {
+  Future<({String token, String rememberToken, User user})> oneTapLogin(String rememberToken) async {
     final j = await _request('POST', '/api/auth/one-tap-login', body: {'rememberToken': rememberToken});
-    return (token: j['token'] as String, user: User.fromJson(j['user'] as Map<String, dynamic>));
+    return (
+      token: j['token'] as String,
+      rememberToken: j['rememberToken'] as String,
+      user: User.fromJson(j['user'] as Map<String, dynamic>),
+    );
   }
 
   Future<({String rememberToken, User user})> enableOneTap() async {

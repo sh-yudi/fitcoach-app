@@ -5,6 +5,7 @@ import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../models/models.dart';
+import '../utils/helpers.dart';
 import 'api_client.dart';
 
 /// Local notification scheduling.
@@ -153,9 +154,6 @@ class NotificationService {
     final now = tz.TZDateTime.now(tz.local);
     final todayKey = _dateKey(now);
 
-    // Exclude preworkout and postworkout from water reminder times.
-    final waterExclude = {'preworkout', 'postworkout'};
-
     for (var offset = 0; offset < 7; offset++) {
       final day = now.add(Duration(days: offset));
       final key = _dateKey(day);
@@ -168,10 +166,10 @@ class NotificationService {
           if (t == null) continue;
           await _scheduleOneShot(
             id: 100000 + (day.difference(DateTime(day.year)).inDays * 10) + meals.indexOf(meal),
-            title: 'Time for ${_mealTitle(meal.meal)}',
+            title: 'Time for ${mealTitle(meal.meal)}',
             body: gymDay
-                ? 'Your ${_mealTitle(meal.meal)} is in ${s.mealMinutes} min — ${meal.time}.'
-                : '${_mealTitle(meal.meal)} at ${meal.time}.',
+                ? 'Your ${mealTitle(meal.meal)} is in ${s.mealMinutes} min — ${meal.time}.'
+                : '${mealTitle(meal.meal)} at ${meal.time}.',
             hour: t.hour,
             minute: t.minute - s.mealMinutes,
             day: day,
@@ -182,7 +180,7 @@ class NotificationService {
       // Water reminders: 30 min before and 25 min after each meal (except pre/post workout).
       if (s.waterEnabled && waterMl > 0) {
         final meals = gymDay ? schedule.gym : schedule.rest;
-        final visibleMeals = meals.where((m) => !waterExclude.contains(m.meal)).toList();
+        final visibleMeals = meals.where((m) => !kWaterExclude.contains(m.meal)).toList();
         final perDrinkMl = visibleMeals.isEmpty ? 0 : waterMl ~/ (visibleMeals.length * 2);
         for (final meal in visibleMeals) {
           final t = _parseTime(meal.time);
@@ -192,7 +190,7 @@ class NotificationService {
           await _scheduleOneShot(
             id: 300000 + (day.difference(DateTime(day.year)).inDays * 100) + mealIdx * 2,
             title: 'Water reminder',
-            body: 'Drink ~${perDrinkMl}ml water before your ${_mealTitle(meal.meal)} (${meal.time}).',
+            body: 'Drink ~${perDrinkMl}ml water before your ${mealTitle(meal.meal)} (${meal.time}).',
             hour: t.hour,
             minute: t.minute - 30,
             day: day,
@@ -201,7 +199,7 @@ class NotificationService {
           await _scheduleOneShot(
             id: 300000 + (day.difference(DateTime(day.year)).inDays * 100) + mealIdx * 2 + 1,
             title: 'Water reminder',
-            body: 'Drink ~${perDrinkMl}ml water after your ${_mealTitle(meal.meal)} to stay hydrated.',
+            body: 'Drink ~${perDrinkMl}ml water after your ${mealTitle(meal.meal)} to stay hydrated.',
             hour: t.hour,
             minute: t.minute + 25,
             day: day,
@@ -342,14 +340,6 @@ class NotificationService {
         return (hour: 17, minute: 0, label: '5:00 PM');
     }
   }
-
-  String _mealTitle(String name) => switch (name) {
-        'preworkout' => 'pre-workout snack',
-        'postworkout' => 'post-workout meal',
-        'snack1' => 'morning snack',
-        'snack2' => 'evening snack',
-        _ => name.replaceAll('_', ' '),
-      };
 }
 
 class NotificationSettingsData {
@@ -361,7 +351,7 @@ class NotificationSettingsData {
   final int workoutMinutes;
 
   const NotificationSettingsData({
-    this.enabled = false,
+    this.enabled = true,
     this.mealEnabled = true,
     this.workoutEnabled = true,
     this.waterEnabled = true,

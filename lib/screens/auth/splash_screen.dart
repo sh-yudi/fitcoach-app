@@ -21,10 +21,11 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _bootstrap() async {
-    // If the app was killed while in the background (e.g. swiped away from
-    // recents), end the session so the next launch starts logged out.
-    await Session.clearAfterKill();
-    final token = await Session.token();
+    final results = await Future.wait([
+      Session.clearAfterKill(),
+      Session.token(),
+    ]);
+    final token = results[1] as String?;
     await Future.delayed(const Duration(milliseconds: 900));
     if (!mounted) return;
 

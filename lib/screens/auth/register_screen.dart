@@ -36,6 +36,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   String _fitnessLevel = 'beginner';
   String _workoutTime = 'afternoon';
   bool _veg = false;
+  bool _eggEater = true;
 
   // Step 3 – measurements (optional but recommended)
   final _waist = TextEditingController();
@@ -54,25 +55,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   bool _validateStep() {
-    if (_step == 0) {
-      return _formKey.currentState!.validate();
-    }
-    if (_step == 1) {
-      return _formKey.currentState!.validate();
-    }
+    if (_step < 2) return _formKey.currentState!.validate();
     return true;
   }
 
   void _next() {
     if (!_validateStep()) return;
-    setState(() {
-      _error = null;
-      if (_step < 2) {
-        _step++;
-      } else {
-        _submit();
-      }
-    });
+    if (_step < 2) {
+      setState(() { _error = null; _step++; });
+    } else {
+      setState(() { _error = null; });
+      _submit();
+    }
   }
 
   void _back() {
@@ -112,6 +106,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       'fitnessLevel': _fitnessLevel,
       'workoutTime': _workoutTime,
       'veg': _veg,
+      'eggFree': _veg && !_eggEater,
       if (_profilePhoto != null) 'profilePhoto': _profilePhoto,
       if (_waist.text.isNotEmpty) 'waistCm': (double.parse(_waist.text) * 2.54).round(),
       if (_neck.text.isNotEmpty) 'neckCm': (double.parse(_neck.text) * 2.54).round(),
@@ -416,7 +411,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           children: [
             Expanded(
               child: InkWell(
-                onTap: () => setState(() => _veg = !_veg),
+                onTap: () => setState(() {
+                  _veg = !_veg;
+                  if (_veg) _eggEater = true;
+                }),
                 borderRadius: BorderRadius.circular(14),
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
@@ -437,6 +435,43 @@ class _RegisterScreenState extends State<RegisterScreen> {
             ),
           ],
         ),
+        if (_veg) ...[
+          const SizedBox(height: 12),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: AppColors.surfaceLight),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Do you eat eggs?', style: TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w700)),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _ChoiceChip(
+                        label: 'Yes, eggetarian',
+                        selected: _eggEater,
+                        onTap: () => setState(() => _eggEater = true),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: _ChoiceChip(
+                        label: 'No, egg-free',
+                        selected: !_eggEater,
+                        onTap: () => setState(() => _eggEater = false),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }

@@ -85,7 +85,7 @@ class PersonalTrainingCard extends StatelessWidget {
                 child: _ContactButton(
                   icon: Icons.chat_bubble_rounded,
                   label: 'WhatsApp',
-                  color: const Color(0xFF25D366),
+                  color: AppColors.whatsapp,
                   onTap: () => _openWhatsApp(context),
                 ),
               ),

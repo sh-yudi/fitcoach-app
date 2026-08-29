@@ -10,6 +10,7 @@ class User {
   final String activityLevel;
   final String fitnessLevel;
   final bool veg;
+  final bool eggFree;
   final int? waistCm;
   final int? neckCm;
   final int? hipCm;
@@ -36,6 +37,7 @@ class User {
     required this.activityLevel,
     required this.fitnessLevel,
     required this.veg,
+    this.eggFree = false,
     this.waistCm,
     this.neckCm,
     this.hipCm,
@@ -64,6 +66,7 @@ class User {
       activityLevel: j['activityLevel'] as String? ?? 'moderate',
       fitnessLevel: j['fitnessLevel'] as String? ?? 'beginner',
       veg: j['veg'] as bool? ?? false,
+      eggFree: j['eggFree'] as bool? ?? false,
       waistCm: (j['waistCm'] as num?)?.toInt(),
       neckCm: (j['neckCm'] as num?)?.toInt(),
       hipCm: (j['hipCm'] as num?)?.toInt(),

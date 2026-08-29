@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import 'config.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/auth/splash_screen.dart';
 import 'screens/calendar/calendar_screen.dart';
@@ -31,11 +30,9 @@ class _AppLifecycleObserver with WidgetsBindingObserver {
       case AppLifecycleState.hidden:
       case AppLifecycleState.detached:
         Session.markBackgrounded();
-        break;
       case AppLifecycleState.resumed:
         _checkIdleLogout();
-        break;
-      default:
+      case AppLifecycleState.inactive:
         break;
     }
   }

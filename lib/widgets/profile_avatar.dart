@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
 import '../config.dart';
+import '../theme.dart';
 
 /// Displays a user profile photo from either a server URL or base64 data.
 class ProfileAvatar extends StatelessWidget {
@@ -19,21 +19,6 @@ class ProfileAvatar extends StatelessWidget {
     this.size = 48,
     this.fallbackIcon = Icons.person,
   });
-
-  /// Convenience: build from a User model's displayPhoto + isPhotoUrl.
-  factory ProfileAvatar.fromUser({
-    required String? displayPhoto,
-    required bool isUrl,
-    double size = 48,
-    IconData fallbackIcon = Icons.person,
-  }) {
-    return ProfileAvatar(
-      photoUrl: isUrl ? displayPhoto : null,
-      base64: isUrl ? null : displayPhoto,
-      size: size,
-      fallbackIcon: fallbackIcon,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,9 +55,9 @@ class ProfileAvatar extends StatelessWidget {
     return Container(
       width: size,
       height: size,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Color(0xFF2A2A3E),
+        color: AppColors.avatarFallback,
       ),
       child: Icon(fallbackIcon, size: size * 0.5, color: Colors.white54),
     );

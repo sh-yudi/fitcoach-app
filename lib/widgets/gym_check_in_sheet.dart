@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/api_client.dart';
 import '../theme.dart';
+import '../utils/helpers.dart';
 
 /// Bottom sheet to plan and record gym attendance for a specific date.
 class GymCheckInSheet extends StatefulWidget {
@@ -27,7 +28,7 @@ class _GymCheckInSheetState extends State<GymCheckInSheet> {
 
   String get _label {
     final parts = widget.dateKey.split('-');
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = kMonths;
     return '${months[int.parse(parts[1]) - 1]} ${int.parse(parts[2])}, ${parts[0]}';
   }
 
