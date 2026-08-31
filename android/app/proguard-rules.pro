@@ -25,3 +25,13 @@
 -keep class androidx.work.** { *; }
 -dontwarn androidx.work.**
 -dontwarn org.conscrypt.**
+
+# --- Lottie Animation ---
+-keep class com.airbnb.lottie.** { *; }
+
+# --- UCrop Image Cropper ---
+-keep class com.yalantis.ucrop.** { *; }
+
+# --- Biometrics & Local Auth ---
+-keep class io.flutter.plugins.localauth.** { *; }
+-keep class androidx.biometric.** { *; }

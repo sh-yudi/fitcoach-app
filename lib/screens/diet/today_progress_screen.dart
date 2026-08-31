@@ -63,17 +63,23 @@ class _TodayProgressScreenState extends State<TodayProgressScreen> {
 
   List<_WaterSlot> _buildWaterSlots() {
     if (_diet == null) return [];
-    final totalMl = (_diet!.waterLiters * 1000).toInt();
     final visible = _diet!.meals.where((m) => !kWaterExclude.contains(m.name)).toList();
-    final perDrinkMl = visible.isEmpty ? 0 : totalMl ~/ (visible.length * 2);
     final slots = <_WaterSlot>[];
     for (final m in visible) {
-      final beforeTime = shiftTime(m.time, -30);
-      final afterTime = shiftTime(m.time, 25);
       final beforeId = '${m.name}_before';
       final afterId = '${m.name}_after';
-      slots.add(_WaterSlot(id: beforeId, time: beforeTime, ml: perDrinkMl, label: 'Before ${mealTitle(m.name)}'));
-      slots.add(_WaterSlot(id: afterId, time: afterTime, ml: perDrinkMl, label: 'After ${mealTitle(m.name)}'));
+      slots.add(_WaterSlot(
+        id: beforeId,
+        ml: '300–500 ml',
+        label: 'Before ${mealTitle(m.name)}',
+        hint: '30–40 min before meal',
+      ));
+      slots.add(_WaterSlot(
+        id: afterId,
+        ml: '300–500 ml',
+        label: 'After ${mealTitle(m.name)}',
+        hint: '30–40 min after meal',
+      ));
     }
     return slots;
   }
@@ -105,9 +111,9 @@ class _TodayProgressScreenState extends State<TodayProgressScreen> {
 
   Widget _buildWaterProgress() {
     final slots = _buildWaterSlots();
-    final totalMl = (_diet!.waterLiters * 1000).toInt();
-    final doneMl = slots.where((s) => _waterDone.contains(s.id)).fold<int>(0, (sum, s) => sum + s.ml);
-    final pct = totalMl > 0 ? (doneMl / totalMl).clamp(0.0, 1.0) : 0.0;
+    final doneCount = slots.where((s) => _waterDone.contains(s.id)).length;
+    final totalCount = slots.length;
+    final pct = totalCount > 0 ? (doneCount / totalCount).clamp(0.0, 1.0) : 0.0;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -124,12 +130,12 @@ class _TodayProgressScreenState extends State<TodayProgressScreen> {
               const Icon(Icons.water_drop, color: Color(0xFF3DA5FF), size: 20),
               const SizedBox(width: 8),
               Text(
-                'Water Intake',
+                'Water Intake (300–500 ml)',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.textPrimary),
               ),
               const Spacer(),
               Text(
-                '$doneMl / $totalMl ml',
+                '$doneCount / $totalCount done',
                 style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w700),
               ),
             ],
@@ -146,7 +152,7 @@ class _TodayProgressScreenState extends State<TodayProgressScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            '${(pct * 100).round()}% complete',
+            '${(pct * 100).round()}% complete · 300–500 ml before & after meals',
             style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
           ),
           const SizedBox(height: 14),
@@ -174,25 +180,30 @@ class _TodayProgressScreenState extends State<TodayProgressScreen> {
                       size: 20,
                     ),
                     const SizedBox(width: 10),
-                    Text(
-                      s.time,
-                      style: TextStyle(
-                        color: AppColors.textPrimary,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        decoration: done ? TextDecoration.lineThrough : null,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        '${s.ml} ml \u00B7 ${s.label}',
-                        style: TextStyle(
-                          color: done ? AppColors.textSecondary : AppColors.textPrimary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          decoration: done ? TextDecoration.lineThrough : null,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            '${s.ml} · ${s.label}',
+                            style: TextStyle(
+                              color: done ? AppColors.textSecondary : AppColors.textPrimary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              decoration: done ? TextDecoration.lineThrough : null,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            s.hint,
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w400,
+                              decoration: done ? TextDecoration.lineThrough : null,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -353,10 +364,10 @@ class _TodayProgressScreenState extends State<TodayProgressScreen> {
 
 class _WaterSlot {
   final String id;
-  final String time;
-  final int ml;
+  final String ml;
   final String label;
-  const _WaterSlot({required this.id, required this.time, required this.ml, required this.label});
+  final String hint;
+  const _WaterSlot({required this.id, required this.ml, required this.label, required this.hint});
 }
 
 class _MacroPill extends StatelessWidget {
