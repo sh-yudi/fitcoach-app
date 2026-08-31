@@ -44,28 +44,17 @@ class _ExerciseDemoSheet extends StatefulWidget {
 
 class _ExerciseDemoSheetState extends State<_ExerciseDemoSheet>
     with SingleTickerProviderStateMixin {
-  late AnimationController _progressController;
-  late Animation<double> _progressAnimation;
-  Timer? _dismissTimer;
+  Timer? _stepTimer;
   Timer? _frameTimer;
   int _currentStep = 0;
   bool _showPeak = false;
-  bool _dismissed = false;
 
   @override
   void initState() {
     super.initState();
-    _progressController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 5),
-    );
-    _progressAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _progressController, curve: Curves.linear),
-    );
-    _progressController.forward();
-
-    _dismissTimer = Timer.periodic(const Duration(milliseconds: 1250), (t) {
-      if (!mounted || _dismissed) return;
+    // Cycle through steps automatically so user can follow along
+    _stepTimer = Timer.periodic(const Duration(milliseconds: 1250), (t) {
+      if (!mounted) return;
       setState(() {
         _currentStep = (_currentStep + 1) % widget.demo.steps.length;
       });
@@ -73,26 +62,19 @@ class _ExerciseDemoSheetState extends State<_ExerciseDemoSheet>
 
     if (widget.images != null) {
       _frameTimer = Timer.periodic(const Duration(milliseconds: 700), (t) {
-        if (!mounted || _dismissed) return;
+        if (!mounted) return;
         setState(() {
           _showPeak = !_showPeak;
         });
       });
     }
-
-    Future.delayed(const Duration(seconds: 5), () {
-      if (mounted && !_dismissed) {
-        _dismissed = true;
-        Navigator.of(context).pop();
-      }
-    });
+    // No auto-dismiss — user closes manually by tapping anywhere or dragging down
   }
 
   @override
   void dispose() {
-    _dismissTimer?.cancel();
+    _stepTimer?.cancel();
     _frameTimer?.cancel();
-    _progressController.dispose();
     super.dispose();
   }
 
@@ -104,10 +86,7 @@ class _ExerciseDemoSheetState extends State<_ExerciseDemoSheet>
     final muscleColor = _muscleColor(demo.muscle);
 
     return GestureDetector(
-      onTap: () {
-        _dismissed = true;
-        Navigator.of(context).pop();
-      },
+      onTap: () => Navigator.of(context).pop(),
       child: Container(
         color: Colors.black54,
         child: Align(
@@ -399,28 +378,27 @@ class _ExerciseDemoSheetState extends State<_ExerciseDemoSheet>
 
                           const SizedBox(height: 16),
 
-                          // Progress bar + close hint
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: AnimatedBuilder(
-                              animation: _progressAnimation,
-                              builder: (context, child) {
-                                return LinearProgressIndicator(
-                                  value: _progressAnimation.value,
-                                  backgroundColor: AppColors.surfaceLight.withValues(alpha: 0.5),
-                                  valueColor: AlwaysStoppedAnimation<Color>(muscleColor),
-                                  minHeight: 3,
-                                );
-                              },
-                            ),
-                          ),
-                          const SizedBox(height: 8),
+                          // Close hint
                           Center(
-                            child: Text(
-                              'Tap anywhere to close',
-                              style: TextStyle(
-                                fontSize: 11,
-                                color: AppColors.textSecondary.withValues(alpha: 0.5),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceLight.withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.swipe_down_rounded, size: 14, color: AppColors.textSecondary),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Tap anywhere or swipe down to close',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      color: AppColors.textSecondary.withValues(alpha: 0.7),
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),

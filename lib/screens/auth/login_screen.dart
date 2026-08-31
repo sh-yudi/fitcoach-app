@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:local_auth/local_auth.dart';
 
 import '../../services/api_client.dart';
 import '../../services/session.dart';
@@ -29,11 +30,15 @@ class _LoginScreenState extends State<LoginScreen> {
   String? _oneTapName;
   String? _oneTapPhoto;
   bool _oneTapLoading = false;
+  bool _biometricAvailable = false;
+
+  final _localAuth = LocalAuthentication();
 
   @override
   void initState() {
     super.initState();
     _loadOneTap();
+    _checkBiometric();
   }
 
   @override
@@ -41,6 +46,16 @@ class _LoginScreenState extends State<LoginScreen> {
     _email.dispose();
     _password.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkBiometric() async {
+    try {
+      final canCheck = await _localAuth.canCheckBiometrics;
+      final isSupported = await _localAuth.isDeviceSupported();
+      if (mounted) {
+        setState(() => _biometricAvailable = canCheck || isSupported);
+      }
+    } catch (_) {}
   }
 
   Future<void> _loadOneTap() async {
@@ -59,9 +74,43 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  /// Triggers fingerprint / Face ID / PIN — same as device screen-lock.
+  /// Returns true on success, or true if the device has no biometric set up
+  /// (so the one-tap flow still works on non-secured devices).
+  Future<bool> _biometricGate() async {
+    if (!_biometricAvailable) return true; // no lock screen → allow
+    try {
+      return await _localAuth.authenticate(
+        localizedReason:
+            'Verify your identity to log in as ${_oneTapName ?? _oneTapEmail ?? 'you'}',
+        biometricOnly: false, // allow PIN/pattern/password fallback
+        persistAcrossBackgrounding: true,
+      );
+    } on LocalAuthException catch (e) {
+      // Device has no credentials configured — allow through
+      if (e.code == LocalAuthExceptionCode.noCredentialsSet ||
+          e.code == LocalAuthExceptionCode.noBiometricsEnrolled ||
+          e.code == LocalAuthExceptionCode.noBiometricHardware) {
+        return true;
+      }
+      // User cancelled or other error
+      return false;
+    } catch (_) {
+      return false;
+    }
+  }
+
   Future<void> _oneTapLogin() async {
     final token = _oneTapToken;
     if (token == null || _oneTapLoading) return;
+
+    // ── Biometric / screen-lock gate ──
+    final passed = await _biometricGate();
+    if (!passed) {
+      if (mounted) setState(() => _error = 'Authentication cancelled.');
+      return;
+    }
+
     setState(() {
       _oneTapLoading = true;
       _error = null;
@@ -147,6 +196,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         email: _oneTapEmail ?? '',
                         photo: _oneTapPhoto,
                         loading: _oneTapLoading,
+                        biometricAvailable: _biometricAvailable,
                         onTap: _oneTapLogin,
                       )
                     else ...[
@@ -266,12 +316,14 @@ class _OneTapHero extends StatelessWidget {
   final String email;
   final String? photo;
   final bool loading;
+  final bool biometricAvailable;
   final VoidCallback onTap;
   const _OneTapHero({
     required this.name,
     required this.email,
     this.photo,
     required this.loading,
+    required this.biometricAvailable,
     required this.onTap,
   });
 
@@ -291,52 +343,98 @@ class _OneTapHero extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           children: [
-            Container(
-              width: 110,
-              height: 110,
-              clipBehavior: Clip.antiAlias,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.darkGreen, Color(0xFF4A6B1E)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+            Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                Container(
+                  width: 110,
+                  height: 110,
+                  clipBehavior: Clip.antiAlias,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [AppColors.darkGreen, Color(0xFF4A6B1E)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(40),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.35),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: loading
+                      ? const SizedBox(
+                          width: 30,
+                          height: 30,
+                          child: CircularProgressIndicator(strokeWidth: 3, color: Colors.white),
+                        )
+                      : (photo != null
+                          ? ProfileAvatar(
+                              photoUrl: !photo!.startsWith('data:') ? photo : null,
+                              base64: photo!.startsWith('data:') ? photo : null,
+                              size: 110,
+                              fallbackIcon: Icons.person,
+                            )
+                          : _initialText()),
                 ),
-                borderRadius: BorderRadius.circular(40),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: 0.35),
-                    blurRadius: 24,
-                    offset: const Offset(0, 8),
+                // Biometric badge in corner
+                if (!loading)
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.3), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.18),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      biometricAvailable ? Icons.fingerprint : Icons.lock_rounded,
+                      color: AppColors.primary,
+                      size: 18,
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.15)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    biometricAvailable ? Icons.fingerprint : Icons.lock_rounded,
+                    color: AppColors.primary,
+                    size: 15,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    biometricAvailable
+                        ? 'Tap to verify & log in'
+                        : 'Tap to log in instantly',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
-              child: loading
-                  ?  SizedBox(
-                      width: 30,
-                      height: 30,
-                      child: CircularProgressIndicator(strokeWidth: 3, color: Colors.white),
-                    )
-                  : (photo != null
-                      ? ProfileAvatar(
-                          photoUrl: !photo!.startsWith('data:') ? photo : null,
-                          base64: photo!.startsWith('data:') ? photo : null,
-                          size: 110,
-                          fallbackIcon: Icons.person,
-                        )
-                      : _initialText()),
-            ),
-            const SizedBox(height: 18),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.bolt, color: AppColors.primary, size: 16),
-                const SizedBox(width: 5),
-                 Text(
-                  'One-tap login · tap to continue',
-                  style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
-                ),
-              ],
             ),
           ],
         ),

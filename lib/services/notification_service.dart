@@ -133,12 +133,10 @@ class NotificationService {
     if (!await _ensurePermission()) return;
 
     try {
-      final dietResult = await ApiClient.instance.getDiet();
       final schedule = await ApiClient.instance.getSchedule();
       final profile = await ApiClient.instance.getProfile();
       final calendar = await ApiClient.instance.getGymCalendar();
-      final waterMl = (dietResult.diet.waterLiters * 1000).toInt();
-      await _scheduleDays(s, schedule, profile.workoutTime, calendar, waterMl);
+      await _scheduleDays(s, schedule, profile.workoutTime, calendar);
     } catch (e, st) {
       debugPrint('NotificationService.sync error: $e\n$st');
     }
@@ -149,7 +147,6 @@ class NotificationService {
     MealSchedule schedule,
     String workoutTime,
     ({Map<String, bool> gymPlans, Map<String, bool> attendance}) calendar,
-    int waterMl,
   ) async {
     final now = tz.TZDateTime.now(tz.local);
     final todayKey = _dateKey(now);
@@ -177,11 +174,10 @@ class NotificationService {
         }
       }
 
-      // Water reminders: 30 min before and 25 min after each meal (except pre/post workout).
-      if (s.waterEnabled && waterMl > 0) {
+      // Water reminders: 30 min before and 30 min after each meal (except pre/post workout).
+      if (s.waterEnabled) {
         final meals = gymDay ? schedule.gym : schedule.rest;
         final visibleMeals = meals.where((m) => !kWaterExclude.contains(m.meal)).toList();
-        final perDrinkMl = visibleMeals.isEmpty ? 0 : waterMl ~/ (visibleMeals.length * 2);
         for (final meal in visibleMeals) {
           final t = _parseTime(meal.time);
           if (t == null) continue;
@@ -189,19 +185,19 @@ class NotificationService {
           // 30 min before meal
           await _scheduleOneShot(
             id: 300000 + (day.difference(DateTime(day.year)).inDays * 100) + mealIdx * 2,
-            title: 'Water reminder',
-            body: 'Drink ~${perDrinkMl}ml water before your ${mealTitle(meal.meal)} (${meal.time}).',
+            title: '💧 Water reminder',
+            body: 'Drink 300–500 ml of water — your ${mealTitle(meal.meal)} is scheduled in 30–40 min.',
             hour: t.hour,
             minute: t.minute - 30,
             day: day,
           );
-          // 25 min after meal
+          // 30 min after meal
           await _scheduleOneShot(
             id: 300000 + (day.difference(DateTime(day.year)).inDays * 100) + mealIdx * 2 + 1,
-            title: 'Water reminder',
-            body: 'Drink ~${perDrinkMl}ml water after your ${mealTitle(meal.meal)} to stay hydrated.',
+            title: '💧 Water reminder',
+            body: 'Drink 300–500 ml of water — your ${mealTitle(meal.meal)} was 30–40 min ago. Stay hydrated!',
             hour: t.hour,
-            minute: t.minute + 25,
+            minute: t.minute + 30,
             day: day,
           );
         }

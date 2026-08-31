@@ -103,43 +103,34 @@ class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateM
 
   List<Widget> _buildMealsWithWater() {
     if (_diet == null) return [];
-    final totalMl = (_diet!.waterLiters * 1000).toInt();
-    final visible = _diet!.meals.where((m) => !kWaterExclude.contains(m.name)).toList();
-    final perDrinkMl = visible.isEmpty ? 0 : totalMl ~/ (visible.length * 2);
-    final beforeMap = <String, int>{};
-    final afterMap = <String, int>{};
-    for (final m in visible) {
-      beforeMap[m.name] = perDrinkMl;
-      afterMap[m.name] = perDrinkMl;
-    }
-
     final widgets = <Widget>[];
     for (final meal in _diet!.meals) {
-      final before = beforeMap[meal.name];
-      if (before != null && before > 0) {
+      // ── Before water chip ──
+      if (!kWaterExclude.contains(meal.name)) {
         final id = '${meal.name}_before';
         widgets.add(_WaterChip(
-          time: shiftTime(meal.time, -30),
-          ml: before,
-          label: 'Before ${mealTitle(meal.name)}',
+          ml: '300–500',
+          label: 'Drink before ${mealTitle(meal.name)}',
+          hint: '30–40 min before your meal',
           done: _waterDone.contains(id),
           onToggle: () => _toggleWater(id),
         ));
-        widgets.add(const SizedBox(height: 10));
+        widgets.add(const SizedBox(height: 8));
       }
+      // ── Meal card ──
       widgets.add(_MealCard(meal: meal));
-      widgets.add(const SizedBox(height: 12));
-      final after = afterMap[meal.name];
-      if (after != null && after > 0) {
+      widgets.add(const SizedBox(height: 8));
+      // ── After water chip ──
+      if (!kWaterExclude.contains(meal.name)) {
         final id = '${meal.name}_after';
         widgets.add(_WaterChip(
-          time: shiftTime(meal.time, 25),
-          ml: after,
-          label: 'After ${mealTitle(meal.name)}',
+          ml: '300–500',
+          label: 'Drink after ${mealTitle(meal.name)}',
+          hint: '30–40 min after your meal',
           done: _waterDone.contains(id),
           onToggle: () => _toggleWater(id),
         ));
-        widgets.add(const SizedBox(height: 10));
+        widgets.add(const SizedBox(height: 12));
       }
     }
     return widgets;
@@ -561,28 +552,28 @@ class _MealCard extends StatelessWidget {
 }
 
 class _WaterChip extends StatelessWidget {
-  final String time;
-  final int ml;
+  final String ml;
   final String label;
+  final String hint;
   final bool done;
   final VoidCallback? onToggle;
-  const _WaterChip({required this.time, required this.ml, required this.label, this.done = false, this.onToggle});
+  const _WaterChip({required this.ml, required this.label, required this.hint, this.done = false, this.onToggle});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onToggle,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
           color: done
               ? AppColors.water.withValues(alpha: 0.12)
-              : AppColors.water.withValues(alpha: 0.08),
+              : AppColors.water.withValues(alpha: 0.06),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
             color: done
                 ? AppColors.water.withValues(alpha: 0.45)
-                : AppColors.water.withValues(alpha: 0.25),
+                : AppColors.water.withValues(alpha: 0.20),
           ),
         ),
         child: Row(
@@ -590,30 +581,37 @@ class _WaterChip extends StatelessWidget {
             Icon(
               done ? Icons.check_circle : Icons.water_drop,
               color: AppColors.water,
-              size: 16,
+              size: 18,
             ),
-            const SizedBox(width: 8),
-            Text(
-              time,
-              style: TextStyle(
-                color: AppColors.textSecondary,
-                fontSize: 12,
-                fontWeight: FontWeight.w700,
-                decoration: done ? TextDecoration.lineThrough : null,
-              ),
-            ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 10),
             Expanded(
-              child: Text(
-                '$ml ml \u00B7 $label',
-                style: TextStyle(
-                  color: AppColors.textPrimary,
-                  fontSize: 12.5,
-                  fontWeight: FontWeight.w600,
-                  decoration: done ? TextDecoration.lineThrough : null,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$ml ml · $label',
+                    style: TextStyle(
+                      color: done ? AppColors.textSecondary : AppColors.textPrimary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      decoration: done ? TextDecoration.lineThrough : null,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    hint,
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w400,
+                      decoration: done ? TextDecoration.lineThrough : null,
+                    ),
+                  ),
+                ],
               ),
             ),
+            if (done)
+              Icon(Icons.check_rounded, color: AppColors.water, size: 16),
           ],
         ),
       ),
