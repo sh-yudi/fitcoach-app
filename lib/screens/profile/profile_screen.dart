@@ -20,12 +20,12 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  late String _heightText;
-  late String _activity;
-  late String _fitnessLevel;
-  late String _workoutTime;
-  late bool _veg;
-  late bool _eggFree;
+  String _heightText = '175';
+  String _activity = 'moderate';
+  String _fitnessLevel = 'intermediate';
+  String _workoutTime = 'evening';
+  bool _veg = false;
+  bool _eggFree = false;
   String? _wakeTime;
   String? _sleepTime;
   String? _gymTime;
@@ -64,15 +64,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _syncFromUser(User? u) {
-    _heightText = u?.heightCm.toString() ?? _heightText;
-    _activity = u?.activityLevel ?? _activity;
-    _fitnessLevel = u?.fitnessLevel ?? _fitnessLevel;
-    _workoutTime = u?.workoutTime ?? _workoutTime;
-    _veg = u?.veg ?? _veg;
-    _eggFree = u?.eggFree ?? false;
-    _wakeTime = u?.wakeTime;
-    _sleepTime = u?.sleepTime;
-    _gymTime = u?.gymTime;
+    if (u == null) return;
+    _heightText = u.heightCm.toString();
+    _activity = u.activityLevel;
+    _fitnessLevel = u.fitnessLevel;
+    _workoutTime = u.workoutTime;
+    _veg = u.veg;
+    _eggFree = u.eggFree;
+    _wakeTime = u.wakeTime;
+    _sleepTime = u.sleepTime;
+    _gymTime = u.gymTime;
+    _weight.text = u.weightKg.toString();
+    _waist.text = u.waistCm?.toString() ?? '';
+    _neck.text = u.neckCm?.toString() ?? '';
+    _hip.text = u.hipCm?.toString() ?? '';
   }
 
   Future<void> _changePhoto() async {
