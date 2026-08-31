@@ -379,6 +379,17 @@ const Map<String, ExerciseDemo> exerciseDemos = {
   ),
 
   // ── Quads ───────────────────────────────────────────────
+  'Quads': ExerciseDemo(
+    name: 'Quads',
+    muscle: 'Quads, Glutes',
+    steps: [
+      'Bar on upper traps, feet shoulder-width apart',
+      'Brace core, push hips back and down',
+      'Descend until thighs are at least parallel',
+      'Drive through heels to stand back up',
+    ],
+    tip: 'Dont let knees cave inward. Push them out over your toes.',
+  ),
   'Back Squat': ExerciseDemo(
     name: 'Back Squat',
     muscle: 'Quads, Glutes',
@@ -392,14 +403,14 @@ const Map<String, ExerciseDemo> exerciseDemos = {
   ),
   'Front Squat': ExerciseDemo(
     name: 'Front Squat',
-    muscle: 'Quads, Core',
+    muscle: 'Quads, Glutes',
     steps: [
-      'Bar rests on front delts, elbows high',
-      'Descend keeping torso upright',
-      'Go as deep as mobility allows',
-      'Drive up, keeping elbows high throughout',
+      'Bar on upper traps, feet shoulder-width apart',
+      'Brace core, push hips back and down',
+      'Descend until thighs are at least parallel',
+      'Drive through heels to stand back up',
     ],
-    tip: 'The upright torso position targets quads more than back squats.',
+    tip: 'Dont let knees cave inward. Push them out over your toes.',
   ),
   'Leg Press': ExerciseDemo(
     name: 'Leg Press',

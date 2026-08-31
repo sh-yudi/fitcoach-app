@@ -406,7 +406,10 @@ class _WorkoutDayCard extends StatelessWidget {
             ? AppColors.primary.withValues(alpha: 0.5)
             : AppColors.surfaceLight;
 
-    final headerLabel = day.label.isEmpty ? (day.day == 7 ? 'Rest / Recovery' : 'Workout') : day.label;
+    var headerLabel = day.label.isEmpty ? (day.day == 7 ? 'Rest / Recovery' : 'Workout') : day.label;
+    if (absExercises.isNotEmpty && !RegExp(r'\b(abs|abbs|core)\b', caseSensitive: false).hasMatch(headerLabel)) {
+      headerLabel = '$headerLabel + Abs';
+    }
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
