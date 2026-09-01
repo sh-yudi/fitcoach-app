@@ -21,6 +21,7 @@ class HomeShell extends StatefulWidget {
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
   int _refreshToken = 0;
+  int _homeRefreshToken = 0;
   User? _user;
   Assessment? _assessment;
 
@@ -45,7 +46,12 @@ class _HomeShellState extends State<HomeShell> {
     } catch (_) {}
   }
 
-  void _selectTab(int i) => setState(() => _index = i);
+  void _selectTab(int i) {
+    setState(() {
+      if (i == 0 && _index != 0) _homeRefreshToken++;
+      _index = i;
+    });
+  }
 
   void _refreshProfile(User user) {
     setState(() => _user = user);
@@ -65,7 +71,7 @@ class _HomeShellState extends State<HomeShell> {
       body: IndexedStack(
         index: _index,
         children: [
-          HomeScreen(user: _user, assessment: _assessment, onRefresh: _load, onOpenProfile: () => _selectTab(6)),
+          HomeScreen(user: _user, assessment: _assessment, onRefresh: _load, onOpenProfile: () => _selectTab(6), refreshToken: _homeRefreshToken),
           DietScreen(refreshToken: _refreshToken),
           WorkoutScreen(refreshToken: _refreshToken),
           CalendarScreen(refreshToken: _refreshToken),

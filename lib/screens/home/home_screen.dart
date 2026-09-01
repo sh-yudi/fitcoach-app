@@ -16,8 +16,9 @@ class HomeScreen extends StatefulWidget {
   final Assessment? assessment;
   final Future<void> Function() onRefresh;
   final VoidCallback? onOpenProfile;
+  final int refreshToken;
 
-  const HomeScreen({super.key, this.user, this.assessment, required this.onRefresh, this.onOpenProfile});
+  const HomeScreen({super.key, this.user, this.assessment, required this.onRefresh, this.onOpenProfile, this.refreshToken = 0});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -31,6 +32,14 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadStreaks();
+  }
+
+  @override
+  void didUpdateWidget(HomeScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.refreshToken != oldWidget.refreshToken) {
+      _loadStreaks();
+    }
   }
 
   Future<void> _loadStreaks() async {
