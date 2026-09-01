@@ -41,6 +41,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>FitCoach uses the camera so you can take a profile picture.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Use Face ID to securely log in to your FitCoach account.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>FitCoach uses the microphone only if you record a video.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

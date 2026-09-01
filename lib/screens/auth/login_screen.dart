@@ -52,8 +52,9 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final canCheck = await _localAuth.canCheckBiometrics;
       final isSupported = await _localAuth.isDeviceSupported();
+      final enrolled = await _localAuth.getAvailableBiometrics();
       if (mounted) {
-        setState(() => _biometricAvailable = canCheck || isSupported);
+        setState(() => _biometricAvailable = canCheck || isSupported || enrolled.isNotEmpty);
       }
     } catch (_) {}
   }
@@ -78,12 +79,12 @@ class _LoginScreenState extends State<LoginScreen> {
   /// Returns true on success, or true if the device has no biometric set up
   /// (so the one-tap flow still works on non-secured devices).
   Future<bool> _biometricGate() async {
-    if (!_biometricAvailable) return true; // no lock screen → allow
     try {
       return await _localAuth.authenticate(
         localizedReason:
-            'Verify your identity to log in as ${_oneTapName ?? _oneTapEmail ?? 'you'}',
-        biometricOnly: false, // allow PIN/pattern/password fallback
+            'Use Face ID or your passcode to log in as ${_oneTapName ?? _oneTapEmail ?? 'you'}',
+        biometricOnly: false, // allow PIN/pattern/passcode fallback if biometric fails
+        sensitiveTransaction: true,
         persistAcrossBackgrounding: true,
       );
     } on LocalAuthException catch (e) {

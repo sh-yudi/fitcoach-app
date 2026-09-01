@@ -31,11 +31,12 @@ class BiometricService {
 
   /// Prompts the device screen-lock authentication (biometric or PIN/pattern).
   /// Returns true if the user passes, false if they cancel or fail.
-  Future<bool> authenticate({String reason = 'Confirm your identity to log in'}) async {
+  Future<bool> authenticate({String reason = 'Use Face ID or your passcode to log in'}) async {
     try {
       return await _auth.authenticate(
         localizedReason: reason,
-        biometricOnly: false, // allow PIN/pattern/password fallback
+        biometricOnly: false, // allow PIN/pattern/passcode fallback
+        sensitiveTransaction: true,
         persistAcrossBackgrounding: true,
       );
     } on LocalAuthException catch (e) {
