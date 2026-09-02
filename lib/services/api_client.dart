@@ -117,12 +117,12 @@ class ApiClient {
     );
   }
 
-  Future<({String token, String rememberToken, User user})> oneTapLogin(String rememberToken) async {
+  Future<({String token, String? rememberToken, User user})> oneTapLogin(String rememberToken) async {
     final j = await _request('POST', '/api/auth/one-tap-login', body: {'rememberToken': rememberToken});
     return (
-      token: j['token'] as String,
-      rememberToken: j['rememberToken'] as String,
-      user: User.fromJson(j['user'] as Map<String, dynamic>),
+      token: j['token'] as String? ?? '',
+      rememberToken: j['rememberToken'] as String?,
+      user: User.fromJson(j['user'] as Map<String, dynamic>? ?? {}),
     );
   }
 

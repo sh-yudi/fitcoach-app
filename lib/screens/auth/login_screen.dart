@@ -80,11 +80,16 @@ class _LoginScreenState extends State<LoginScreen> {
   /// (so the one-tap flow still works on non-secured devices).
   Future<bool> _biometricGate() async {
     try {
+      final isSupported = await _localAuth.isDeviceSupported();
+      final canCheck = await _localAuth.canCheckBiometrics;
+      if (!isSupported && !canCheck) {
+        return true;
+      }
       return await _localAuth.authenticate(
         localizedReason:
-            'Use Face ID or your passcode to log in as ${_oneTapName ?? _oneTapEmail ?? 'you'}',
-        biometricOnly: false, // allow PIN/pattern/passcode fallback if biometric fails
-        sensitiveTransaction: true,
+            'Use Face ID, Touch ID, or Passcode to log in as ${_oneTapName ?? _oneTapEmail ?? 'you'}',
+        biometricOnly: false,
+        sensitiveTransaction: false,
         persistAcrossBackgrounding: true,
       );
     } on LocalAuthException catch (e) {
@@ -97,7 +102,8 @@ class _LoginScreenState extends State<LoginScreen> {
       // User cancelled or other error
       return false;
     } catch (_) {
-      return false;
+      // Allow through on unexpected platform errors to prevent locking out the user
+      return true;
     }
   }
 
@@ -112,6 +118,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
+    if (!mounted) return;
     setState(() {
       _oneTapLoading = true;
       _error = null;
@@ -122,7 +129,7 @@ class _LoginScreenState extends State<LoginScreen> {
         result.token,
         result.user.email,
         name: result.user.name,
-        rememberToken: result.rememberToken,
+        rememberToken: result.rememberToken ?? token,
         photo: result.user.displayPhoto,
       );
       ApiClient.instance.setToken(result.token);
@@ -131,6 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(builder: (_) => const HomeShell()),
       );
     } on ApiException catch (e) {
+      if (!mounted) return;
       setState(() {
         _oneTapLoading = false;
         _error = e.message;
@@ -145,6 +153,12 @@ class _LoginScreenState extends State<LoginScreen> {
           _oneTapPhoto = null;
         });
       }
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _oneTapLoading = false;
+        _error = 'Unable to log in with one-tap. Please use your password.';
+      });
     }
   }
 
@@ -373,7 +387,7 @@ class _OneTapHero extends StatelessWidget {
                           height: 30,
                           child: CircularProgressIndicator(strokeWidth: 3, color: Colors.white),
                         )
-                      : (photo != null
+                      : (photo != null && photo!.isNotEmpty
                           ? ProfileAvatar(
                               photoUrl: !photo!.startsWith('data:') ? photo : null,
                               base64: photo!.startsWith('data:') ? photo : null,
