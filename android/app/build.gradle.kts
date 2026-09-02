@@ -69,10 +69,16 @@ android {
 
     splits {
         abi {
-            isEnable = true
-            reset()
-            include("arm64-v8a", "armeabi-v7a")
-            isUniversalApk = false
+            // Produce per-ABI splits only for release builds (keeps APKs small).
+            // Debug builds (flutter run / integration tests) need a single
+            // universal APK, so disable splits when the task name is a Debug variant.
+            val isDebugTask = project.gradle.startParameter.taskNames.any { it.contains("Debug") }
+            isEnable = !isDebugTask
+            if (isEnable) {
+                reset()
+                include("arm64-v8a", "armeabi-v7a")
+                isUniversalApk = false
+            }
         }
     }
 }
