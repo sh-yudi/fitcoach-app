@@ -54,3 +54,6 @@ android/build/
 android/key.properties
 android/keystore-password.txt
 android/app/*.keystore
+
+# FVM Version Cache
+.fvm/
