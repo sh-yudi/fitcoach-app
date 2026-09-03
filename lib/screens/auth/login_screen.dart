@@ -298,16 +298,20 @@ class _LoginScreenState extends State<LoginScreen> {
                           "New client? ",
                           style: TextStyle(color: AppColors.textSecondary, fontSize: 14),
                         ),
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(builder: (_) => const RegisterScreen()),
-                          ),
-                          child:  Text(
-                            'Create account',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
+                        Semantics(
+                          button: true,
+                          label: 'Create account',
+                          child: GestureDetector(
+                            onTap: () => Navigator.of(context).push(
+                              MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                            ),
+                            child:  Text(
+                              'Create account',
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                              ),
                             ),
                           ),
                         ),
