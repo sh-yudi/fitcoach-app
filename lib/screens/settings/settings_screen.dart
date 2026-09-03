@@ -9,6 +9,7 @@ import '../../theme.dart';
 import '../../widgets/ad_banner.dart';
 import '../../widgets/profile_avatar.dart';
 import '../../widgets/section_header.dart';
+import '../auth/login_screen.dart';
 import 'developer_screen.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -99,6 +100,81 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> _confirmDeleteAccount() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: AppColors.surface,
+        title: Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: AppColors.danger, size: 26),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                'Delete Account?',
+                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 18),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'This action is permanent and cannot be undone.',
+              style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w600, fontSize: 13.5),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              '• All workout streaks, logs and calendar records will be deleted.\n'
+              '• Your customized daily meal plans will be erased.\n'
+              '• Your credentials, biometrics and profile photo will be permanently purged from the server.',
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 13, height: 1.4),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.danger),
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Delete Permanently'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _saving = true);
+    try {
+      await ApiClient.instance.deleteAccount();
+      await Session.clearAll();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Account and associated data deleted successfully.')),
+      );
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (route) => false,
+      );
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to delete account. Please try again.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (!_loaded) {
@@ -186,6 +262,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             const SizedBox(height: 20),
             _SettingsCard(
               children: [
+                 Divider(height: 1, color: AppColors.surfaceLight),
                 _SwitchRow(
                   icon: Icons.water_drop_outlined,
                   title: 'Water reminders',
@@ -232,8 +309,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
             if (!kReleaseMode) ...[
+              const SizedBox(height: 20),
               const SectionHeader(title: 'Developer'),
               const SizedBox(height: 10),
               _SettingsCard(
@@ -251,6 +328,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ],
               ),
             ],
+            const SizedBox(height: 20),
+            const SectionHeader(title: 'Danger Zone'),
+            const SizedBox(height: 10),
+            _SettingsCard(
+              children: [
+                _DangerRow(
+                  icon: Icons.delete_forever,
+                  title: 'Delete Account',
+                  subtitle: 'Permanently remove your account and all data',
+                  onTap: _saving ? () {} : _confirmDeleteAccount,
+                ),
+              ],
+            ),
             const SizedBox(height: 20),
             const AdBanner(),
           ],
@@ -551,6 +641,56 @@ class _ThemeModeRow extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class _DangerRow extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+  const _DangerRow({required this.icon, required this.title, required this.subtitle, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: AppColors.danger.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Icon(icon, color: AppColors.danger, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(color: AppColors.danger, fontSize: 14.5, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    subtitle,
+                    style: TextStyle(color: AppColors.textSecondary, fontSize: 12),
+                  ),
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 20),
+          ],
+        ),
+      ),
     );
   }
 }

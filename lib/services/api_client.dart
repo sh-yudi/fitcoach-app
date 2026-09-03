@@ -153,6 +153,13 @@ class ApiClient {
     );
   }
 
+  Future<void> deleteAccount() async {
+    try {
+      await _request('DELETE', '/api/profile');
+    } catch (_) {}
+    _token = null;
+  }
+
   // ---- Profile ----
   Future<User> getProfile() async {
     final j = await _request('GET', '/api/profile');
