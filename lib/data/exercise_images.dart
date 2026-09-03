@@ -60,4 +60,10 @@ const Map<String, Map<String, String>> exerciseImages = {
   'Hanging Leg Raise': {'start': 'assets/exercises/hanging_leg_raise_start.webp', 'peak': 'assets/exercises/hanging_leg_raise_peak.webp'},
   'Russian Twist': {'start': 'assets/exercises/russian_twist_start.webp', 'peak': 'assets/exercises/russian_twist_peak.webp'},
   'Side Plank': {'start': 'assets/exercises/side_plank_main.webp', 'peak': 'assets/exercises/side_plank_main.webp'},
+
+  // ── Cardio ──────────────────────────────────────────────
+  'Jump Rope': {'start': 'assets/exercises/jump_rope_main.webp', 'peak': 'assets/exercises/jump_rope_main.webp'},
+  'Rowing Machine': {'start': 'assets/exercises/rowing_machine_start.webp', 'peak': 'assets/exercises/rowing_machine_peak.webp'},
+  'Stationary Bike': {'start': 'assets/exercises/stationary_bike_main.webp', 'peak': 'assets/exercises/stationary_bike_main.webp'},
+  'Treadmill Incline Walk': {'start': 'assets/exercises/treadmill_incline_walk_main.webp', 'peak': 'assets/exercises/treadmill_incline_walk_main.webp'},
 };

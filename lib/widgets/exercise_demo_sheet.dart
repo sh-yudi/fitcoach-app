@@ -42,10 +42,23 @@ class _ExerciseDemoSheet extends StatefulWidget {
   State<_ExerciseDemoSheet> createState() => _ExerciseDemoSheetState();
 }
 
+// Exercises that only have a single static illustration (no start/peak motion
+// frames in the dataset). These get a programmatic motion animation so the
+// demo still looks alive. Keyed by the exercise name.
+enum _MotionStyle { jumpRope, stationaryBike, treadmillWalk }
+
+const Map<String, _MotionStyle> _motionStyles = {
+  'Jump Rope': _MotionStyle.jumpRope,
+  'Stationary Bike': _MotionStyle.stationaryBike,
+  'Treadmill Incline Walk': _MotionStyle.treadmillWalk,
+};
+
 class _ExerciseDemoSheetState extends State<_ExerciseDemoSheet>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   Timer? _stepTimer;
   Timer? _frameTimer;
+  late final AnimationController _motionController;
+  late final Animation<double> _motion;
   int _currentStep = 0;
   bool _showPeak = false;
 
@@ -68,6 +81,22 @@ class _ExerciseDemoSheetState extends State<_ExerciseDemoSheet>
         });
       });
     }
+
+    // Programmatic motion for exercises that have no start/peak motion frames.
+    final style = _motionStyles[widget.demo.name];
+    if (style != null) {
+      _motionController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 900),
+      )..repeat();
+      _motion = CurvedAnimation(
+        parent: _motionController,
+        curve: Curves.easeInOut,
+      );
+    } else {
+      _motionController = AnimationController.unbounded(vsync: this);
+      _motion = const AlwaysStoppedAnimation(0);
+    }
     // No auto-dismiss — user closes manually by tapping anywhere or dragging down
   }
 
@@ -75,6 +104,7 @@ class _ExerciseDemoSheetState extends State<_ExerciseDemoSheet>
   void dispose() {
     _stepTimer?.cancel();
     _frameTimer?.cancel();
+    _motionController.dispose();
     super.dispose();
   }
 
@@ -162,27 +192,58 @@ class _ExerciseDemoSheetState extends State<_ExerciseDemoSheet>
                                 ),
                               ),
                             ),
-                            // Exercise illustration
+                            // Exercise illustration (with motion animation)
                             AnimatedSwitcher(
                               duration: const Duration(milliseconds: 350),
                               transitionBuilder: (child, anim) =>
                                   FadeTransition(opacity: anim, child: child),
-                              child: Image.asset(
-                                _showPeak ? images['peak']! : images['start']!,
+                              child: AnimatedBuilder(
+                                animation: _motion,
                                 key: ValueKey(_showPeak ? 'peak' : 'start'),
-                                height: 190,
-                                fit: BoxFit.contain,
-                                errorBuilder: (_, __, ___) => Container(
+                                builder: (context, imgChild) {
+                                  final style = _motionStyles[widget.demo.name];
+                                  final t =
+                                      _motion.value < 0.5 ? _motion.value : (1 - _motion.value);
+                                  Offset translate = Offset.zero;
+                                  double scale = 1;
+                                  if (style == _MotionStyle.jumpRope) {
+                                    // Vertical jump bounce.
+                                    translate = Offset(
+                                        0, -14 * Curves.easeOut.transform(t));
+                                  } else if (style == _MotionStyle.stationaryBike) {
+                                    // Gentle pedal-rock.
+                                    final e = Curves.easeInOut.transform(t);
+                                    translate = Offset(3 * e, 2 * e);
+                                    scale = 1 + 0.02 * e;
+                                  } else if (style == _MotionStyle.treadmillWalk) {
+                                    // Striding shuffle forward and slight bob.
+                                    final e = Curves.easeInOut.transform(t);
+                                    translate = Offset(6 * e, -6 * e);
+                                  }
+                                  return Transform.translate(
+                                    offset: translate,
+                                    child: Transform.scale(
+                                      scale: scale,
+                                      child: imgChild,
+                                    ),
+                                  );
+                                },
+                                child: Image.asset(
+                                  _showPeak ? images['peak']! : images['start']!,
                                   height: 190,
-                                  width: 190,
-                                  decoration: BoxDecoration(
-                                    color: muscleColor.withValues(alpha: 0.1),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.fitness_center,
-                                    color: muscleColor,
-                                    size: 48,
+                                  fit: BoxFit.contain,
+                                  errorBuilder: (_, _, _) => Container(
+                                    height: 190,
+                                    width: 190,
+                                    decoration: BoxDecoration(
+                                      color: muscleColor.withValues(alpha: 0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.fitness_center,
+                                      color: muscleColor,
+                                      size: 48,
+                                    ),
                                   ),
                                 ),
                               ),
