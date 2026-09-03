@@ -83,6 +83,28 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Keep a slight bend in elbows. Dont lower too far if shoulders feel tight.',
   ),
+  'Decline Bench Press': ExerciseDemo(
+    name: 'Decline Bench Press',
+    muscle: 'Lower Chest',
+    steps: [
+      'Secure feet under the pads, lie back on a decline bench',
+      'Grip the bar slightly wider than shoulders',
+      'Lower the bar to the lower chest with control',
+      'Press up and slightly back to lockout',
+    ],
+    tip: 'The decline angle emphasizes the lower chest. Keep feet locked under the pads.',
+  ),
+  'Dumbbell Fly': ExerciseDemo(
+    name: 'Dumbbell Fly',
+    muscle: 'Chest',
+    steps: [
+      'Lie on a bench, hold dumbbells above chest with a slight elbow bend',
+      'Lower arms out to the sides in a wide arc',
+      'Stop when you feel a comfortable chest stretch',
+      'Bring dumbbells back together, squeezing chest',
+    ],
+    tip: 'Imagine hugging a barrel. Keep a fixed elbow bend — no pressing.',
+  ),
 
   // ── Shoulders ──────────────────────────────────────────
   'Overhead Shoulder Press': ExerciseDemo(
@@ -128,6 +150,17 @@ const Map<String, ExerciseDemo> exerciseDemos = {
       'Lower slowly back down',
     ],
     tip: 'Cables give constant tension throughout the range of motion.',
+  ),
+  'Machine Shoulder Press': ExerciseDemo(
+    name: 'Machine Shoulder Press',
+    muscle: 'Shoulders',
+    steps: [
+      'Adjust the seat so handles are at shoulder height',
+      'Grip the handles and press overhead',
+      'Extend arms without locking elbows',
+      'Lower with control back to shoulder height',
+    ],
+    tip: 'A machine press is safe for beginners. Keep your back flat against the pad.',
   ),
   'Front Raise': ExerciseDemo(
     name: 'Front Raise',
@@ -377,6 +410,28 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Elevate your feet to make it harder. Bend knees to make it easier.',
   ),
+  'Single-Arm Dumbbell Row': ExerciseDemo(
+    name: 'Single-Arm Dumbbell Row',
+    muscle: 'Back, Biceps',
+    steps: [
+      'Place one knee and hand on a bench, back flat',
+      'Hold a dumbbell in the other hand, arm hanging down',
+      'Row the dumbbell up to your hip',
+      'Squeeze your back at the top, then lower with control',
+    ],
+    tip: 'The one-arm version lets you correct imbalances and use a longer range of motion.',
+  ),
+  'Close-Grip Pulldown': ExerciseDemo(
+    name: 'Close-Grip Pulldown',
+    muscle: 'Lats, Biceps',
+    steps: [
+      'Grip the bar with hands shoulder-width or closer',
+      'Lean back slightly and pull the bar to your upper chest',
+      'Squeeze your back at the bottom',
+      'Control the return until arms are extended',
+    ],
+    tip: 'A narrow grip shifts more work to the lats and allows a deeper stretch at the top.',
+  ),
 
   // ── Quads ───────────────────────────────────────────────
   'Quads': ExerciseDemo(
@@ -411,6 +466,17 @@ const Map<String, ExerciseDemo> exerciseDemos = {
       'Drive through heels to stand back up',
     ],
     tip: 'Dont let knees cave inward. Push them out over your toes.',
+  ),
+  'Barbell Squat': ExerciseDemo(
+    name: 'Barbell Squat',
+    muscle: 'Quads, Glutes',
+    steps: [
+      'Bar on upper traps, feet shoulder-width apart',
+      'Brace core, push hips back and down',
+      'Descend until thighs are at least parallel',
+      'Drive through heels to stand back up',
+    ],
+    tip: 'Drive through your whole foot and push your knees out. Full-depth reps build the most muscle.',
   ),
   'Leg Press': ExerciseDemo(
     name: 'Leg Press',
@@ -512,17 +578,6 @@ const Map<String, ExerciseDemo> exerciseDemos = {
       'Extend legs back out without dropping hips',
     ],
     tip: 'Keep hips elevated throughout the entire movement.',
-  ),
-  'Good Morning': ExerciseDemo(
-    name: 'Good Morning',
-    muscle: 'Hamstrings, Lower Back',
-    steps: [
-      'Bar on upper back, feet shoulder-width',
-      'Push hips back and hinge forward at waist',
-      'Lower torso until nearly parallel to floor',
-      'Drive hips forward to return to standing',
-    ],
-    tip: 'Start very light. This is a hip hinge, not a squat.',
   ),
 
   // ── Glutes ──────────────────────────────────────────────
@@ -629,6 +684,28 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Press your lower back into the floor throughout. Dont rush.',
   ),
+  'Mountain Climbers': ExerciseDemo(
+    name: 'Mountain Climbers',
+    muscle: 'Core, Cardio',
+    steps: [
+      'Start in a high plank, hands under shoulders',
+      'Drive one knee toward your chest',
+      'Quickly switch legs, alternating the sprint',
+      'Keep hips low and core braced throughout',
+    ],
+    tip: 'Think of running in place in a plank. Keep your hips from bouncing up and down.',
+  ),
+  'Ab Wheel Rollout': ExerciseDemo(
+    name: 'Ab Wheel Rollout',
+    muscle: 'Abs, Core',
+    steps: [
+      'Kneel and grip the ab wheel, hands under shoulders',
+      'Engage core and roll the wheel forward slowly',
+      'Go only as far as you can without arching your back',
+      'Pull the wheel back using your abs, not your arms',
+    ],
+    tip: 'Keep your spine neutral and abs braced. Stop if your lower back arches.',
+  ),
 
   // ── Abs ─────────────────────────────────────────────────
   'Cable Crunch': ExerciseDemo(
@@ -641,6 +718,17 @@ const Map<String, ExerciseDemo> exerciseDemos = {
       'Focus on contracting abs, not pulling with arms',
     ],
     tip: 'The movement comes from curling the spine, not hinging at the hips.',
+  ),
+  'Bicycle Crunch': ExerciseDemo(
+    name: 'Bicycle Crunch',
+    muscle: 'Abs, Obliques',
+    steps: [
+      'Lie on your back, hands behind your head, legs lifted',
+      'Bring one knee toward the opposite elbow',
+      'Rotate your torso as you straighten the other leg',
+      'Alternate sides in a smooth pedaling motion',
+    ],
+    tip: 'Keep your lower back pressed into the floor. Rotate from the ribs, not just the elbows.',
   ),
   'Hanging Leg Raise': ExerciseDemo(
     name: 'Hanging Leg Raise',
