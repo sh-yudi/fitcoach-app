@@ -4,6 +4,7 @@ import '../../models/models.dart';
 import '../../services/api_client.dart';
 import '../../theme.dart';
 import '../../widgets/ad_banner.dart';
+import '../../widgets/body_composition_sheet.dart';
 import '../../widgets/personal_training_card.dart';
 import '../../widgets/section_header.dart';
 import '../../widgets/stat_card.dart';
@@ -137,14 +138,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         value: a.bodyFatPct != null ? '${a.bodyFatPct}%' : '—',
                         sub: bfOut
                             ? (bf > a.targetFatMax
-                                ? 'Above target (${a.targetFatMin}–${a.targetFatMax}%)'
-                                : 'Below target (${a.targetFatMin}–${a.targetFatMax}%)')
-                            : 'Target ${a.targetFatMin}–${a.targetFatMax}%',
+                                ? 'Above target (${a.targetFatMin.toInt()}–${a.targetFatMax.toInt()}%)'
+                                : 'Below target (${a.targetFatMin.toInt()}–${a.targetFatMax.toInt()}%)')
+                            : '${a.bodyFatCategory} · Target ${a.targetFatMin.toInt()}–${a.targetFatMax.toInt()}%',
                         icon: Icons.water_drop_outlined,
                         accent: AppColors.primary,
                         alert: bfOut,
                         blink: blink && bfOut,
-                        onTap: () => _showBodyFatInfo(context, u, a),
+                        onTap: () => showBodyCompositionSheet(
+                          context,
+                          user: u,
+                          assessment: a,
+                          onUpdated: widget.onRefresh,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -354,47 +360,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showBodyFatInfo(BuildContext context, User? u, Assessment a) {
-    final hasNavy = (u?.waistCm ?? 0) > 0 && (u?.neckCm ?? 0) > 0;
-
-    String inches(num? cm) => (cm! / 2.54).toStringAsFixed(1);
-    _showMetricSheet(
-      context,
-      title: 'Body Fat %',
-      value: a.bodyFatPct != null ? '${a.bodyFatPct}%' : '—',
-      category: 'Estimated',
-      inputs: {
-        if (u != null) 'Gender': _cap(u.gender),
-        if (u != null) 'Age': '${u.age} years',
-        if (u != null) 'Height': '${u.heightCm} cm',
-        if (u != null && hasNavy) 'Waist': '${u.waistCm} cm (${inches(u.waistCm!)} in)',
-        if (u != null && hasNavy) 'Neck': '${u.neckCm} cm (${inches(u.neckCm!)} in)',
-        if (u != null && hasNavy && u.hipCm != null) 'Hip': '${u.hipCm} cm (${inches(u.hipCm!)} in)',
-      },
-      steps: hasNavy
-          ? u!.gender == 'male'
-              ? [
-                  'Convert height, waist & neck to inches',
-                  'Compute waist − neck',
-                  'Substitute into the US Navy equation',
-                ]
-              : [
-                  'Convert height, waist, neck & hip to inches',
-                  'Compute waist + hip − neck',
-                  'Substitute into the US Navy equation',
-                ]
-          : [
-              'Uses BMI and age (Deurenberg formula)',
-              'Applied when no waist/neck measurements are saved',
-              'Add waist & neck measurements for a more accurate estimate',
-            ],
-      formula: hasNavy
-          ? u!.gender == 'male'
-              ? 'BF% = 495 / (1.0324 − 0.19077·log10(waist−neck) + 0.15456·log10(height)) − 450'
-              : 'BF% = 495 / (1.29579 − 0.35004·log10(waist+hip−neck) + 0.221·log10(height)) − 450'
-          : 'BF% = 1.2·BMI + 0.23·age − 10.8·sex − 5.4',
-    );
-  }
 
   void _showMetricSheet(
     BuildContext context, {

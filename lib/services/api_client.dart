@@ -217,6 +217,14 @@ class ApiClient {
     return MealSchedule.fromJson(j);
   }
 
+  Future<Map<String, dynamic>> calculateBodyFat(Map<String, dynamic> params) async {
+    return _request('POST', '/api/plans/calculate-body-fat', body: params);
+  }
+
+  Future<Map<String, dynamic>> simulateTarget(Map<String, dynamic> params) async {
+    return _request('POST', '/api/plans/simulate-target', body: params);
+  }
+
   // ---- Developer info (global constant) ----
   Future<DeveloperInfo> getDeveloperInfo() async {
     final j = await _request('GET', '/api/developer');

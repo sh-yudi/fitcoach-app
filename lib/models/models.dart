@@ -130,8 +130,15 @@ class Assessment {
   final double? bmi;
   final String bmiCategory;
   final double? bodyFatPct;
+  final String bodyFatCategory;
   final double targetFatMin;
   final double targetFatMax;
+  final double? leanMassKg;
+  final double? fatMassKg;
+  final double? ffmi;
+  final double? normalizedFfmi;
+  final String? ffmiCategory;
+  final double? rfm;
   final String goal;
   final int bmr;
   final int tdee;
@@ -145,8 +152,15 @@ class Assessment {
     required this.bmi,
     required this.bmiCategory,
     required this.bodyFatPct,
+    this.bodyFatCategory = 'Fitness',
     required this.targetFatMin,
     required this.targetFatMax,
+    this.leanMassKg,
+    this.fatMassKg,
+    this.ffmi,
+    this.normalizedFfmi,
+    this.ffmiCategory,
+    this.rfm,
     required this.goal,
     required this.bmr,
     required this.tdee,
@@ -163,8 +177,15 @@ class Assessment {
       bmi: (j['bmi'] as num?)?.toDouble(),
       bmiCategory: j['bmiCategory'] as String? ?? '—',
       bodyFatPct: (j['bodyFatPct'] as num?)?.toDouble(),
+      bodyFatCategory: j['bodyFatCategory'] as String? ?? 'Fitness',
       targetFatMin: ((j['targetBodyFat'] as Map<String, dynamic>?)?['min'] as num?)?.toDouble() ?? 15,
       targetFatMax: ((j['targetBodyFat'] as Map<String, dynamic>?)?['max'] as num?)?.toDouble() ?? 17,
+      leanMassKg: (j['leanMassKg'] as num?)?.toDouble(),
+      fatMassKg: (j['fatMassKg'] as num?)?.toDouble(),
+      ffmi: (j['ffmi'] as num?)?.toDouble(),
+      normalizedFfmi: (j['normalizedFfmi'] as num?)?.toDouble(),
+      ffmiCategory: j['ffmiCategory'] as String?,
+      rfm: (j['rfm'] as num?)?.toDouble(),
       goal: j['goal'] as String? ?? 'maintain',
       bmr: (j['bmr'] as num?)?.toInt() ?? 0,
       tdee: (j['tdee'] as num?)?.toInt() ?? 0,
