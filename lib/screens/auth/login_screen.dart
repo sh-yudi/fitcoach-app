@@ -76,13 +76,14 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   /// Triggers fingerprint / Face ID / PIN — same as device screen-lock.
-  /// Returns true on success, or true if the device has no biometric set up
-  /// (so the one-tap flow still works on non-secured devices).
+  /// Returns true on success, or true if the device has no biometric enrolled
+  /// (so the one-tap flow still works on non-secured/test devices).
   Future<bool> _biometricGate() async {
     try {
       final isSupported = await _localAuth.isDeviceSupported();
       final canCheck = await _localAuth.canCheckBiometrics;
-      if (!isSupported && !canCheck) {
+      final available = await _localAuth.getAvailableBiometrics();
+      if (!isSupported || (!canCheck && available.isEmpty)) {
         return true;
       }
       return await _localAuth.authenticate(
@@ -93,16 +94,13 @@ class _LoginScreenState extends State<LoginScreen> {
         persistAcrossBackgrounding: true,
       );
     } on LocalAuthException catch (e) {
-      // Device has no credentials configured — allow through
       if (e.code == LocalAuthExceptionCode.noCredentialsSet ||
           e.code == LocalAuthExceptionCode.noBiometricsEnrolled ||
           e.code == LocalAuthExceptionCode.noBiometricHardware) {
         return true;
       }
-      // User cancelled or other error
       return false;
     } catch (_) {
-      // Allow through on unexpected platform errors to prevent locking out the user
       return true;
     }
   }
