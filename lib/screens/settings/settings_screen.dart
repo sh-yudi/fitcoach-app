@@ -10,7 +10,6 @@ import '../../widgets/ad_banner.dart';
 import '../../widgets/profile_avatar.dart';
 import '../../widgets/section_header.dart';
 import '../auth/login_screen.dart';
-import 'developer_screen.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -309,25 +308,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ],
             ),
-            if (!kReleaseMode) ...[
-              const SizedBox(height: 20),
-              const SectionHeader(title: 'Developer'),
-              const SizedBox(height: 10),
-              _SettingsCard(
-                children: [
-                  _NavRow(
-                    icon: Icons.code,
-                    title: 'Developer Information',
-                    subtitle: 'About the app developer',
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const DeveloperScreen()),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            ],
             const SizedBox(height: 20),
             const SectionHeader(title: 'Danger Zone'),
             const SizedBox(height: 10),
