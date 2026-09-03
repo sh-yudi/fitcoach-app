@@ -1,4 +1,4 @@
-// Exercise demo data — instructions for all 61 exercises.
+// Exercise demo data — instructions for all 168 exercises.
 // Images are loaded from assets/exercises/ based on the exercise name mapping.
 
 class ExerciseDemo {
@@ -16,7 +16,7 @@ class ExerciseDemo {
 }
 
 const Map<String, ExerciseDemo> exerciseDemos = {
-  // ── Chest ──────────────────────────────────────────────
+  // ── PUSH ──────────────────────────────────────────
   'Barbell Bench Press': ExerciseDemo(
     name: 'Barbell Bench Press',
     muscle: 'Chest',
@@ -38,6 +38,149 @@ const Map<String, ExerciseDemo> exerciseDemos = {
       'Lower with control back to shoulders',
     ],
     tip: 'The incline targets upper chest. Dont go too steep or shoulders take over.',
+  ),
+  'Incline Barbell Bench Press': ExerciseDemo(
+    name: 'Incline Barbell Bench Press',
+    muscle: 'Chest',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target chest muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep shoulder blades retracted and avoid locking out joints aggressively at top.',
+  ),
+  'Decline Bench Press': ExerciseDemo(
+    name: 'Decline Bench Press',
+    muscle: 'Lower Chest',
+    steps: [
+      'Secure feet under the pads, lie back on a decline bench',
+      'Grip the bar slightly wider than shoulders',
+      'Lower the bar to the lower chest with control',
+      'Press up and slightly back to lockout',
+    ],
+    tip: 'The decline angle emphasizes the lower chest. Keep feet locked under the pads.',
+  ),
+  'Overhead Shoulder Press': ExerciseDemo(
+    name: 'Overhead Shoulder Press',
+    muscle: 'Shoulders',
+    steps: [
+      'Stand or sit with dumbbells at shoulder height',
+      'Press straight overhead until arms lock out',
+      'Lower with control back to ears',
+      'Keep core braced — avoid arching back',
+    ],
+    tip: 'Dont lean back excessively. If standing, squeeze glutes for stability.',
+  ),
+  'Arnold Press': ExerciseDemo(
+    name: 'Arnold Press',
+    muscle: 'Shoulders (all heads)',
+    steps: [
+      'Start with dumbbells in front of chest, palms facing you',
+      'As you press up, rotate palms to face forward',
+      'At the top, arms are fully extended overhead',
+      'Reverse the rotation on the way down',
+    ],
+    tip: 'The rotation hits all three deltoid heads. Keep it smooth.',
+  ),
+  'Machine Shoulder Press': ExerciseDemo(
+    name: 'Machine Shoulder Press',
+    muscle: 'Shoulders',
+    steps: [
+      'Adjust the seat so handles are at shoulder height',
+      'Grip the handles and press overhead',
+      'Extend arms without locking elbows',
+      'Lower with control back to shoulder height',
+    ],
+    tip: 'A machine press is safe for beginners. Keep your back flat against the pad.',
+  ),
+  'Lateral Raises': ExerciseDemo(
+    name: 'Lateral Raises',
+    muscle: 'Side Delts',
+    steps: [
+      'Stand with dumbbells at your sides, slight elbow bend',
+      'Raise arms out to the sides until shoulder height',
+      'Pause briefly at the top',
+      'Lower slowly — resist gravity',
+    ],
+    tip: 'Use light weight with strict form. Lead with your elbows, not hands.',
+  ),
+  'Cable Lateral Raise': ExerciseDemo(
+    name: 'Cable Lateral Raise',
+    muscle: 'Side Delts',
+    steps: [
+      'Stand beside a low cable, grip handle with far hand',
+      'Raise arm out to the side until shoulder height',
+      'Pause and squeeze at the top',
+      'Lower slowly back down',
+    ],
+    tip: 'Cables give constant tension throughout the range of motion.',
+  ),
+  'Cable Tricep Pushdown': ExerciseDemo(
+    name: 'Cable Tricep Pushdown',
+    muscle: 'Triceps',
+    steps: [
+      'Stand facing a high cable with straight or rope attachment',
+      'Push down until arms are fully extended',
+      'Squeeze triceps at the bottom',
+      'Return slowly — dont let the weight yank your arms up',
+    ],
+    tip: 'Keep elbows locked at your sides. Only your forearms should move.',
+  ),
+  'Rope Pushdown': ExerciseDemo(
+    name: 'Rope Pushdown',
+    muscle: 'Triceps',
+    steps: [
+      'Attach rope to high cable',
+      'Push down and spread the rope apart at the bottom',
+      'Squeeze triceps hard',
+      'Return with control',
+    ],
+    tip: 'Spreading the rope at the bottom gives an extra tricep contraction.',
+  ),
+  'Overhead Tricep Extension': ExerciseDemo(
+    name: 'Overhead Tricep Extension',
+    muscle: 'Triceps (long head)',
+    steps: [
+      'Hold one dumbbell with both hands overhead',
+      'Lower it behind your head by bending elbows',
+      'Extend arms back overhead',
+      'Keep elbows pointed forward and close to ears',
+    ],
+    tip: 'The overhead position maximally stretches the long head.',
+  ),
+  'Skullcrusher': ExerciseDemo(
+    name: 'Skullcrusher',
+    muscle: 'Triceps',
+    steps: [
+      'Lie on bench, hold EZ-bar above chest with arms extended',
+      'Lower bar toward forehead by bending elbows',
+      'Stop just above your forehead',
+      'Extend back to starting position',
+    ],
+    tip: 'Dont flare elbows out. Keep them pointed at the ceiling.',
+  ),
+  'Close-Grip Bench Press': ExerciseDemo(
+    name: 'Close-Grip Bench Press',
+    muscle: 'Triceps, Chest',
+    steps: [
+      'Lie on bench, grip bar with hands shoulder-width apart',
+      'Lower bar to lower chest',
+      'Press up, keeping elbows close to body',
+      'Lock out at the top',
+    ],
+    tip: 'Hands should be inside shoulder width. This is a triceps-focused press.',
+  ),
+  'Dips': ExerciseDemo(
+    name: 'Dips',
+    muscle: 'Triceps, Chest',
+    steps: [
+      'Grip parallel bars and lift yourself up',
+      'Lower body by bending elbows to about 90 degrees',
+      'Push back up to full extension',
+      'Lean forward slightly to target chest more',
+    ],
+    tip: 'Lean forward for chest, stay upright for triceps.',
   ),
   'Push-Ups': ExerciseDemo(
     name: 'Push-Ups',
@@ -61,6 +204,17 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Great for beginners. Focus on controlled reps, not heavy weight.',
   ),
+  'Pec Deck Fly': ExerciseDemo(
+    name: 'Pec Deck Fly',
+    muscle: 'Chest',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target chest muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Maintain a soft bend in elbows and focus on bringing biceps together across chest.',
+  ),
   'Cable Fly': ExerciseDemo(
     name: 'Cable Fly',
     muscle: 'Chest',
@@ -72,267 +226,40 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Think hugging a tree. Squeeze your chest at the peak.',
   ),
-  'Dumbbell Pullover': ExerciseDemo(
-    name: 'Dumbbell Pullover',
-    muscle: 'Chest, Lats',
-    steps: [
-      'Lie across a bench, upper back supported',
-      'Hold one dumbbell with both hands above chest',
-      'Lower it behind your head in an arc',
-      'Pull back over your chest, squeezing lats',
-    ],
-    tip: 'Keep a slight bend in elbows. Dont lower too far if shoulders feel tight.',
-  ),
-  'Decline Bench Press': ExerciseDemo(
-    name: 'Decline Bench Press',
-    muscle: 'Lower Chest',
-    steps: [
-      'Secure feet under the pads, lie back on a decline bench',
-      'Grip the bar slightly wider than shoulders',
-      'Lower the bar to the lower chest with control',
-      'Press up and slightly back to lockout',
-    ],
-    tip: 'The decline angle emphasizes the lower chest. Keep feet locked under the pads.',
-  ),
-  'Dumbbell Fly': ExerciseDemo(
-    name: 'Dumbbell Fly',
+  'Low-to-High Cable Fly': ExerciseDemo(
+    name: 'Low-to-High Cable Fly',
     muscle: 'Chest',
     steps: [
-      'Lie on a bench, hold dumbbells above chest with a slight elbow bend',
-      'Lower arms out to the sides in a wide arc',
-      'Stop when you feel a comfortable chest stretch',
-      'Bring dumbbells back together, squeezing chest',
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target chest muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
     ],
-    tip: 'Imagine hugging a barrel. Keep a fixed elbow bend — no pressing.',
+    tip: 'Maintain a soft bend in elbows and focus on bringing biceps together across chest.',
   ),
-
-  // ── Shoulders ──────────────────────────────────────────
-  'Overhead Shoulder Press': ExerciseDemo(
-    name: 'Overhead Shoulder Press',
-    muscle: 'Shoulders',
+  'High-to-Low Cable Fly': ExerciseDemo(
+    name: 'High-to-Low Cable Fly',
+    muscle: 'Chest',
     steps: [
-      'Stand or sit with dumbbells at shoulder height',
-      'Press straight overhead until arms lock out',
-      'Lower with control back to ears',
-      'Keep core braced — avoid arching back',
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target chest muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
     ],
-    tip: 'Dont lean back excessively. If standing, squeeze glutes for stability.',
+    tip: 'Maintain a soft bend in elbows and focus on bringing biceps together across chest.',
   ),
-  'Lateral Raises': ExerciseDemo(
-    name: 'Lateral Raises',
-    muscle: 'Side Delts',
+  'Landmine Chest Press': ExerciseDemo(
+    name: 'Landmine Chest Press',
+    muscle: 'Chest',
     steps: [
-      'Stand with dumbbells at your sides, slight elbow bend',
-      'Raise arms out to the sides until shoulder height',
-      'Pause briefly at the top',
-      'Lower slowly — resist gravity',
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target chest muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
     ],
-    tip: 'Use light weight with strict form. Lead with your elbows, not hands.',
+    tip: 'Keep shoulder blades retracted and avoid locking out joints aggressively at top.',
   ),
-  'Arnold Press': ExerciseDemo(
-    name: 'Arnold Press',
-    muscle: 'Shoulders (all heads)',
-    steps: [
-      'Start with dumbbells in front of chest, palms facing you',
-      'As you press up, rotate palms to face forward',
-      'At the top, arms are fully extended overhead',
-      'Reverse the rotation on the way down',
-    ],
-    tip: 'The rotation hits all three deltoid heads. Keep it smooth.',
-  ),
-  'Cable Lateral Raise': ExerciseDemo(
-    name: 'Cable Lateral Raise',
-    muscle: 'Side Delts',
-    steps: [
-      'Stand beside a low cable, grip handle with far hand',
-      'Raise arm out to the side until shoulder height',
-      'Pause and squeeze at the top',
-      'Lower slowly back down',
-    ],
-    tip: 'Cables give constant tension throughout the range of motion.',
-  ),
-  'Machine Shoulder Press': ExerciseDemo(
-    name: 'Machine Shoulder Press',
-    muscle: 'Shoulders',
-    steps: [
-      'Adjust the seat so handles are at shoulder height',
-      'Grip the handles and press overhead',
-      'Extend arms without locking elbows',
-      'Lower with control back to shoulder height',
-    ],
-    tip: 'A machine press is safe for beginners. Keep your back flat against the pad.',
-  ),
-  'Front Raise': ExerciseDemo(
-    name: 'Front Raise',
-    muscle: 'Front Delts',
-    steps: [
-      'Stand with dumbbells in front of thighs, palms facing thighs',
-      'Raise one arm forward to shoulder height',
-      'Lower with control, then alternate arms',
-      'Keep torso still — no swinging',
-    ],
-    tip: 'Use light weight. Swinging defeats the purpose of this isolation exercise.',
-  ),
-  'Face Pull': ExerciseDemo(
-    name: 'Face Pull',
-    muscle: 'Rear Delts, Rotator Cuff',
-    steps: [
-      'Set cable at face height with rope attachment',
-      'Pull rope toward your face, elbows high',
-      'Spread the rope apart as you pull back',
-      'Squeeze rear delts and hold briefly',
-    ],
-    tip: 'Essential for shoulder health. Pull to your ears, not your chin.',
-  ),
-  'Rear Delt Fly': ExerciseDemo(
-    name: 'Rear Delt Fly',
-    muscle: 'Rear Delts',
-    steps: [
-      'Bend forward at hips, dumbbells hanging down',
-      'Raise arms out to the sides with slight elbow bend',
-      'Squeeze shoulder blades together at the top',
-      'Lower slowly with control',
-    ],
-    tip: 'Keep your back flat. Think of spreading your wings.',
-  ),
-
-  // ── Biceps ──────────────────────────────────────────────
-  'Dumbbell Bicep Curl': ExerciseDemo(
-    name: 'Dumbbell Bicep Curl',
-    muscle: 'Biceps',
-    steps: [
-      'Stand with dumbbells at sides, palms forward',
-      'Curl both dumbbells up by bending elbows',
-      'Squeeze at the top, then lower slowly',
-      'Keep elbows pinned to your sides',
-    ],
-    tip: 'Dont swing your body. Control the negative (lowering) phase.',
-  ),
-  'Hammer Curls': ExerciseDemo(
-    name: 'Hammer Curls',
-    muscle: 'Biceps, Brachialis',
-    steps: [
-      'Hold dumbbells with palms facing each other',
-      'Curl up without rotating your wrists',
-      'Squeeze at the top, lower slowly',
-      'Elbows stay at your sides throughout',
-    ],
-    tip: 'Hammer curls build the brachialis — making your arms look thicker.',
-  ),
-  'Preacher Curl': ExerciseDemo(
-    name: 'Preacher Curl',
-    muscle: 'Biceps',
-    steps: [
-      'Rest upper arms on the preacher pad',
-      'Curl the weight up, squeezing biceps',
-      'Lower slowly until arms are nearly straight',
-      'Dont lock out completely at the bottom',
-    ],
-    tip: 'Strict form — no momentum. Great for peak contraction.',
-  ),
-  'Concentration Curl': ExerciseDemo(
-    name: 'Concentration Curl',
-    muscle: 'Biceps',
-    steps: [
-      'Sit on bench, elbow braced against inner thigh',
-      'Curl dumbbell up toward shoulder',
-      'Squeeze hard at the top for 1-2 seconds',
-      'Lower slowly back down',
-    ],
-    tip: 'Focus on the mind-muscle connection. Slow and controlled.',
-  ),
-  'Incline Dumbbell Curl': ExerciseDemo(
-    name: 'Incline Dumbbell Curl',
-    muscle: 'Biceps (long head)',
-    steps: [
-      'Set bench to 45-60 degrees, sit back',
-      'Let arms hang straight down with dumbbells',
-      'Curl up, keeping upper arms stationary',
-      'Lower slowly, feeling the stretch at the bottom',
-    ],
-    tip: 'The incline stretches the long head of the biceps for better growth.',
-  ),
-  'EZ-Bar Curl': ExerciseDemo(
-    name: 'EZ-Bar Curl',
-    muscle: 'Biceps',
-    steps: [
-      'Grip the EZ-bar at the angled sections',
-      'Curl up by bending at the elbows',
-      'Squeeze biceps at the top',
-      'Lower with control',
-    ],
-    tip: 'The angled grip is easier on your wrists than a straight bar.',
-  ),
-
-  // ── Triceps ─────────────────────────────────────────────
-  'Cable Tricep Pushdown': ExerciseDemo(
-    name: 'Cable Tricep Pushdown',
-    muscle: 'Triceps',
-    steps: [
-      'Stand facing a high cable with straight or rope attachment',
-      'Push down until arms are fully extended',
-      'Squeeze triceps at the bottom',
-      'Return slowly — dont let the weight yank your arms up',
-    ],
-    tip: 'Keep elbows locked at your sides. Only your forearms should move.',
-  ),
-  'Dips': ExerciseDemo(
-    name: 'Dips',
-    muscle: 'Triceps, Chest',
-    steps: [
-      'Grip parallel bars and lift yourself up',
-      'Lower body by bending elbows to about 90 degrees',
-      'Push back up to full extension',
-      'Lean forward slightly to target chest more',
-    ],
-    tip: 'Lean forward for chest, stay upright for triceps.',
-  ),
-  'Overhead Tricep Extension': ExerciseDemo(
-    name: 'Overhead Tricep Extension',
-    muscle: 'Triceps (long head)',
-    steps: [
-      'Hold one dumbbell with both hands overhead',
-      'Lower it behind your head by bending elbows',
-      'Extend arms back overhead',
-      'Keep elbows pointed forward and close to ears',
-    ],
-    tip: 'The overhead position maximally stretches the long head.',
-  ),
-  'Close-Grip Bench Press': ExerciseDemo(
-    name: 'Close-Grip Bench Press',
-    muscle: 'Triceps, Chest',
-    steps: [
-      'Lie on bench, grip bar with hands shoulder-width apart',
-      'Lower bar to lower chest',
-      'Press up, keeping elbows close to body',
-      'Lock out at the top',
-    ],
-    tip: 'Hands should be inside shoulder width. This is a triceps-focused press.',
-  ),
-  'Skullcrusher': ExerciseDemo(
-    name: 'Skullcrusher',
-    muscle: 'Triceps',
-    steps: [
-      'Lie on bench, hold EZ-bar above chest with arms extended',
-      'Lower bar toward forehead by bending elbows',
-      'Stop just above your forehead',
-      'Extend back to starting position',
-    ],
-    tip: 'Dont flare elbows out. Keep them pointed at the ceiling.',
-  ),
-  'Rope Pushdown': ExerciseDemo(
-    name: 'Rope Pushdown',
-    muscle: 'Triceps',
-    steps: [
-      'Attach rope to high cable',
-      'Push down and spread the rope apart at the bottom',
-      'Squeeze triceps hard',
-      'Return with control',
-    ],
-    tip: 'Spreading the rope at the bottom gives an extra tricep contraction.',
-  ),
-
-  // ── Back ────────────────────────────────────────────────
+  // ── PULL ──────────────────────────────────────────
   'Lat Pulldown': ExerciseDemo(
     name: 'Lat Pulldown',
     muscle: 'Lats, Biceps',
@@ -343,6 +270,61 @@ const Map<String, ExerciseDemo> exerciseDemos = {
       'Control the return — feel the stretch',
     ],
     tip: 'Think pulling with your elbows, not your hands.',
+  ),
+  'Wide-Grip Lat Pulldown': ExerciseDemo(
+    name: 'Wide-Grip Lat Pulldown',
+    muscle: 'Back',
+    steps: [
+      'Sit down on a pull-down machine with a wide bar attached to the top pulley. Make sure that you adjust the knee pad of the machine to fit your height. These pads will prevent your body from being raised by the resistance attached to the bar.',
+      'Grab the bar with the palms facing forward using the prescribed grip. Note on grips: For a wide grip, your hands need to be spaced out at a distance wider than shoulder width. For a medium grip, your hands need to be spaced out at a distance equal to your shoulder width and for a close grip at a distance smaller than your shoulder width.',
+      'As you have both arms extended in front of you holding the bar at the chosen grip width, bring your torso back around 30 degrees or so while creating a curvature on your lower back and sticking your chest out. This is your starting position.',
+      'As you breathe out, bring the bar down until it touches your upper chest by drawing the shoulders and the upper arms down and back. Tip: Concentrate on squeezing the back muscles once you reach the full contracted position. The upper torso should remain stationary and only the arms should move. The forearms should do no other work except for holding the bar; therefore do not try to pull down the bar using the forearms.',
+    ],
+    tip: 'Lead with your elbows and squeeze shoulder blades back at the bottom of the rep.',
+  ),
+  'Close-Grip Pulldown': ExerciseDemo(
+    name: 'Close-Grip Pulldown',
+    muscle: 'Lats, Biceps',
+    steps: [
+      'Grip the bar with hands shoulder-width or closer',
+      'Lean back slightly and pull the bar to your upper chest',
+      'Squeeze your back at the bottom',
+      'Control the return until arms are extended',
+    ],
+    tip: 'A narrow grip shifts more work to the lats and allows a deeper stretch at the top.',
+  ),
+  'Reverse-Grip Lat Pulldown': ExerciseDemo(
+    name: 'Reverse-Grip Lat Pulldown',
+    muscle: 'Back',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target back muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Lead with your elbows and squeeze shoulder blades back at the bottom of the rep.',
+  ),
+  'Pull-Ups': ExerciseDemo(
+    name: 'Pull-Ups',
+    muscle: 'Lats, Biceps',
+    steps: [
+      'Grip bar with palms facing away, hands shoulder-width',
+      'Pull yourself up until chin clears the bar',
+      'Lower with control to full arm extension',
+      'Dont kip — strict form only',
+    ],
+    tip: 'Can not do one? Use a resistance band for assistance.',
+  ),
+  'Chin-Ups': ExerciseDemo(
+    name: 'Chin-Ups',
+    muscle: 'Back',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target back muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
   ),
   'Barbell Row': ExerciseDemo(
     name: 'Barbell Row',
@@ -355,6 +337,28 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Keep your core tight and back flat throughout. No rounding.',
   ),
+  'Pendlay Row': ExerciseDemo(
+    name: 'Pendlay Row',
+    muscle: 'Back',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target back muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Lead with your elbows and squeeze shoulder blades back at the bottom of the rep.',
+  ),
+  'Underhand Barbell Row': ExerciseDemo(
+    name: 'Underhand Barbell Row',
+    muscle: 'Back',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target back muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Lead with your elbows and squeeze shoulder blades back at the bottom of the rep.',
+  ),
   'Seated Cable Row': ExerciseDemo(
     name: 'Seated Cable Row',
     muscle: 'Back',
@@ -366,16 +370,16 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Dont lean too far back. The movement is in the arms and shoulders.',
   ),
-  'Pull-Ups': ExerciseDemo(
-    name: 'Pull-Ups',
-    muscle: 'Lats, Biceps',
+  'Wide-Grip Seated Row': ExerciseDemo(
+    name: 'Wide-Grip Seated Row',
+    muscle: 'Back',
     steps: [
-      'Grip bar with palms facing away, hands shoulder-width',
-      'Pull yourself up until chin clears the bar',
-      'Lower with control to full arm extension',
-      'Dont kip — strict form only',
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target back muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
     ],
-    tip: 'Can not do one? Use a resistance band for assistance.',
+    tip: 'Lead with your elbows and squeeze shoulder blades back at the bottom of the rep.',
   ),
   'T-Bar Row': ExerciseDemo(
     name: 'T-Bar Row',
@@ -399,17 +403,6 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Eliminates cheating — pure back isolation.',
   ),
-  'Inverted Row': ExerciseDemo(
-    name: 'Inverted Row',
-    muscle: 'Back, Biceps',
-    steps: [
-      'Lie under a bar set at waist height',
-      'Grip the bar and pull your chest to it',
-      'Keep body in a straight line',
-      'Lower slowly back down',
-    ],
-    tip: 'Elevate your feet to make it harder. Bend knees to make it easier.',
-  ),
   'Single-Arm Dumbbell Row': ExerciseDemo(
     name: 'Single-Arm Dumbbell Row',
     muscle: 'Back, Biceps',
@@ -421,52 +414,128 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'The one-arm version lets you correct imbalances and use a longer range of motion.',
   ),
-  'Close-Grip Pulldown': ExerciseDemo(
-    name: 'Close-Grip Pulldown',
-    muscle: 'Lats, Biceps',
+  'Meadows Row': ExerciseDemo(
+    name: 'Meadows Row',
+    muscle: 'Back',
     steps: [
-      'Grip the bar with hands shoulder-width or closer',
-      'Lean back slightly and pull the bar to your upper chest',
-      'Squeeze your back at the bottom',
-      'Control the return until arms are extended',
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target back muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
     ],
-    tip: 'A narrow grip shifts more work to the lats and allows a deeper stretch at the top.',
+    tip: 'Lead with your elbows and squeeze shoulder blades back at the bottom of the rep.',
   ),
-
-  // ── Quads ───────────────────────────────────────────────
-  'Quads': ExerciseDemo(
-    name: 'Quads',
-    muscle: 'Quads, Glutes',
+  'Straight-Arm Cable Pulldown': ExerciseDemo(
+    name: 'Straight-Arm Cable Pulldown',
+    muscle: 'Back',
     steps: [
-      'Bar on upper traps, feet shoulder-width apart',
-      'Brace core, push hips back and down',
-      'Descend until thighs are at least parallel',
-      'Drive through heels to stand back up',
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target back muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
     ],
-    tip: 'Dont let knees cave inward. Push them out over your toes.',
+    tip: 'Lead with your elbows and squeeze shoulder blades back at the bottom of the rep.',
   ),
-  'Back Squat': ExerciseDemo(
-    name: 'Back Squat',
-    muscle: 'Quads, Glutes',
+  'Face Pull': ExerciseDemo(
+    name: 'Face Pull',
+    muscle: 'Rear Delts, Rotator Cuff',
     steps: [
-      'Bar on upper traps, feet shoulder-width apart',
-      'Brace core, push hips back and down',
-      'Descend until thighs are at least parallel',
-      'Drive through heels to stand back up',
+      'Set cable at face height with rope attachment',
+      'Pull rope toward your face, elbows high',
+      'Spread the rope apart as you pull back',
+      'Squeeze rear delts and hold briefly',
     ],
-    tip: 'Dont let knees cave inward. Push them out over your toes.',
+    tip: 'Essential for shoulder health. Pull to your ears, not your chin.',
   ),
-  'Front Squat': ExerciseDemo(
-    name: 'Front Squat',
-    muscle: 'Quads, Glutes',
+  'Rear Delt Fly': ExerciseDemo(
+    name: 'Rear Delt Fly',
+    muscle: 'Rear Delts',
     steps: [
-      'Bar on upper traps, feet shoulder-width apart',
-      'Brace core, push hips back and down',
-      'Descend until thighs are at least parallel',
-      'Drive through heels to stand back up',
+      'Bend forward at hips, dumbbells hanging down',
+      'Raise arms out to the sides with slight elbow bend',
+      'Squeeze shoulder blades together at the top',
+      'Lower slowly with control',
     ],
-    tip: 'Dont let knees cave inward. Push them out over your toes.',
+    tip: 'Keep your back flat. Think of spreading your wings.',
   ),
+  'Reverse Pec Deck': ExerciseDemo(
+    name: 'Reverse Pec Deck',
+    muscle: 'Rear Delts',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target rear delts muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Dumbbell Bicep Curl': ExerciseDemo(
+    name: 'Dumbbell Bicep Curl',
+    muscle: 'Biceps',
+    steps: [
+      'Stand with dumbbells at sides, palms forward',
+      'Curl both dumbbells up by bending elbows',
+      'Squeeze at the top, then lower slowly',
+      'Keep elbows pinned to your sides',
+    ],
+    tip: 'Dont swing your body. Control the negative (lowering) phase.',
+  ),
+  'Hammer Curls': ExerciseDemo(
+    name: 'Hammer Curls',
+    muscle: 'Biceps, Brachialis',
+    steps: [
+      'Hold dumbbells with palms facing each other',
+      'Curl up without rotating your wrists',
+      'Squeeze at the top, lower slowly',
+      'Elbows stay at your sides throughout',
+    ],
+    tip: 'Hammer curls build the brachialis — making your arms look thicker.',
+  ),
+  'Incline Dumbbell Curl': ExerciseDemo(
+    name: 'Incline Dumbbell Curl',
+    muscle: 'Biceps (long head)',
+    steps: [
+      'Set bench to 45-60 degrees, sit back',
+      'Let arms hang straight down with dumbbells',
+      'Curl up, keeping upper arms stationary',
+      'Lower slowly, feeling the stretch at the bottom',
+    ],
+    tip: 'The incline stretches the long head of the biceps for better growth.',
+  ),
+  'Preacher Curl': ExerciseDemo(
+    name: 'Preacher Curl',
+    muscle: 'Biceps',
+    steps: [
+      'Rest upper arms on the preacher pad',
+      'Curl the weight up, squeezing biceps',
+      'Lower slowly until arms are nearly straight',
+      'Dont lock out completely at the bottom',
+    ],
+    tip: 'Strict form — no momentum. Great for peak contraction.',
+  ),
+  'EZ-Bar Curl': ExerciseDemo(
+    name: 'EZ-Bar Curl',
+    muscle: 'Biceps',
+    steps: [
+      'Grip the EZ-bar at the angled sections',
+      'Curl up by bending at the elbows',
+      'Squeeze biceps at the top',
+      'Lower with control',
+    ],
+    tip: 'The angled grip is easier on your wrists than a straight bar.',
+  ),
+  'Cable Bicep Curl': ExerciseDemo(
+    name: 'Cable Bicep Curl',
+    muscle: 'Biceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target biceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep elbows pinned to your sides and eliminate swinging from torso.',
+  ),
+  // ── LEGS ──────────────────────────────────────────
   'Barbell Squat': ExerciseDemo(
     name: 'Barbell Squat',
     muscle: 'Quads, Glutes',
@@ -477,6 +546,17 @@ const Map<String, ExerciseDemo> exerciseDemos = {
       'Drive through heels to stand back up',
     ],
     tip: 'Drive through your whole foot and push your knees out. Full-depth reps build the most muscle.',
+  ),
+  'Barbell Front Squat': ExerciseDemo(
+    name: 'Barbell Front Squat',
+    muscle: 'Quads',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target quads muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Drive through the mid-foot, keep chest upright, and ensure knees track over toes.',
   ),
   'Leg Press': ExerciseDemo(
     name: 'Leg Press',
@@ -500,30 +580,6 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Wider stance = more glutes. Narrow stance = more quads.',
   ),
-  'Walking Lunges': ExerciseDemo(
-    name: 'Walking Lunges',
-    muscle: 'Quads, Glutes',
-    steps: [
-      'Step forward into a long stride',
-      'Lower back knee toward the ground',
-      'Push off front foot and step forward into next lunge',
-      'Alternate legs with each step',
-    ],
-    tip: 'Keep torso upright. Front knee should track over your toes.',
-  ),
-  'Leg Extension': ExerciseDemo(
-    name: 'Leg Extension',
-    muscle: 'Quads',
-    steps: [
-      'Sit in the machine, pad on lower shins',
-      'Extend legs until straight',
-      'Squeeze quads hard at the top',
-      'Lower with control',
-    ],
-    tip: 'Great for finishing off quads. Use slow, controlled reps.',
-  ),
-
-  // ── Hamstrings ──────────────────────────────────────────
   'Romanian Deadlift': ExerciseDemo(
     name: 'Romanian Deadlift',
     muscle: 'Hamstrings, Glutes',
@@ -534,6 +590,17 @@ const Map<String, ExerciseDemo> exerciseDemos = {
       'Drive hips forward to return to standing',
     ],
     tip: 'The movement is in the hips, not the knees. Feel the hamstring stretch.',
+  ),
+  'Dumbbell Romanian Deadlift': ExerciseDemo(
+    name: 'Dumbbell Romanian Deadlift',
+    muscle: 'Hamstrings',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target hamstrings muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Hinge strictly at hips, keep bar close to shins, and maintain neutral spine.',
   ),
   'Stiff-Leg Deadlift': ExerciseDemo(
     name: 'Stiff-Leg Deadlift',
@@ -546,17 +613,6 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'More hamstring emphasis than RDL. Keep a slight knee bend.',
   ),
-  'Single-Leg RDL': ExerciseDemo(
-    name: 'Single-Leg RDL',
-    muscle: 'Hamstrings, Balance',
-    steps: [
-      'Stand on one leg, hold dumbbell in opposite hand',
-      'Hinge forward, extending free leg behind you',
-      'Lower until torso is roughly parallel to floor',
-      'Return to standing by contracting hamstring',
-    ],
-    tip: 'Great for fixing imbalances between legs. Start with light weight.',
-  ),
   'Leg Curl': ExerciseDemo(
     name: 'Leg Curl',
     muscle: 'Hamstrings',
@@ -568,19 +624,82 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Dont lift your hips off the pad. Keep the movement isolated.',
   ),
-  'Stability Ball Leg Curl': ExerciseDemo(
-    name: 'Stability Ball Leg Curl',
-    muscle: 'Hamstrings, Core',
+  'Seated Leg Curl': ExerciseDemo(
+    name: 'Seated Leg Curl',
+    muscle: 'Hamstrings',
     steps: [
-      'Lie on your back, heels on a stability ball',
-      'Lift hips into a bridge position',
-      'Curl the ball toward your glutes using hamstrings',
-      'Extend legs back out without dropping hips',
+      'Adjust the machine lever to fit your height and sit on the machine with your back against the back support pad.',
+      'Place the back of lower leg on top of padded lever (just a few inches under the calves) and secure the lap pad against your thighs, just above the knees. Then grasp the side handles on the machine as you point your toes straight (or you can also use any of the other two stances) and ensure that the legs are fully straight right in front of you. This will be your starting position.',
+      'As you exhale, pull the machine lever as far as possible to the back of your thighs by flexing at the knees. Keep your torso stationary at all times. Hold the contracted position for a second.',
+      'Slowly return to the starting position as you breathe in.',
     ],
-    tip: 'Keep hips elevated throughout the entire movement.',
+    tip: 'Keep elbows pinned to your sides and eliminate swinging from torso.',
   ),
-
-  // ── Glutes ──────────────────────────────────────────────
+  'Nordic Curl': ExerciseDemo(
+    name: 'Nordic Curl',
+    muscle: 'Hamstrings',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target hamstrings muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep elbows pinned to your sides and eliminate swinging from torso.',
+  ),
+  'Walking Lunges': ExerciseDemo(
+    name: 'Walking Lunges',
+    muscle: 'Quads, Glutes',
+    steps: [
+      'Step forward into a long stride',
+      'Lower back knee toward the ground',
+      'Push off front foot and step forward into next lunge',
+      'Alternate legs with each step',
+    ],
+    tip: 'Keep torso upright. Front knee should track over your toes.',
+  ),
+  'Reverse Lunges': ExerciseDemo(
+    name: 'Reverse Lunges',
+    muscle: 'Quads',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target quads muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Drive through the mid-foot, keep chest upright, and ensure knees track over toes.',
+  ),
+  'Bulgarian Split Squat': ExerciseDemo(
+    name: 'Bulgarian Split Squat',
+    muscle: 'Quads, Glutes',
+    steps: [
+      'Rear foot elevated on a bench behind you',
+      'Lower into a lunge until front thigh is parallel',
+      'Drive through front heel to stand back up',
+      'Keep torso upright throughout',
+    ],
+    tip: 'Brutal but effective. Start bodyweight before adding load.',
+  ),
+  'Goblet Squat': ExerciseDemo(
+    name: 'Goblet Squat',
+    muscle: 'Quads',
+    steps: [
+      'Stand holding a light kettlebell by the horns close to your chest. This will be your starting position.',
+      'Squat down between your legs until your hamstrings are on your calves. Keep your chest and head up and your back straight.',
+      'At the bottom position, pause and use your elbows to push your knees out. Return to the starting position, and repeat for 10-20 repetitions.',
+    ],
+    tip: 'Drive through the mid-foot, keep chest upright, and ensure knees track over toes.',
+  ),
+  'Leg Extension': ExerciseDemo(
+    name: 'Leg Extension',
+    muscle: 'Quads',
+    steps: [
+      'Sit in the machine, pad on lower shins',
+      'Extend legs until straight',
+      'Squeeze quads hard at the top',
+      'Lower with control',
+    ],
+    tip: 'Great for finishing off quads. Use slow, controlled reps.',
+  ),
   'Hip Thrust': ExerciseDemo(
     name: 'Hip Thrust',
     muscle: 'Glutes',
@@ -603,17 +722,6 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'No equipment needed. Great warm-up activation exercise.',
   ),
-  'Bulgarian Split Squat': ExerciseDemo(
-    name: 'Bulgarian Split Squat',
-    muscle: 'Quads, Glutes',
-    steps: [
-      'Rear foot elevated on a bench behind you',
-      'Lower into a lunge until front thigh is parallel',
-      'Drive through front heel to stand back up',
-      'Keep torso upright throughout',
-    ],
-    tip: 'Brutal but effective. Start bodyweight before adding load.',
-  ),
   'Cable Kickback': ExerciseDemo(
     name: 'Cable Kickback',
     muscle: 'Glutes',
@@ -625,8 +733,17 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Dont arch your back. The movement should come from the hip only.',
   ),
-
-  // ── Calves ──────────────────────────────────────────────
+  'Seated Machine Hip Abduction': ExerciseDemo(
+    name: 'Seated Machine Hip Abduction',
+    muscle: 'Glutes',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target glutes muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
   'Standing Calf Raises': ExerciseDemo(
     name: 'Standing Calf Raises',
     muscle: 'Calves (Gastrocnemius)',
@@ -660,8 +777,792 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Hold a dumbbell for added resistance. Great for fixing imbalances.',
   ),
-
-  // ── Core ────────────────────────────────────────────────
+  // ── CHEST ──────────────────────────────────────────
+  'Flat Dumbbell Press': ExerciseDemo(
+    name: 'Flat Dumbbell Press',
+    muscle: 'Chest',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target chest muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep shoulder blades retracted and avoid locking out joints aggressively at top.',
+  ),
+  'Decline Dumbbell Press': ExerciseDemo(
+    name: 'Decline Dumbbell Press',
+    muscle: 'Chest',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target chest muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep shoulder blades retracted and avoid locking out joints aggressively at top.',
+  ),
+  'Dumbbell Fly': ExerciseDemo(
+    name: 'Dumbbell Fly',
+    muscle: 'Chest',
+    steps: [
+      'Lie on a bench, hold dumbbells above chest with a slight elbow bend',
+      'Lower arms out to the sides in a wide arc',
+      'Stop when you feel a comfortable chest stretch',
+      'Bring dumbbells back together, squeezing chest',
+    ],
+    tip: 'Imagine hugging a barrel. Keep a fixed elbow bend — no pressing.',
+  ),
+  'Incline Dumbbell Fly': ExerciseDemo(
+    name: 'Incline Dumbbell Fly',
+    muscle: 'Chest',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target chest muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Maintain a soft bend in elbows and focus on bringing biceps together across chest.',
+  ),
+  'Deficit Push-Ups': ExerciseDemo(
+    name: 'Deficit Push-Ups',
+    muscle: 'Chest',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target chest muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Diamond Push-Ups': ExerciseDemo(
+    name: 'Diamond Push-Ups',
+    muscle: 'Chest',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target chest muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Incline Machine Chest Press': ExerciseDemo(
+    name: 'Incline Machine Chest Press',
+    muscle: 'Chest',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target chest muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep shoulder blades retracted and avoid locking out joints aggressively at top.',
+  ),
+  'Dumbbell Pullover': ExerciseDemo(
+    name: 'Dumbbell Pullover',
+    muscle: 'Chest, Lats',
+    steps: [
+      'Lie across a bench, upper back supported',
+      'Hold one dumbbell with both hands above chest',
+      'Lower it behind your head in an arc',
+      'Pull back over your chest, squeezing lats',
+    ],
+    tip: 'Keep a slight bend in elbows. Dont lower too far if shoulders feel tight.',
+  ),
+  'Floor Press': ExerciseDemo(
+    name: 'Floor Press',
+    muscle: 'Chest',
+    steps: [
+      'Adjust the j-hooks so they are at the appropriate height to rack the bar. Begin lying on the floor with your head near the end of a power rack. Keeping your shoulder blades pulled together; pull the bar off of the hooks.',
+      'Lower the bar towards the bottom of your chest or upper stomach, squeezing the bar and attempting to pull it apart as you do so. Ensure that you tuck your elbows throughout the movement. Lower the bar until your upper arm contacts the ground and pause, preventing any slamming or bouncing of the weight.',
+      'Press the bar back up as fast as you can, keeping the bar, your wrists, and elbows in line as you do so.',
+    ],
+    tip: 'Keep shoulder blades retracted and avoid locking out joints aggressively at top.',
+  ),
+  // ── BACK ──────────────────────────────────────────
+  'Kroc Row': ExerciseDemo(
+    name: 'Kroc Row',
+    muscle: 'Back',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target back muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Lead with your elbows and squeeze shoulder blades back at the bottom of the rep.',
+  ),
+  'Seal Row': ExerciseDemo(
+    name: 'Seal Row',
+    muscle: 'Back',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target back muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Lead with your elbows and squeeze shoulder blades back at the bottom of the rep.',
+  ),
+  'Inverted Row': ExerciseDemo(
+    name: 'Inverted Row',
+    muscle: 'Back, Biceps',
+    steps: [
+      'Lie under a bar set at waist height',
+      'Grip the bar and pull your chest to it',
+      'Keep body in a straight line',
+      'Lower slowly back down',
+    ],
+    tip: 'Elevate your feet to make it harder. Bend knees to make it easier.',
+  ),
+  'Conventional Deadlift': ExerciseDemo(
+    name: 'Conventional Deadlift',
+    muscle: 'Back',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target back muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Hinge strictly at hips, keep bar close to shins, and maintain neutral spine.',
+  ),
+  'Trap Bar Deadlift': ExerciseDemo(
+    name: 'Trap Bar Deadlift',
+    muscle: 'Back',
+    steps: [
+      'For this exercise load a trap bar, also known as a hex bar, to an appropriate weight resting on the ground. Stand in the center of the apparatus and grasp both handles.',
+      'Lower your hips, look forward with your head and keep your chest up.',
+      'Begin the movement by driving through the heels and extend your hips and knees. Avoid rounding your back at all times.',
+      'At the completion of the movement, lower the weight back to the ground under control.',
+    ],
+    tip: 'Hinge strictly at hips, keep bar close to shins, and maintain neutral spine.',
+  ),
+  'Rack Pulls': ExerciseDemo(
+    name: 'Rack Pulls',
+    muscle: 'Back',
+    steps: [
+      'Set up in a power rack with the bar on the pins. The pins should be set to the desired point; just below the knees, just above, or in the mid thigh position. Position yourself against the bar in proper deadlifting position. Your feet should be under your hips, your grip shoulder width, back arched, and hips back to engage the hamstrings. Since the weight is typically heavy, you may use a mixed grip, a hook grip, or use straps to aid in holding the weight.',
+      'With your head looking forward, extend through the hips and knees, pulling the weight up and back until lockout. Be sure to pull your shoulders back as you complete the movement.',
+      'Return the weight to the pins and repeat.',
+    ],
+    tip: 'Maintain strict core tension and controlled eccentric tempo throughout the movement.',
+  ),
+  'Hyperextensions': ExerciseDemo(
+    name: 'Hyperextensions',
+    muscle: 'Lower Back',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target lower back muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  // ── SHOULDERS ──────────────────────────────────────────
+  'Seated Dumbbell Shoulder Press': ExerciseDemo(
+    name: 'Seated Dumbbell Shoulder Press',
+    muscle: 'Shoulders',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target shoulders muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep shoulder blades retracted and avoid locking out joints aggressively at top.',
+  ),
+  'Smith Machine Shoulder Press': ExerciseDemo(
+    name: 'Smith Machine Shoulder Press',
+    muscle: 'Shoulders',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target shoulders muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep shoulder blades retracted and avoid locking out joints aggressively at top.',
+  ),
+  'Behind-the-Back Cable Raise': ExerciseDemo(
+    name: 'Behind-the-Back Cable Raise',
+    muscle: 'Shoulders',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target shoulders muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  'Leaning Incline Lateral Raise': ExerciseDemo(
+    name: 'Leaning Incline Lateral Raise',
+    muscle: 'Shoulders',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target shoulders muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  'Machine Lateral Raise': ExerciseDemo(
+    name: 'Machine Lateral Raise',
+    muscle: 'Shoulders',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target shoulders muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  'Front Raise': ExerciseDemo(
+    name: 'Front Raise',
+    muscle: 'Front Delts',
+    steps: [
+      'Stand with dumbbells in front of thighs, palms facing thighs',
+      'Raise one arm forward to shoulder height',
+      'Lower with control, then alternate arms',
+      'Keep torso still — no swinging',
+    ],
+    tip: 'Use light weight. Swinging defeats the purpose of this isolation exercise.',
+  ),
+  'Barbell Front Raise': ExerciseDemo(
+    name: 'Barbell Front Raise',
+    muscle: 'Front Delts',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target front delts muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  'Cable Front Raise': ExerciseDemo(
+    name: 'Cable Front Raise',
+    muscle: 'Front Delts',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target front delts muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  'Cable Rear Delt Crossover': ExerciseDemo(
+    name: 'Cable Rear Delt Crossover',
+    muscle: 'Rear Delts',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target rear delts muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Upright Row': ExerciseDemo(
+    name: 'Upright Row',
+    muscle: 'Shoulders',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target shoulders muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Lead with your elbows and squeeze shoulder blades back at the bottom of the rep.',
+  ),
+  'Cable Upright Row': ExerciseDemo(
+    name: 'Cable Upright Row',
+    muscle: 'Shoulders',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target shoulders muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Lead with your elbows and squeeze shoulder blades back at the bottom of the rep.',
+  ),
+  'Lu Raises': ExerciseDemo(
+    name: 'Lu Raises',
+    muscle: 'Shoulders',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target shoulders muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  'Barbell Shrugs': ExerciseDemo(
+    name: 'Barbell Shrugs',
+    muscle: 'Traps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target traps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Dumbbell Shrugs': ExerciseDemo(
+    name: 'Dumbbell Shrugs',
+    muscle: 'Traps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target traps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  // ── ARMS ──────────────────────────────────────────
+  'Barbell Bicep Curl': ExerciseDemo(
+    name: 'Barbell Bicep Curl',
+    muscle: 'Biceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target biceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep elbows pinned to your sides and eliminate swinging from torso.',
+  ),
+  'Concentration Curl': ExerciseDemo(
+    name: 'Concentration Curl',
+    muscle: 'Biceps',
+    steps: [
+      'Sit on bench, elbow braced against inner thigh',
+      'Curl dumbbell up toward shoulder',
+      'Squeeze hard at the top for 1-2 seconds',
+      'Lower slowly back down',
+    ],
+    tip: 'Focus on the mind-muscle connection. Slow and controlled.',
+  ),
+  'Spider Curl': ExerciseDemo(
+    name: 'Spider Curl',
+    muscle: 'Biceps',
+    steps: [
+      'Start out by setting the bar on the part of the preacher bench that you would normally sit on. Make sure to align the barbell properly so that it is balanced and will not fall off.',
+      'Move to the front side of the preacher bench (the part where the arms usually lay) and position yourself to lay at a 45 degree slant with your torso and stomach pressed against the front side of the preacher bench.',
+      'Make sure that your feet (especially the toes) are well positioned on the floor and place your upper arms on top of the pad located on the inside part of the preacher bench.',
+      'Use your arms to grab the barbell with a supinated grip (palms facing up) at about shoulder width apart or slightly closer from each other.',
+    ],
+    tip: 'Keep elbows pinned to your sides and eliminate swinging from torso.',
+  ),
+  'Cable Overhead Tricep Ext': ExerciseDemo(
+    name: 'Cable Overhead Tricep Ext',
+    muscle: 'Triceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target triceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Bench Dips': ExerciseDemo(
+    name: 'Bench Dips',
+    muscle: 'Triceps',
+    steps: [
+      'For this exercise you will need to place a bench behind your back. With the bench perpendicular to your body, and while looking away from it, hold on to the bench on its edge with the hands fully extended, separated at shoulder width. The legs will be extended forward, bent at the waist and perpendicular to your torso. This will be your starting position.',
+      'Slowly lower your body as you inhale by bending at the elbows until you lower yourself far enough to where there is an angle slightly smaller than 90 degrees between the upper arm and the forearm. Tip: Keep the elbows as close as possible throughout the movement. Forearms should always be pointing down.',
+      'Using your triceps to bring your torso up again, lift yourself back to the starting position.',
+      'Repeat for the recommended amount of repetitions.',
+    ],
+    tip: 'Maintain strict core tension and controlled eccentric tempo throughout the movement.',
+  ),
+  'Tricep Kickback': ExerciseDemo(
+    name: 'Tricep Kickback',
+    muscle: 'Triceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target triceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  // ── BICEPS ──────────────────────────────────────────
+  'Cable Rope Hammer Curl': ExerciseDemo(
+    name: 'Cable Rope Hammer Curl',
+    muscle: 'Biceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target biceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep elbows pinned to your sides and eliminate swinging from torso.',
+  ),
+  'Machine Preacher Curl': ExerciseDemo(
+    name: 'Machine Preacher Curl',
+    muscle: 'Biceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target biceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep elbows pinned to your sides and eliminate swinging from torso.',
+  ),
+  'Single-Arm Cable Curl': ExerciseDemo(
+    name: 'Single-Arm Cable Curl',
+    muscle: 'Biceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target biceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep elbows pinned to your sides and eliminate swinging from torso.',
+  ),
+  'Reverse Barbell Curl': ExerciseDemo(
+    name: 'Reverse Barbell Curl',
+    muscle: 'Forearms',
+    steps: [
+      'Stand up with your torso upright while holding a barbell at shoulder width with the elbows close to the torso. The palm of your hands should be facing down (pronated grip). This will be your starting position.',
+      'While holding the upper arms stationary, curl the weights while contracting the biceps as you breathe out. Only the forearms should move. Continue the movement until your biceps are fully contracted and the bar is at shoulder level. Hold the contracted position for a second as you squeeze the muscle.',
+      'Slowly begin to bring the bar back to starting position as your breathe in.',
+      'Repeat for the recommended amount of repetitions.',
+    ],
+    tip: 'Keep elbows pinned to your sides and eliminate swinging from torso.',
+  ),
+  'Zottman Curl': ExerciseDemo(
+    name: 'Zottman Curl',
+    muscle: 'Biceps',
+    steps: [
+      'Stand up with your torso upright and a dumbbell in each hand being held at arms length. The elbows should be close to the torso.',
+      'Make sure the palms of the hands are facing each other. This will be your starting position.',
+      'While holding the upper arm stationary, curl the weights while contracting the biceps as you breathe out. Only the forearms should move. Your wrist should rotate so that you have a supinated (palms up) grip. Continue the movement until your biceps are fully contracted and the dumbbells are at shoulder level.',
+      'Hold the contracted position for a second as you squeeze the biceps.',
+    ],
+    tip: 'Keep elbows pinned to your sides and eliminate swinging from torso.',
+  ),
+  '21s Bicep Curl': ExerciseDemo(
+    name: '21s Bicep Curl',
+    muscle: 'Biceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target biceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep elbows pinned to your sides and eliminate swinging from torso.',
+  ),
+  'Farmer’s Walk': ExerciseDemo(
+    name: 'Farmer’s Walk',
+    muscle: 'Forearms',
+    steps: [
+      'There are various implements that can be used for the farmers walk. These can also be performed with heavy dumbbells or short bars if these implements aren\'t available. Begin by standing between the implements.',
+      'After gripping the handles, lift them up by driving through your heels, keeping your back straight and your head up.',
+      'Walk taking short, quick steps, and don\'t forget to breathe. Move for a given distance, typically 50-100 feet, as fast as possible.',
+    ],
+    tip: 'Maintain strict core tension and controlled eccentric tempo throughout the movement.',
+  ),
+  // ── TRICEPS ──────────────────────────────────────────
+  'Straight-Bar Pushdown': ExerciseDemo(
+    name: 'Straight-Bar Pushdown',
+    muscle: 'Triceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target triceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Single-Arm Overhead Cable Ext': ExerciseDemo(
+    name: 'Single-Arm Overhead Cable Ext',
+    muscle: 'Triceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target triceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Dumbbell Skullcrusher': ExerciseDemo(
+    name: 'Dumbbell Skullcrusher',
+    muscle: 'Triceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target triceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Cable Tricep Kickback': ExerciseDemo(
+    name: 'Cable Tricep Kickback',
+    muscle: 'Triceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target triceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Machine Tricep Extension': ExerciseDemo(
+    name: 'Machine Tricep Extension',
+    muscle: 'Triceps',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target triceps muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'JM Press': ExerciseDemo(
+    name: 'JM Press',
+    muscle: 'Triceps',
+    steps: [
+      'Start the exercise the same way you would a close grip bench press. You will lie on a flat bench while holding a barbell at arms length (fully extended) with the elbows in. However, instead of having the arms perpendicular to the torso, make sure the bar is set in a direct line above the upper chest. This will be your starting position.',
+      'Now beginning from a fully extended position lower the bar down as if performing a lying triceps extension. Inhale as you perform this movement. When you reach the half way point, let the bar roll back about one inch by moving the upper arms towards your legs until they are perpendicular to the torso. Tip: Keep the bend at the elbows constant as you bring the upper arms forward.',
+      'As you exhale, press the bar back up by using the triceps to perform a close grip bench press.',
+      'Now go back to the starting position and start over.',
+    ],
+    tip: 'Keep shoulder blades retracted and avoid locking out joints aggressively at top.',
+  ),
+  'Tate Press': ExerciseDemo(
+    name: 'Tate Press',
+    muscle: 'Triceps',
+    steps: [
+      'Lie down on a flat bench with a dumbbell in each hand on top of your thighs. The palms of your hand will be facing each other.',
+      'By using your thighs to help you get the dumbbells up, clean the dumbbells one arm at a time so that you can hold them in front of you at shoulder width. Note: when holding the dumbbells in front of you, make sure your arms are wider than shoulder width apart from each other using a pronated (palms forward) grip. Allow your elbows to point out. This is your starting position.',
+      'Keeping the upper arms stationary, slowly move the dumbbells in and down in a semi circular motion until they touch the upper chest while inhaling. Keep full control of the dumbbells at all times and do not move the upper arms nor rest the dumbbells on the chest.',
+      'As you breathe out, move the dumbbells up using your triceps and the same semi-circular motion but in reverse. Attempt to keep the dumbbells together as they move up. Lock your arms in the contracted position, hold for a second and then start coming down again slowly again. Tip: It should take at least twice as long to go down than to come up.',
+    ],
+    tip: 'Keep shoulder blades retracted and avoid locking out joints aggressively at top.',
+  ),
+  // ── QUADS ──────────────────────────────────────────
+  'Zercher Squat': ExerciseDemo(
+    name: 'Zercher Squat',
+    muscle: 'Quads',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target quads muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Drive through the mid-foot, keep chest upright, and ensure knees track over toes.',
+  ),
+  'Single-Leg Extension': ExerciseDemo(
+    name: 'Single-Leg Extension',
+    muscle: 'Quads',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target quads muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Sissy Squat': ExerciseDemo(
+    name: 'Sissy Squat',
+    muscle: 'Quads',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target quads muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Drive through the mid-foot, keep chest upright, and ensure knees track over toes.',
+  ),
+  'Step-Ups': ExerciseDemo(
+    name: 'Step-Ups',
+    muscle: 'Quads',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target quads muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Landmine Squat': ExerciseDemo(
+    name: 'Landmine Squat',
+    muscle: 'Quads',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target quads muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Drive through the mid-foot, keep chest upright, and ensure knees track over toes.',
+  ),
+  // ── HAMSTRINGS ──────────────────────────────────────────
+  'Standing Single-Leg Curl': ExerciseDemo(
+    name: 'Standing Single-Leg Curl',
+    muscle: 'Hamstrings',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target hamstrings muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep elbows pinned to your sides and eliminate swinging from torso.',
+  ),
+  'Single-Leg RDL': ExerciseDemo(
+    name: 'Single-Leg RDL',
+    muscle: 'Hamstrings, Balance',
+    steps: [
+      'Stand on one leg, hold dumbbell in opposite hand',
+      'Hinge forward, extending free leg behind you',
+      'Lower until torso is roughly parallel to floor',
+      'Return to standing by contracting hamstring',
+    ],
+    tip: 'Great for fixing imbalances between legs. Start with light weight.',
+  ),
+  'Glute-Ham Raise': ExerciseDemo(
+    name: 'Glute-Ham Raise',
+    muscle: 'Hamstrings',
+    steps: [
+      'Begin by adjusting the equipment to fit your body. Place your feet against the footplate in between the rollers as you lie facedown. Your knees should be just behind the pad.',
+      'Start from the bottom of the movement. Keep your back arched as you begin the movement by flexing the knees. Drive your toes into the foot plate as you do so. Keep your upper body straight, and continue until your body is upright.',
+      'Return to the starting position, keeping your descent under control.',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  'Stability Ball Leg Curl': ExerciseDemo(
+    name: 'Stability Ball Leg Curl',
+    muscle: 'Hamstrings, Core',
+    steps: [
+      'Lie on your back, heels on a stability ball',
+      'Lift hips into a bridge position',
+      'Curl the ball toward your glutes using hamstrings',
+      'Extend legs back out without dropping hips',
+    ],
+    tip: 'Keep hips elevated throughout the entire movement.',
+  ),
+  'Good Morning': ExerciseDemo(
+    name: 'Good Morning',
+    muscle: 'Hamstrings',
+    steps: [
+      'Begin with a bar on a rack at shoulder height. Rack the bar across the rear of your shoulders as you would a power squat, not on top of your shoulders. Keep your back tight, shoulder blades pinched together, and your knees slightly bent. Step back from the rack.',
+      'Begin by bending at the hips, moving them back as you bend over to near parallel. Keep your back arched and your cervical spine in proper alignment.',
+      'Reverse the motion by extending through the hips with your glutes and hamstrings. Continue until you have returned to the starting position.',
+    ],
+    tip: 'Maintain strict core tension and controlled eccentric tempo throughout the movement.',
+  ),
+  'Cable Pull-Through': ExerciseDemo(
+    name: 'Cable Pull-Through',
+    muscle: 'Hamstrings',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target hamstrings muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  // ── GLUTES ──────────────────────────────────────────
+  'Barbell Hip Thrust': ExerciseDemo(
+    name: 'Barbell Hip Thrust',
+    muscle: 'Glutes',
+    steps: [
+      'Begin seated on the ground with a bench directly behind you. Have a loaded barbell over your legs. Using a fat bar or having a pad on the bar can greatly reduce the discomfort caused by this exercise.',
+      'Roll the bar so that it is directly above your hips, and lean back against the bench so that your shoulder blades are near the top of it.',
+      'Begin the movement by driving through your feet, extending your hips vertically through the bar. Your weight should be supported by your shoulder blades and your feet. Extend as far as possible, then reverse the motion to return to the starting position.',
+    ],
+    tip: 'Maintain strict core tension and controlled eccentric tempo throughout the movement.',
+  ),
+  'Single-Leg Hip Thrust': ExerciseDemo(
+    name: 'Single-Leg Hip Thrust',
+    muscle: 'Glutes',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target glutes muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Kas Glute Bridge': ExerciseDemo(
+    name: 'Kas Glute Bridge',
+    muscle: 'Glutes',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target glutes muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Cable Hip Abduction': ExerciseDemo(
+    name: 'Cable Hip Abduction',
+    muscle: 'Glutes',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target glutes muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Bulgarian Split Squat - Glute': ExerciseDemo(
+    name: 'Bulgarian Split Squat - Glute',
+    muscle: 'Glutes',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target glutes muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Drive through the mid-foot, keep chest upright, and ensure knees track over toes.',
+  ),
+  'Deficit Curtsy Lunges': ExerciseDemo(
+    name: 'Deficit Curtsy Lunges',
+    muscle: 'Glutes',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target glutes muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Drive through the mid-foot, keep chest upright, and ensure knees track over toes.',
+  ),
+  'Frog Pumps': ExerciseDemo(
+    name: 'Frog Pumps',
+    muscle: 'Glutes',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target glutes muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  // ── CALVES ──────────────────────────────────────────
+  'Leg Press Calf Press': ExerciseDemo(
+    name: 'Leg Press Calf Press',
+    muscle: 'Calves',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target calves muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Keep shoulder blades retracted and avoid locking out joints aggressively at top.',
+  ),
+  'Donkey Calf Raises': ExerciseDemo(
+    name: 'Donkey Calf Raises',
+    muscle: 'Calves',
+    steps: [
+      'For this exercise you will need access to a donkey calf raise machine. Start by positioning your lower back and hips under the padded lever provided. The tailbone area should be the one making contact with the pad.',
+      'Place both of your arms on the side handles and place the balls of your feet on the calf block with the heels extending off. Align the toes forward, inward or outward, depending on the area you wish to target, and straighten the knees without locking them. This will be your starting position.',
+      'Raise your heels as you breathe out by extending your ankles as high as possible and flexing your calf. Ensure that the knee is kept stationary at all times. There should be no bending at any time. Hold the contracted position by a second before you start to go back down.',
+      'Go back slowly to the starting position as you breathe in by lowering your heels as you bend the ankles until calves are stretched.',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  'Tibialis Raises': ExerciseDemo(
+    name: 'Tibialis Raises',
+    muscle: 'Calves',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target calves muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  // ── CORE ──────────────────────────────────────────
   'Plank': ExerciseDemo(
     name: 'Plank',
     muscle: 'Core (all)',
@@ -672,6 +1573,105 @@ const Map<String, ExerciseDemo> exerciseDemos = {
       'Breathe normally throughout',
     ],
     tip: 'Quality over time. 30 seconds of perfect form beats 2 minutes of bad form.',
+  ),
+  'Side Plank': ExerciseDemo(
+    name: 'Side Plank',
+    muscle: 'Obliques, Core',
+    steps: [
+      'Lie on your side, forearm on the ground',
+      'Lift hips to form a straight line from head to feet',
+      'Hold the position, keeping hips elevated',
+      'Switch sides after the target time',
+    ],
+    tip: 'Stack your feet or place the top foot in front for more stability.',
+  ),
+  'RKC Plank': ExerciseDemo(
+    name: 'RKC Plank',
+    muscle: 'Core',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target core muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  'Cable Crunch': ExerciseDemo(
+    name: 'Cable Crunch',
+    muscle: 'Abs',
+    steps: [
+      'Kneel facing a high cable with rope attachment',
+      'Hold rope behind your head',
+      'Crunch down, bringing elbows toward knees',
+      'Focus on contracting abs, not pulling with arms',
+    ],
+    tip: 'The movement comes from curling the spine, not hinging at the hips.',
+  ),
+  'Hanging Leg Raise': ExerciseDemo(
+    name: 'Hanging Leg Raise',
+    muscle: 'Lower Abs, Hip Flexors',
+    steps: [
+      'Hang from a pull-up bar with straight arms',
+      'Raise legs until thighs are parallel to floor',
+      'Lower slowly with control',
+      'Dont swing — use strict form',
+    ],
+    tip: 'Bend your knees to make it easier. Straight legs for more challenge.',
+  ),
+  'Hanging Knee Raise': ExerciseDemo(
+    name: 'Hanging Knee Raise',
+    muscle: 'Abs',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target abs muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  'Captain’s Chair Leg Raise': ExerciseDemo(
+    name: 'Captain’s Chair Leg Raise',
+    muscle: 'Abs',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target abs muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  'Ab Wheel Rollout': ExerciseDemo(
+    name: 'Ab Wheel Rollout',
+    muscle: 'Abs, Core',
+    steps: [
+      'Kneel and grip the ab wheel, hands under shoulders',
+      'Engage core and roll the wheel forward slowly',
+      'Go only as far as you can without arching your back',
+      'Pull the wheel back using your abs, not your arms',
+    ],
+    tip: 'Keep your spine neutral and abs braced. Stop if your lower back arches.',
+  ),
+  'Russian Twist': ExerciseDemo(
+    name: 'Russian Twist',
+    muscle: 'Obliques',
+    steps: [
+      'Sit with knees bent, lean torso back slightly',
+      'Hold hands together or a weight at chest',
+      'Rotate torso to the right, then to the left',
+      'Feet can be on floor or elevated for more challenge',
+    ],
+    tip: 'Dont just move your arms — rotate your entire torso.',
+  ),
+  'Bicycle Crunch': ExerciseDemo(
+    name: 'Bicycle Crunch',
+    muscle: 'Abs, Obliques',
+    steps: [
+      'Lie on your back, hands behind your head, legs lifted',
+      'Bring one knee toward the opposite elbow',
+      'Rotate your torso as you straighten the other leg',
+      'Alternate sides in a smooth pedaling motion',
+    ],
+    tip: 'Keep your lower back pressed into the floor. Rotate from the ribs, not just the elbows.',
   ),
   'Dead Bug': ExerciseDemo(
     name: 'Dead Bug',
@@ -695,78 +1695,84 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: 'Think of running in place in a plank. Keep your hips from bouncing up and down.',
   ),
-  'Ab Wheel Rollout': ExerciseDemo(
-    name: 'Ab Wheel Rollout',
-    muscle: 'Abs, Core',
-    steps: [
-      'Kneel and grip the ab wheel, hands under shoulders',
-      'Engage core and roll the wheel forward slowly',
-      'Go only as far as you can without arching your back',
-      'Pull the wheel back using your abs, not your arms',
-    ],
-    tip: 'Keep your spine neutral and abs braced. Stop if your lower back arches.',
-  ),
-
-  // ── Abs ─────────────────────────────────────────────────
-  'Cable Crunch': ExerciseDemo(
-    name: 'Cable Crunch',
-    muscle: 'Abs',
-    steps: [
-      'Kneel facing a high cable with rope attachment',
-      'Hold rope behind your head',
-      'Crunch down, bringing elbows toward knees',
-      'Focus on contracting abs, not pulling with arms',
-    ],
-    tip: 'The movement comes from curling the spine, not hinging at the hips.',
-  ),
-  'Bicycle Crunch': ExerciseDemo(
-    name: 'Bicycle Crunch',
-    muscle: 'Abs, Obliques',
-    steps: [
-      'Lie on your back, hands behind your head, legs lifted',
-      'Bring one knee toward the opposite elbow',
-      'Rotate your torso as you straighten the other leg',
-      'Alternate sides in a smooth pedaling motion',
-    ],
-    tip: 'Keep your lower back pressed into the floor. Rotate from the ribs, not just the elbows.',
-  ),
-  'Hanging Leg Raise': ExerciseDemo(
-    name: 'Hanging Leg Raise',
-    muscle: 'Lower Abs, Hip Flexors',
-    steps: [
-      'Hang from a pull-up bar with straight arms',
-      'Raise legs until thighs are parallel to floor',
-      'Lower slowly with control',
-      'Dont swing — use strict form',
-    ],
-    tip: 'Bend your knees to make it easier. Straight legs for more challenge.',
-  ),
-
-  // ── Obliques ────────────────────────────────────────────
-  'Russian Twist': ExerciseDemo(
-    name: 'Russian Twist',
+  'Woodchoppers': ExerciseDemo(
+    name: 'Woodchoppers',
     muscle: 'Obliques',
     steps: [
-      'Sit with knees bent, lean torso back slightly',
-      'Hold hands together or a weight at chest',
-      'Rotate torso to the right, then to the left',
-      'Feet can be on floor or elevated for more challenge',
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target obliques muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
     ],
-    tip: 'Dont just move your arms — rotate your entire torso.',
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
   ),
-  'Side Plank': ExerciseDemo(
-    name: 'Side Plank',
-    muscle: 'Obliques, Core',
+  'Decline Bench Crunch': ExerciseDemo(
+    name: 'Decline Bench Crunch',
+    muscle: 'Abs',
     steps: [
-      'Lie on your side, forearm on the ground',
-      'Lift hips to form a straight line from head to feet',
-      'Hold the position, keeping hips elevated',
-      'Switch sides after the target time',
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target abs muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
     ],
-    tip: 'Stack your feet or place the top foot in front for more stability.',
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
   ),
-
-  // ── Cardio ──────────────────────────────────────────────
+  'Dragon Flag': ExerciseDemo(
+    name: 'Dragon Flag',
+    muscle: 'Abs',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target abs muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Toes-to-Bar': ExerciseDemo(
+    name: 'Toes-to-Bar',
+    muscle: 'Abs',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target abs muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Reverse Crunch': ExerciseDemo(
+    name: 'Reverse Crunch',
+    muscle: 'Abs',
+    steps: [
+      'Lie down on the floor with your legs fully extended and arms to the side of your torso with the palms on the floor. Your arms should be stationary for the entire exercise.',
+      'Move your legs up so that your thighs are perpendicular to the floor and feet are together and parallel to the floor. This is the starting position.',
+      'While inhaling, move your legs towards the torso as you roll your pelvis backwards and you raise your hips off the floor. At the end of this movement your knees will be touching your chest.',
+      'Hold the contraction for a second and move your legs back to the starting position while exhaling.',
+    ],
+    tip: 'Exhale fully as you contract your abs to maximize core activation.',
+  ),
+  'Pallof Press': ExerciseDemo(
+    name: 'Pallof Press',
+    muscle: 'Core',
+    steps: [
+      'Connect a standard handle to a tower, and—if possible—position the cable to shoulder height. If not, a low pulley will suffice.',
+      'With your side to the cable, grab the handle with both hands and step away from the tower. You should be approximately arm\'s length away from the pulley, with the tension of the weight on the cable.',
+      'With your feet positioned hip-width apart and knees slightly bent, hold the cable to the middle of your chest. This will be your starting position.',
+      'Press the cable away from your chest, fully extending both arms. You core should be tight and engaged.',
+    ],
+    tip: 'Keep shoulder blades retracted and avoid locking out joints aggressively at top.',
+  ),
+  'Hollow Body Hold': ExerciseDemo(
+    name: 'Hollow Body Hold',
+    muscle: 'Core',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target core muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  // ── CARDIO ──────────────────────────────────────────
   'Treadmill Incline Walk': ExerciseDemo(
     name: 'Treadmill Incline Walk',
     muscle: 'Cardio, Glutes',
@@ -811,6 +1817,61 @@ const Map<String, ExerciseDemo> exerciseDemos = {
     ],
     tip: '60% legs, 20% core, 20% arms. Drive with your legs, not your back.',
   ),
+  'Stair Climber': ExerciseDemo(
+    name: 'Stair Climber',
+    muscle: 'Cardio',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target cardio muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Assault Air Bike': ExerciseDemo(
+    name: 'Assault Air Bike',
+    muscle: 'Cardio',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target cardio muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Elliptical Trainer': ExerciseDemo(
+    name: 'Elliptical Trainer',
+    muscle: 'Cardio',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target cardio muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Battle Ropes': ExerciseDemo(
+    name: 'Battle Ropes',
+    muscle: 'Cardio',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target cardio muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
+  'Kettlebell Swings': ExerciseDemo(
+    name: 'Kettlebell Swings',
+    muscle: 'Cardio',
+    steps: [
+      'Set up in proper alignment with stable foot and core bracing',
+      'Initiate movement by engaging the target cardio muscles',
+      'Execute full range of motion under strict control without momentum',
+      'Squeeze at peak contraction and return smoothly to starting position',
+    ],
+    tip: 'Control the weight on the lowering phase (2-3 seconds) to maximize muscle tension.',
+  ),
 };
 
 /// Lookup demo data for an exercise. Falls back to a generic entry.
@@ -819,11 +1880,11 @@ ExerciseDemo getExerciseDemo(String exerciseName) {
     name: exerciseName,
     muscle: 'General',
     steps: [
-      'Get into the starting position',
-      'Perform the movement with controlled form',
-      'Complete the target reps',
-      'Rest and repeat for the next set',
+      'Get into the starting position with proper alignment',
+      'Perform the movement with smooth, controlled form',
+      'Complete the target repetitions with full range of motion',
+      'Rest and repeat for the assigned sets',
     ],
-    tip: 'Focus on proper form and controlled breathing.',
+    tip: 'Focus on proper form, steady tempo, and controlled breathing.',
   );
 }
