@@ -77,7 +77,9 @@ android {
             if (isEnable) {
                 reset()
                 include("arm64-v8a", "armeabi-v7a")
-                isUniversalApk = false
+                // Also emit the universal APK so download.apk always reflects the
+                // current release (kept in sync with AGENTS.md deploy process).
+                isUniversalApk = true
             }
         }
     }

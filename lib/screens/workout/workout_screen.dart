@@ -33,11 +33,16 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   final Map<int, GlobalKey> _dayKeys = {};
 
   static const _splits = [
-    (value: 'fullbody', label: 'Full Body', subtitle: '4 days/week (Beginner)'),
-    (value: 'upperlower', label: 'Upper / Lower', subtitle: '4 days/week'),
-    (value: 'ppl', label: 'Push / Pull / Legs', subtitle: 'Push \u2192 Pull \u2192 Legs \u2192 Repeat'),
-    (value: 'two', label: 'Two Body Parts', subtitle: '4-day cycle'),
-    (value: 'single', label: 'Single Body Part', subtitle: '6 days/week'),
+    // Beginner
+    (value: 'fullbody', label: 'Full Body', subtitle: '5 days/week (Beginner Default)'),
+    // Intermediate
+    (value: 'upperlower', label: 'Upper / Lower', subtitle: '4 days/week (Intermediate)'),
+    (value: 'two', label: 'Two Body Parts', subtitle: '4-day cycle (Intermediate)'),
+    // Advanced
+    (value: 'ppl', label: 'Push / Pull / Legs', subtitle: '6 days/week (Advanced)'),
+    (value: 'single', label: 'Single Body Part', subtitle: '6 days/week (Advanced Bro-Split)'),
+    // Specialty
+    (value: 'strength', label: 'Strength Training', subtitle: '5 days/week (Powerbuilding/Pro)'),
   ];
 
   @override
