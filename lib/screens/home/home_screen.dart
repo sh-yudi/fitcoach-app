@@ -7,8 +7,6 @@ import '../../widgets/ad_banner.dart';
 import '../../widgets/body_composition_sheet.dart';
 import '../../widgets/personal_training_card.dart';
 import '../../widgets/section_header.dart';
-import '../../widgets/stat_card.dart';
-import '../../widgets/streak_card.dart';
 import '../diet/diet_screen.dart';
 import '../workout/workout_screen.dart';
 
@@ -19,14 +17,20 @@ class HomeScreen extends StatefulWidget {
   final VoidCallback? onOpenProfile;
   final int refreshToken;
 
-  const HomeScreen({super.key, this.user, this.assessment, required this.onRefresh, this.onOpenProfile, this.refreshToken = 0});
+  const HomeScreen({
+    super.key,
+    this.user,
+    this.assessment,
+    required this.onRefresh,
+    this.onOpenProfile,
+    this.refreshToken = 0,
+  });
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _blinked = false;
   Map<String, dynamic>? _streaks;
 
   @override
@@ -57,13 +61,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final a = widget.assessment;
     final firstName = u?.name.split(' ').first ?? 'there';
 
-    final bmiOut = a?.bmi != null && (a!.bmi! < 18.5 || a.bmi! >= 25);
-    final bf = a?.bodyFatPct;
-    final bfOut = bf != null && (bf < a!.targetFatMin || bf > a.targetFatMax);
-    // Blink only on the very first render after the assessment loads.
-    final blink = !_blinked;
-    if (a != null) _blinked = true;
-
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
@@ -75,76 +72,45 @@ class _HomeScreenState extends State<HomeScreen> {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
             children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Hi $firstName,',
-                          style:  TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
-                        ),
-                        const SizedBox(height: 2),
-                        InkWell(
-                          onTap: widget.onOpenProfile,
-                          borderRadius: BorderRadius.circular(6),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 2),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    u != null ? '${u.weightKg} kg · ${u.heightCm} cm · ${_cap(u.activityLevel)}' : 'Loading profile…',
-                                    style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
-                                  ),
-                                ),
-                                if (u != null) ...[
-                                  const SizedBox(width: 4),
-                                  Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 14),
-                                ],
-                              ],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child:  Icon(Icons.fitness_center, color: AppColors.onPrimary),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _GoalBanner(assessment: a),
-              const SizedBox(height: 20),
-              if (_streaks != null) ...[
-                StreakCard(data: _streaks),
-                const SizedBox(height: 20),
-              ],
+              // Top Greeting & Profile Header
+              _buildHeader(u, firstName),
+              const SizedBox(height: 18),
+
               if (a != null) ...[
+                // Unified Daily Momentum Hero Card
+                _DailyMomentumCard(
+                  user: u,
+                  assessment: a,
+                  streaks: _streaks,
+                  onSelectGoal: () => _showGoalPicker(context, u, a),
+                  onOpenWorkout: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const WorkoutScreen()),
+                  ),
+                  onOpenDiet: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const DietScreen()),
+                  ),
+                ),
+                const SizedBox(height: 18),
+
+                // Health & Body Composition 2-Column Hub
+                const SectionHeader(title: 'Body & Health Metrics'),
+                const SizedBox(height: 8),
                 Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Expanded(
-                      child: StatCard(
-                        label: 'Body Fat',
+                      child: _MetricHubCard(
+                        title: 'Body Fat',
                         value: a.bodyFatPct != null ? '${a.bodyFatPct}%' : '—',
-                        sub: bfOut
-                            ? (bf > a.targetFatMax
-                                ? 'Above target (${a.targetFatMin.toInt()}–${a.targetFatMax.toInt()}%)'
-                                : 'Below target (${a.targetFatMin.toInt()}–${a.targetFatMax.toInt()}%)')
-                            : '${a.bodyFatCategory} · Target ${a.targetFatMin.toInt()}–${a.targetFatMax.toInt()}%',
+                        category: a.bodyFatCategory.isNotEmpty ? a.bodyFatCategory : 'Estimated',
+                        badgeColor: (a.bodyFatPct ?? 0) > a.targetFatMax
+                            ? AppColors.danger
+                            : ((a.bodyFatPct ?? 0) < a.targetFatMin ? AppColors.macroCarbs : AppColors.primary),
+                        subtitle: 'Target ${a.targetFatMin.toInt()}–${a.targetFatMax.toInt()}%',
+                        detailText: a.leanMassKg != null && a.fatMassKg != null
+                            ? '${a.leanMassKg}kg Lean · ${a.fatMassKg}kg Fat'
+                            : (a.ffmi != null ? 'FFMI ${a.ffmi} (${a.ffmiCategory})' : 'Tap for suite & gauge'),
                         icon: Icons.water_drop_outlined,
-                        accent: AppColors.primary,
-                        alert: bfOut,
-                        blink: blink && bfOut,
                         onTap: () => showBodyCompositionSheet(
                           context,
                           user: u,
@@ -155,85 +121,39 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: StatCard(
-                        label: 'BMI',
+                      child: _MetricHubCard(
+                        title: 'BMI',
                         value: a.bmi?.toString() ?? '—',
-                        sub: _bmiSub(a),
+                        category: a.bmiCategory.isNotEmpty ? a.bmiCategory : 'Normal',
+                        badgeColor: (a.bmi ?? 22) < 18.5 || (a.bmi ?? 22) >= 25 ? AppColors.macroCarbs : AppColors.success,
+                        subtitle: 'Target 18.5–24.9',
+                        detailText: a.weeksToTarget != null && a.weeksToTarget! > 0
+                            ? '~${a.weeksToTarget} wks to goal'
+                            : 'Healthy weight range',
                         icon: Icons.speed,
-                        accent: AppColors.success,
-                        alert: bmiOut,
-                        blink: blink && bmiOut,
                         onTap: () => _showBmiInfo(context, u, a),
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: StatCard(
-                        label: 'Daily Calories',
-                        value: a.calories > 0 ? '${a.calories} kcal' : '—',
-                        sub: '${a.protein}g P · ${a.carbs}g C · ${a.fiber}g F',
-                        icon: Icons.local_fire_department_outlined,
-                        accent: AppColors.macroCarbs,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: StatCard(
-                        label: 'Goal',
-                        value: _goalLabel(a.goal),
-                        sub: a.weeksToTarget != null && a.weeksToTarget! > 0
-                            ? '~${a.weeksToTarget} weeks to target'
-                            : 'On target',
-                        icon: Icons.flag_outlined,
-                        accent: AppColors.macroFiber,
-                        onTap: () => _showGoalPicker(context, u, a),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                const SectionHeader(title: 'Today\'s plan'),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _PlanTile(
-                        icon: Icons.restaurant,
-                        title: 'Diet Plan',
-                        subtitle: '${a.calories} kcal · ${a.protein}g protein',
-                        color: AppColors.macroCarbs,
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const DietScreen()),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _PlanTile(
-                        icon: Icons.fitness_center,
-                        title: 'Workout',
-                        subtitle: 'Weekly schedule',
-                        color: AppColors.primary,
-                        onTap: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const WorkoutScreen()),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ] else
-                 Padding(
-                  padding: EdgeInsets.symmetric(vertical: 40),
+                const SizedBox(height: 18),
+
+                // Compact Consistency & Badges Strip
+                if (_streaks != null) ...[
+                  _ConsistencyStrip(data: _streaks),
+                  const SizedBox(height: 20),
+                ],
+              ] else ...[
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 48),
                   child: Center(
                     child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5),
                   ),
                 ),
-              const SizedBox(height: 24),
+              ],
+
               const PersonalTrainingCard(),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
               const AdBanner(),
             ],
           ),
@@ -242,18 +162,61 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
-  String _goalLabel(String g) => g == 'cut' ? 'Cut fat' : g == 'bulk' ? 'Build muscle' : 'Maintain';
-
-  static const _bmiMin = 18.5;
-  static const _bmiMax = 24.9;
-  String _bmiSub(Assessment a) {
-    final b = a.bmi;
-    if (b == null) return 'Target $_bmiMin–$_bmiMax';
-    if (b < _bmiMin) return 'Below target ($_bmiMin–$_bmiMax)';
-    if (b > _bmiMax) return 'Above target ($_bmiMin–$_bmiMax)';
-    return 'Target $_bmiMin–$_bmiMax';
+  Widget _buildHeader(User? u, String firstName) {
+    return Row(
+      children: [
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Hi $firstName,',
+                style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
+              ),
+              const SizedBox(height: 2),
+              InkWell(
+                onTap: widget.onOpenProfile,
+                borderRadius: BorderRadius.circular(6),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          u != null ? '${u.weightKg} kg · ${u.heightCm} cm · ${_cap(u.activityLevel)}' : 'Loading profile…',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                        ),
+                      ),
+                      if (u != null) ...[
+                        const SizedBox(width: 4),
+                        Icon(Icons.chevron_right, color: AppColors.textSecondary, size: 14),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        InkWell(
+          onTap: widget.onOpenProfile,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.primary,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(Icons.fitness_center, color: AppColors.onPrimary),
+          ),
+        ),
+      ],
+    );
   }
+
+  String _cap(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 
   void _showGoalPicker(BuildContext context, User? u, Assessment a) {
     final recommended = _recommendedGoal(u, a);
@@ -505,75 +468,307 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
-class _GoalBanner extends StatelessWidget {
-  final Assessment? assessment;
-  const _GoalBanner({this.assessment});
+// ─────────────────────────────────────────────────────────────────────────────
+// UNIFIED DAILY MOMENTUM HERO CARD
+// ─────────────────────────────────────────────────────────────────────────────
+class _DailyMomentumCard extends StatelessWidget {
+  final User? user;
+  final Assessment assessment;
+  final Map<String, dynamic>? streaks;
+  final VoidCallback onSelectGoal;
+  final VoidCallback onOpenWorkout;
+  final VoidCallback onOpenDiet;
+
+  const _DailyMomentumCard({
+    required this.user,
+    required this.assessment,
+    required this.streaks,
+    required this.onSelectGoal,
+    required this.onOpenWorkout,
+    required this.onOpenDiet,
+  });
+
+  String _goalTitle(String g) => g == 'cut' ? 'Fat loss phase' : g == 'bulk' ? 'Lean bulk phase' : 'Maintenance phase';
+
+  int _currentStreak() {
+    final d = streaks ?? const {};
+    for (final k in ['currentStreak', 'current', 'streak']) {
+      final v = d[k];
+      if (v is num) return v.toInt();
+      if (v is String) {
+        final n = int.tryParse(v);
+        if (n != null) return n;
+      }
+    }
+    return 0;
+  }
 
   @override
   Widget build(BuildContext context) {
     final a = assessment;
+    final streak = _currentStreak();
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.darkGreen, Color(0xFF4A6B1E)],
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.surfaceLight, width: 1.2),
+        gradient: LinearGradient(
+          colors: [
+            AppColors.surface,
+            AppColors.surfaceLight.withValues(alpha: 0.35),
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(18),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 0.20),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              a?.goal == 'cut' ? Icons.trending_down : a?.goal == 'bulk' ? Icons.trending_up : Icons.eco,
-              color: const Color(0xFFFFF3D6),
+          // Top Row: Goal Phase Chip + Streak Pill
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              InkWell(
+                onTap: onSelectGoal,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        a.goal == 'cut' ? Icons.trending_down : (a.goal == 'bulk' ? Icons.trending_up : Icons.eco),
+                        color: AppColors.primary,
+                        size: 15,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _goalTitle(a.goal),
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 14),
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFF9800).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFFF9800).withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('🔥', style: TextStyle(fontSize: 12.5)),
+                    const SizedBox(width: 4),
+                    Text(
+                      '$streak day${streak == 1 ? '' : 's'} streak',
+                      style: const TextStyle(
+                        color: Color(0xFFFFB74D),
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+
+          // Centerpiece: Daily Calorie & Macronutrient Summary
+          InkWell(
+            onTap: onOpenDiet,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceLight.withValues(alpha: 0.45),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.local_fire_department, color: AppColors.macroCarbs, size: 18),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Daily Target',
+                            style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w700),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        a.calories > 0 ? '${a.calories} kcal' : '—',
+                        style: TextStyle(
+                          color: AppColors.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _MacroPill(
+                          label: 'Protein',
+                          value: '${a.protein}g',
+                          color: AppColors.macroProtein,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _MacroPill(
+                          label: 'Carbs',
+                          value: '${a.carbs}g',
+                          color: AppColors.macroCarbs,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _MacroPill(
+                          label: 'Fiber',
+                          value: '${a.fiber}g',
+                          color: AppColors.macroFiber,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  a != null ? _title(a.goal) : 'Preparing your plan…',
-                  style: TextStyle(color: AppColors.cream, fontSize: 16, fontWeight: FontWeight.w800),
-                ),
-                const SizedBox(height: 3),
-                Text(
-                  a != null
-                      ? 'Body fat ${a.bodyFatPct ?? '—'}% → target ${a.targetFatMin}–${a.targetFatMax}%'
-                      : 'Calculating your numbers',
-                  style: const TextStyle(color: Color(0xFFDDE6C2), fontSize: 12.5),
-                ),
-              ],
+          const SizedBox(height: 14),
+
+          // Bottom Action Row: Today's Workout Focus & Jump Action
+          InkWell(
+            onTap: onOpenWorkout,
+            borderRadius: BorderRadius.circular(12),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(Icons.fitness_center, color: AppColors.primary, size: 16),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Workout',
+                          style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w800),
+                        ),
+                        Text(
+                          'View exercises & track sets',
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    'Start  →',
+                    style: TextStyle(color: AppColors.primary, fontSize: 12.5, fontWeight: FontWeight.w800),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
     );
   }
-
-  String _title(String g) => g == 'cut' ? 'Fat loss phase' : g == 'bulk' ? 'Lean bulk phase' : 'Maintenance phase';
 }
 
-class _PlanTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String subtitle;
+class _MacroPill extends StatelessWidget {
+  final String label;
+  final String value;
   final Color color;
-  final VoidCallback onTap;
-  const _PlanTile({
-    required this.icon,
-    required this.title,
-    required this.subtitle,
+
+  const _MacroPill({
+    required this.label,
+    required this.value,
     required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
+      ),
+      child: Column(
+        children: [
+          Text(
+            value,
+            style: TextStyle(color: color, fontSize: 12.5, fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 1),
+          Text(
+            'Target',
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 10),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 2-COLUMN METRIC HUB CARD
+// ─────────────────────────────────────────────────────────────────────────────
+class _MetricHubCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final String category;
+  final Color badgeColor;
+  final String subtitle;
+  final String detailText;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _MetricHubCard({
+    required this.title,
+    required this.value,
+    required this.category,
+    required this.badgeColor,
+    required this.subtitle,
+    required this.detailText,
+    required this.icon,
     required this.onTap,
   });
 
@@ -583,7 +778,7 @@ class _PlanTile extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(16),
@@ -592,15 +787,195 @@ class _PlanTile extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: color, size: 28),
-            const SizedBox(height: 12),
-            Text(title, style:  TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: AppColors.textPrimary)),
-            const SizedBox(height: 3),
-            Text(subtitle, style:  TextStyle(color: AppColors.textSecondary, fontSize: 12)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(icon, size: 16, color: AppColors.textSecondary),
+                    const SizedBox(width: 5),
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textSecondary,
+                      ),
+                    ),
+                  ],
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: badgeColor.withValues(alpha: 0.14),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    category,
+                    style: TextStyle(
+                      color: badgeColor,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 10),
-             Text('Open  →', style: TextStyle(color: AppColors.primary, fontSize: 12, fontWeight: FontWeight.w700)),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                color: AppColors.textPrimary,
+                height: 1.1,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceLight.withValues(alpha: 0.4),
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      detailText,
+                      style: TextStyle(color: AppColors.textPrimary, fontSize: 10.5, fontWeight: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(Icons.arrow_forward_ios, size: 9, color: AppColors.textSecondary),
+                ],
+              ),
+            ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// COMPACT CONSISTENCY & BADGES STRIP
+// ─────────────────────────────────────────────────────────────────────────────
+class _ConsistencyStrip extends StatelessWidget {
+  final Map<String, dynamic>? data;
+
+  const _ConsistencyStrip({required this.data});
+
+  int _int(Map<String, dynamic> m, List<String> keys) {
+    for (final k in keys) {
+      final v = m[k];
+      if (v is num) return v.toInt();
+      if (v is String) {
+        final n = int.tryParse(v);
+        if (n != null) return n;
+      }
+    }
+    return 0;
+  }
+
+  String _badgeEmoji(String id) {
+    final lower = id.toLowerCase();
+    if (lower.contains('first')) return '🎯';
+    if (lower.contains('week') && lower.contains('streak')) return '🔥';
+    if (lower.contains('month')) return '🌟';
+    if (lower.contains('ten') || lower.contains('10')) return '💪';
+    if (lower.contains('fifty') || lower.contains('50')) return '🏆';
+    if (lower.contains('century') || lower.contains('100')) return '👑';
+    if (lower.contains('early')) return '🌅';
+    if (lower.contains('perfect')) return '💎';
+    return '🏅';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final d = data ?? const {};
+    final longest = _int(d, ['longestStreak', 'longest', 'bestStreak', 'best']);
+    final total = _int(d, ['totalWorkouts', 'workouts', 'total']);
+    final rawBadges = d['badges'];
+    final badges = rawBadges is List ? rawBadges.map((b) => b.toString()).toList() : <String>[];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.surfaceLight),
+      ),
+      child: Row(
+        children: [
+          Row(
+            children: [
+              const Text('🏆', style: TextStyle(fontSize: 16)),
+              const SizedBox(width: 6),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Best Streak', style: TextStyle(color: AppColors.textSecondary, fontSize: 10)),
+                  Text('$longest day${longest == 1 ? '' : 's'}', style: TextStyle(color: AppColors.textPrimary, fontSize: 12.5, fontWeight: FontWeight.w800)),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(width: 14),
+          Container(width: 1, height: 28, color: AppColors.surfaceLight),
+          const SizedBox(width: 14),
+          Row(
+            children: [
+              const Text('💪', style: TextStyle(fontSize: 16)),
+              const SizedBox(width: 6),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Total workouts', style: TextStyle(color: AppColors.textSecondary, fontSize: 10)),
+                  Text('$total', style: TextStyle(color: AppColors.textPrimary, fontSize: 12.5, fontWeight: FontWeight.w800)),
+                ],
+              ),
+            ],
+          ),
+          if (badges.isNotEmpty) ...[
+            const SizedBox(width: 12),
+            Container(width: 1, height: 28, color: AppColors.surfaceLight),
+            const SizedBox(width: 8),
+            Expanded(
+              child: SizedBox(
+                height: 32,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: badges.length,
+                  separatorBuilder: (_, _) => const SizedBox(width: 6),
+                  itemBuilder: (_, i) {
+                    final b = badges[i];
+                    return Tooltip(
+                      message: b,
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceLight.withValues(alpha: 0.6),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(_badgeEmoji(b), style: const TextStyle(fontSize: 14)),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
