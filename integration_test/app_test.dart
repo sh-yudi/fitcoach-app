@@ -108,7 +108,7 @@ void main() {
 
       expect(find.textContaining('Hi '), findsWidgets);
       expect(find.textContaining('Body Fat'), findsWidgets);
-      expect(find.textContaining('Daily Calories'), findsWidgets);
+      expect(find.textContaining('Body & Health Metrics'), findsWidgets);
       expect(find.textContaining('streak'), findsWidgets);
       expect(find.textContaining('Workout'), findsWidgets);
       // Phase badge (one of the phases is guaranteed)
