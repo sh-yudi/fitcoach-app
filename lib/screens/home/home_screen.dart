@@ -32,13 +32,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? _streaks;
+  // Today's logged macro totals (from /api/diet/logged → totals)
   int _todayCalories = 0;
+  int _todayProtein  = 0;
+  int _todayCarbs    = 0;
+  int _todayFiber    = 0;
 
   @override
   void initState() {
     super.initState();
     _loadStreaks();
-    _loadTodayCalories();
+    _loadTodayMacros();
   }
 
   @override
@@ -46,7 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.didUpdateWidget(oldWidget);
     if (widget.refreshToken != oldWidget.refreshToken) {
       _loadStreaks();
-      _loadTodayCalories();
+      _loadTodayMacros();
     }
   }
 
@@ -58,22 +62,26 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (_) {}
   }
 
-  Future<void> _loadTodayCalories() async {
+  Future<void> _loadTodayMacros() async {
     try {
       final log = await ApiClient.instance.getLoggedFood();
       if (!mounted) return;
-      // sum calories from all today's logged items
-      int total = 0;
-      final items = log['items'];
-      if (items is List) {
-        for (final item in items) {
-          if (item is Map) {
-            final cal = item['calories'] ?? item['kcal'] ?? 0;
-            total += (cal is num ? cal.toInt() : int.tryParse(cal.toString()) ?? 0);
-          }
-        }
+      // The server returns a `totals` map with aggregated values for today
+      final totals = log['totals'];
+      int cal = 0, pro = 0, carb = 0, fib = 0;
+      if (totals is Map) {
+        int _parse(dynamic v) => v is num ? v.toInt() : int.tryParse(v?.toString() ?? '') ?? 0;
+        cal  = _parse(totals['calories']);
+        pro  = _parse(totals['protein']);
+        carb = _parse(totals['carbs']);
+        fib  = _parse(totals['fiber']);
       }
-      setState(() => _todayCalories = total);
+      setState(() {
+        _todayCalories = cal;
+        _todayProtein  = pro;
+        _todayCarbs    = carb;
+        _todayFiber    = fib;
+      });
     } catch (_) {}
   }
 
@@ -105,6 +113,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   assessment: a,
                   streaks: _streaks,
                   todayCalories: _todayCalories,
+                  todayProtein: _todayProtein,
+                  todayCarbs: _todayCarbs,
+                  todayFiber: _todayFiber,
                   onSelectGoal: () => _showGoalPicker(context, u, a),
                   onOpenStreak: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => StreakDetailScreen(initialData: _streaks)),
@@ -493,6 +504,9 @@ class _DailyMomentumCard extends StatelessWidget {
   final Assessment assessment;
   final Map<String, dynamic>? streaks;
   final int todayCalories;
+  final int todayProtein;
+  final int todayCarbs;
+  final int todayFiber;
   final VoidCallback onSelectGoal;
   final VoidCallback onOpenStreak;
   final VoidCallback onOpenDiet;
@@ -502,6 +516,9 @@ class _DailyMomentumCard extends StatelessWidget {
     required this.assessment,
     required this.streaks,
     required this.todayCalories,
+    required this.todayProtein,
+    required this.todayCarbs,
+    required this.todayFiber,
     required this.onSelectGoal,
     required this.onOpenStreak,
     required this.onOpenDiet,
@@ -526,10 +543,8 @@ class _DailyMomentumCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final a = assessment;
     final streak = _currentStreak();
-    final target = a.calories > 0 ? a.calories : 1;
-    final progress = (todayCalories / target).clamp(0.0, 1.0);
-    final remaining = (target - todayCalories).clamp(0, target);
-    final overTarget = todayCalories > target;
+    final calTarget = a.calories > 0 ? a.calories : 1;
+    final overCal = todayCalories > calTarget;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -546,7 +561,7 @@ class _DailyMomentumCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Row: Goal Phase Chip + Tappable Streak Pill
+          // ── Top Row: Goal Phase Chip + Tappable Streak Pill ──
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -568,17 +583,14 @@ class _DailyMomentumCard extends StatelessWidget {
                         color: AppColors.primary, size: 15,
                       ),
                       const SizedBox(width: 6),
-                      Text(
-                        _goalTitle(a.goal),
-                        style: TextStyle(color: AppColors.primary, fontSize: 12.5, fontWeight: FontWeight.w800),
-                      ),
+                      Text(_goalTitle(a.goal),
+                          style: TextStyle(color: AppColors.primary, fontSize: 12.5, fontWeight: FontWeight.w800)),
                       const SizedBox(width: 4),
                       Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 14),
                     ],
                   ),
                 ),
               ),
-              // ── Tappable streak pill ──
               InkWell(
                 onTap: onOpenStreak,
                 borderRadius: BorderRadius.circular(10),
@@ -594,10 +606,8 @@ class _DailyMomentumCard extends StatelessWidget {
                     children: [
                       const Text('🔥', style: TextStyle(fontSize: 12.5)),
                       const SizedBox(width: 4),
-                      Text(
-                        '$streak day${streak == 1 ? '' : 's'} streak',
-                        style: const TextStyle(color: Color(0xFFFFB74D), fontSize: 12.5, fontWeight: FontWeight.w800),
-                      ),
+                      Text('$streak day${streak == 1 ? '' : 's'} streak',
+                          style: const TextStyle(color: Color(0xFFFFB74D), fontSize: 12.5, fontWeight: FontWeight.w800)),
                       const SizedBox(width: 4),
                       const Icon(Icons.chevron_right, color: Color(0xFFFFB74D), size: 13),
                     ],
@@ -608,7 +618,7 @@ class _DailyMomentumCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          // Daily calorie target section (tappable → Diet)
+          // ── Daily Target + Macro Progress (tappable → Diet) ──
           InkWell(
             onTap: onOpenDiet,
             borderRadius: BorderRadius.circular(12),
@@ -620,106 +630,84 @@ class _DailyMomentumCard extends StatelessWidget {
               ),
               child: Column(
                 children: [
+                  // Calorie total row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.local_fire_department, color: AppColors.macroCarbs, size: 18),
-                          const SizedBox(width: 6),
-                          Text('Daily Target', style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w700)),
-                        ],
-                      ),
-                      Text(
-                        a.calories > 0 ? '${a.calories} kcal' : '—',
-                        style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w900),
-                      ),
+                      Row(children: [
+                        const Icon(Icons.local_fire_department, color: AppColors.macroCarbs, size: 18),
+                        const SizedBox(width: 6),
+                        Text('Daily Target',
+                            style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w700)),
+                      ]),
+                      Row(children: [
+                        Text(
+                          '$todayCalories',
+                          style: TextStyle(
+                            color: overCal ? AppColors.danger : AppColors.primary,
+                            fontSize: 15, fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                        Text(
+                          ' / ${a.calories} kcal',
+                          style: TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w900),
+                        ),
+                      ]),
                     ],
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      Expanded(child: _MacroPill(label: 'Protein', value: '${a.protein}g', color: AppColors.macroProtein)),
-                      const SizedBox(width: 8),
-                      Expanded(child: _MacroPill(label: 'Carbs', value: '${a.carbs}g', color: AppColors.macroCarbs)),
-                      const SizedBox(width: 8),
-                      Expanded(child: _MacroPill(label: 'Fiber', value: '${a.fiber}g', color: AppColors.macroFiber)),
-                    ],
+                  const SizedBox(height: 6),
+                  // Calorie progress bar
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(4),
+                    child: LinearProgressIndicator(
+                      value: (todayCalories / calTarget).clamp(0.0, 1.0),
+                      backgroundColor: AppColors.surfaceLight,
+                      color: overCal ? AppColors.danger : AppColors.macroCarbs,
+                      minHeight: 5,
+                    ),
                   ),
+                  const SizedBox(height: 12),
+                  // 4 macro pills with progress
+                  Row(children: [
+                    Expanded(
+                      child: _MacroPill(
+                        label: 'Protein',
+                        consumed: todayProtein,
+                        target: a.protein,
+                        color: AppColors.macroProtein,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _MacroPill(
+                        label: 'Carbs',
+                        consumed: todayCarbs,
+                        target: a.carbs,
+                        color: AppColors.macroCarbs,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _MacroPill(
+                        label: 'Fiber',
+                        consumed: todayFiber,
+                        target: a.fiber,
+                        color: AppColors.macroFiber,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: _MacroPill(
+                        label: 'Calories',
+                        consumed: todayCalories,
+                        target: a.calories,
+                        color: AppColors.macroCarbs,
+                        unit: 'kcal',
+                      ),
+                    ),
+                  ]),
                 ],
               ),
-            ),
-          ),
-          const SizedBox(height: 14),
-
-          // ── TODAY'S PROGRESS ──
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-            decoration: BoxDecoration(
-              color: overTarget
-                  ? AppColors.danger.withValues(alpha: 0.06)
-                  : AppColors.primary.withValues(alpha: 0.06),
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(
-                color: overTarget
-                    ? AppColors.danger.withValues(alpha: 0.2)
-                    : AppColors.primary.withValues(alpha: 0.15),
-              ),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(children: [
-                      Icon(Icons.restaurant_outlined,
-                          color: overTarget ? AppColors.danger : AppColors.primary, size: 16),
-                      const SizedBox(width: 6),
-                      Text(
-                        "Today's Progress",
-                        style: TextStyle(
-                          color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                    ]),
-                    Text(
-                      overTarget
-                          ? '+${todayCalories - target} kcal over'
-                          : '$remaining kcal left',
-                      style: TextStyle(
-                        color: overTarget ? AppColors.danger : AppColors.textSecondary,
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(6),
-                        child: LinearProgressIndicator(
-                          value: progress,
-                          backgroundColor: AppColors.surfaceLight,
-                          color: overTarget ? AppColors.danger : AppColors.primary,
-                          minHeight: 8,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      '$todayCalories / $target kcal',
-                      style: TextStyle(
-                        color: overTarget ? AppColors.danger : AppColors.textPrimary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
             ),
           ),
         ],
@@ -730,36 +718,63 @@ class _DailyMomentumCard extends StatelessWidget {
 
 
 
+
 class _MacroPill extends StatelessWidget {
   final String label;
-  final String value;
+  final int consumed;
+  final int target;
   final Color color;
+  final String unit;
 
   const _MacroPill({
     required this.label,
-    required this.value,
+    required this.consumed,
+    required this.target,
     required this.color,
+    this.unit = 'g',
   });
 
   @override
   Widget build(BuildContext context) {
+    final t = target > 0 ? target : 1;
+    final progress = (consumed / t).clamp(0.0, 1.0);
+    final over = consumed > t;
+
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: color.withValues(alpha: 0.25)),
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.2)),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            value,
-            style: TextStyle(color: color, fontSize: 12.5, fontWeight: FontWeight.w800),
+          Text(label, style: TextStyle(color: AppColors.textSecondary, fontSize: 10.5, fontWeight: FontWeight.w700)),
+          const SizedBox(height: 4),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.baseline,
+            textBaseline: TextBaseline.alphabetic,
+            children: [
+              Text(
+                '$consumed',
+                style: TextStyle(color: over ? AppColors.danger : color, fontSize: 14, fontWeight: FontWeight.w900),
+              ),
+              Text(
+                ' / $target$unit',
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 10.5, fontWeight: FontWeight.w700),
+              ),
+            ],
           ),
-          const SizedBox(height: 1),
-          Text(
-            'Target',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 10),
+          const SizedBox(height: 6),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3),
+            child: LinearProgressIndicator(
+              value: progress,
+              backgroundColor: AppColors.surfaceLight,
+              color: over ? AppColors.danger : color,
+              minHeight: 4,
+            ),
           ),
         ],
       ),
