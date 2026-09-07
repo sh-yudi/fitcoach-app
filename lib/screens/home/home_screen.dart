@@ -8,7 +8,7 @@ import '../../widgets/body_composition_sheet.dart';
 import '../../widgets/personal_training_card.dart';
 import '../../widgets/section_header.dart';
 import '../diet/diet_screen.dart';
-import '../workout/workout_screen.dart';
+import 'streak_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final User? user;
@@ -32,11 +32,13 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? _streaks;
+  int _todayCalories = 0;
 
   @override
   void initState() {
     super.initState();
     _loadStreaks();
+    _loadTodayCalories();
   }
 
   @override
@@ -44,6 +46,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.didUpdateWidget(oldWidget);
     if (widget.refreshToken != oldWidget.refreshToken) {
       _loadStreaks();
+      _loadTodayCalories();
     }
   }
 
@@ -52,6 +55,25 @@ class _HomeScreenState extends State<HomeScreen> {
       final s = await ApiClient.instance.getStreaks();
       if (!mounted) return;
       setState(() => _streaks = s);
+    } catch (_) {}
+  }
+
+  Future<void> _loadTodayCalories() async {
+    try {
+      final log = await ApiClient.instance.getLoggedFood();
+      if (!mounted) return;
+      // sum calories from all today's logged items
+      int total = 0;
+      final items = log['items'];
+      if (items is List) {
+        for (final item in items) {
+          if (item is Map) {
+            final cal = item['calories'] ?? item['kcal'] ?? 0;
+            total += (cal is num ? cal.toInt() : int.tryParse(cal.toString()) ?? 0);
+          }
+        }
+      }
+      setState(() => _todayCalories = total);
     } catch (_) {}
   }
 
@@ -82,9 +104,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   user: u,
                   assessment: a,
                   streaks: _streaks,
+                  todayCalories: _todayCalories,
                   onSelectGoal: () => _showGoalPicker(context, u, a),
-                  onOpenWorkout: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const WorkoutScreen()),
+                  onOpenStreak: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => StreakDetailScreen(initialData: _streaks)),
                   ),
                   onOpenDiet: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => const DietScreen()),
@@ -137,12 +160,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
                 const SizedBox(height: 18),
-
-                // Compact Consistency & Badges Strip
-                if (_streaks != null) ...[
-                  _ConsistencyStrip(data: _streaks),
-                  const SizedBox(height: 20),
-                ],
               ] else ...[
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 48),
@@ -475,16 +492,18 @@ class _DailyMomentumCard extends StatelessWidget {
   final User? user;
   final Assessment assessment;
   final Map<String, dynamic>? streaks;
+  final int todayCalories;
   final VoidCallback onSelectGoal;
-  final VoidCallback onOpenWorkout;
+  final VoidCallback onOpenStreak;
   final VoidCallback onOpenDiet;
 
   const _DailyMomentumCard({
     required this.user,
     required this.assessment,
     required this.streaks,
+    required this.todayCalories,
     required this.onSelectGoal,
-    required this.onOpenWorkout,
+    required this.onOpenStreak,
     required this.onOpenDiet,
   });
 
@@ -507,6 +526,10 @@ class _DailyMomentumCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final a = assessment;
     final streak = _currentStreak();
+    final target = a.calories > 0 ? a.calories : 1;
+    final progress = (todayCalories / target).clamp(0.0, 1.0);
+    final remaining = (target - todayCalories).clamp(0, target);
+    final overTarget = todayCalories > target;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -515,10 +538,7 @@ class _DailyMomentumCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: AppColors.surfaceLight, width: 1.2),
         gradient: LinearGradient(
-          colors: [
-            AppColors.surface,
-            AppColors.surfaceLight.withValues(alpha: 0.35),
-          ],
+          colors: [AppColors.surface, AppColors.surfaceLight.withValues(alpha: 0.35)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -526,7 +546,7 @@ class _DailyMomentumCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Row: Goal Phase Chip + Streak Pill
+          // Top Row: Goal Phase Chip + Tappable Streak Pill
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -545,17 +565,12 @@ class _DailyMomentumCard extends StatelessWidget {
                     children: [
                       Icon(
                         a.goal == 'cut' ? Icons.trending_down : (a.goal == 'bulk' ? Icons.trending_up : Icons.eco),
-                        color: AppColors.primary,
-                        size: 15,
+                        color: AppColors.primary, size: 15,
                       ),
                       const SizedBox(width: 6),
                       Text(
                         _goalTitle(a.goal),
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w800,
-                        ),
+                        style: TextStyle(color: AppColors.primary, fontSize: 12.5, fontWeight: FontWeight.w800),
                       ),
                       const SizedBox(width: 4),
                       Icon(Icons.keyboard_arrow_down, color: AppColors.primary, size: 14),
@@ -563,34 +578,37 @@ class _DailyMomentumCard extends StatelessWidget {
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFF9800).withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: const Color(0xFFFF9800).withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('🔥', style: TextStyle(fontSize: 12.5)),
-                    const SizedBox(width: 4),
-                    Text(
-                      '$streak day${streak == 1 ? '' : 's'} streak',
-                      style: const TextStyle(
-                        color: Color(0xFFFFB74D),
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w800,
+              // ── Tappable streak pill ──
+              InkWell(
+                onTap: onOpenStreak,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFF9800).withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFFF9800).withValues(alpha: 0.3)),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text('🔥', style: TextStyle(fontSize: 12.5)),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$streak day${streak == 1 ? '' : 's'} streak',
+                        style: const TextStyle(color: Color(0xFFFFB74D), fontSize: 12.5, fontWeight: FontWeight.w800),
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 4),
+                      const Icon(Icons.chevron_right, color: Color(0xFFFFB74D), size: 13),
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
 
-          // Centerpiece: Daily Calorie & Macronutrient Summary
+          // Daily calorie target section (tappable → Diet)
           InkWell(
             onTap: onOpenDiet,
             borderRadius: BorderRadius.circular(12),
@@ -609,48 +627,23 @@ class _DailyMomentumCard extends StatelessWidget {
                         children: [
                           const Icon(Icons.local_fire_department, color: AppColors.macroCarbs, size: 18),
                           const SizedBox(width: 6),
-                          Text(
-                            'Daily Target',
-                            style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w700),
-                          ),
+                          Text('Daily Target', style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w700)),
                         ],
                       ),
                       Text(
                         a.calories > 0 ? '${a.calories} kcal' : '—',
-                        style: TextStyle(
-                          color: AppColors.textPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w900,
-                        ),
+                        style: TextStyle(color: AppColors.textPrimary, fontSize: 16, fontWeight: FontWeight.w900),
                       ),
                     ],
                   ),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      Expanded(
-                        child: _MacroPill(
-                          label: 'Protein',
-                          value: '${a.protein}g',
-                          color: AppColors.macroProtein,
-                        ),
-                      ),
+                      Expanded(child: _MacroPill(label: 'Protein', value: '${a.protein}g', color: AppColors.macroProtein)),
                       const SizedBox(width: 8),
-                      Expanded(
-                        child: _MacroPill(
-                          label: 'Carbs',
-                          value: '${a.carbs}g',
-                          color: AppColors.macroCarbs,
-                        ),
-                      ),
+                      Expanded(child: _MacroPill(label: 'Carbs', value: '${a.carbs}g', color: AppColors.macroCarbs)),
                       const SizedBox(width: 8),
-                      Expanded(
-                        child: _MacroPill(
-                          label: 'Fiber',
-                          value: '${a.fiber}g',
-                          color: AppColors.macroFiber,
-                        ),
-                      ),
+                      Expanded(child: _MacroPill(label: 'Fiber', value: '${a.fiber}g', color: AppColors.macroFiber)),
                     ],
                   ),
                 ],
@@ -659,50 +652,74 @@ class _DailyMomentumCard extends StatelessWidget {
           ),
           const SizedBox(height: 14),
 
-          // Bottom Action Row: Today's Workout Focus & Jump Action
-          InkWell(
-            onTap: onOpenWorkout,
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+          // ── TODAY'S PROGRESS ──
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            decoration: BoxDecoration(
+              color: overTarget
+                  ? AppColors.danger.withValues(alpha: 0.06)
+                  : AppColors.primary.withValues(alpha: 0.06),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: overTarget
+                    ? AppColors.danger.withValues(alpha: 0.2)
+                    : AppColors.primary.withValues(alpha: 0.15),
               ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 30,
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(Icons.fitness_center, color: AppColors.primary, size: 16),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Workout',
-                          style: TextStyle(color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w800),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(children: [
+                      Icon(Icons.restaurant_outlined,
+                          color: overTarget ? AppColors.danger : AppColors.primary, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        "Today's Progress",
+                        style: TextStyle(
+                          color: AppColors.textPrimary, fontSize: 13, fontWeight: FontWeight.w800,
                         ),
-                        Text(
-                          'View exercises & track sets',
-                          style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
-                        ),
-                      ],
+                      ),
+                    ]),
+                    Text(
+                      overTarget
+                          ? '+${todayCalories - target} kcal over'
+                          : '$remaining kcal left',
+                      style: TextStyle(
+                        color: overTarget ? AppColors.danger : AppColors.textSecondary,
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  Text(
-                    'Start  →',
-                    style: TextStyle(color: AppColors.primary, fontSize: 12.5, fontWeight: FontWeight.w800),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: LinearProgressIndicator(
+                          value: progress,
+                          backgroundColor: AppColors.surfaceLight,
+                          color: overTarget ? AppColors.danger : AppColors.primary,
+                          minHeight: 8,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Text(
+                      '$todayCalories / $target kcal',
+                      style: TextStyle(
+                        color: overTarget ? AppColors.danger : AppColors.textPrimary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
@@ -710,6 +727,8 @@ class _DailyMomentumCard extends StatelessWidget {
     );
   }
 }
+
+
 
 class _MacroPill extends StatelessWidget {
   final String label;
@@ -865,121 +884,6 @@ class _MetricHubCard extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// COMPACT CONSISTENCY & BADGES STRIP
-// ─────────────────────────────────────────────────────────────────────────────
-class _ConsistencyStrip extends StatelessWidget {
-  final Map<String, dynamic>? data;
-
-  const _ConsistencyStrip({required this.data});
-
-  int _int(Map<String, dynamic> m, List<String> keys) {
-    for (final k in keys) {
-      final v = m[k];
-      if (v is num) return v.toInt();
-      if (v is String) {
-        final n = int.tryParse(v);
-        if (n != null) return n;
-      }
-    }
-    return 0;
-  }
-
-  String _badgeEmoji(String id) {
-    final lower = id.toLowerCase();
-    if (lower.contains('first')) return '🎯';
-    if (lower.contains('week') && lower.contains('streak')) return '🔥';
-    if (lower.contains('month')) return '🌟';
-    if (lower.contains('ten') || lower.contains('10')) return '💪';
-    if (lower.contains('fifty') || lower.contains('50')) return '🏆';
-    if (lower.contains('century') || lower.contains('100')) return '👑';
-    if (lower.contains('early')) return '🌅';
-    if (lower.contains('perfect')) return '💎';
-    return '🏅';
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final d = data ?? const {};
-    final longest = _int(d, ['longestStreak', 'longest', 'bestStreak', 'best']);
-    final total = _int(d, ['totalWorkouts', 'workouts', 'total']);
-    final rawBadges = d['badges'];
-    final badges = rawBadges is List ? rawBadges.map((b) => b.toString()).toList() : <String>[];
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.surfaceLight),
-      ),
-      child: Row(
-        children: [
-          Row(
-            children: [
-              const Text('🏆', style: TextStyle(fontSize: 16)),
-              const SizedBox(width: 6),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Best Streak', style: TextStyle(color: AppColors.textSecondary, fontSize: 10)),
-                  Text('$longest day${longest == 1 ? '' : 's'}', style: TextStyle(color: AppColors.textPrimary, fontSize: 12.5, fontWeight: FontWeight.w800)),
-                ],
-              ),
-            ],
-          ),
-          const SizedBox(width: 14),
-          Container(width: 1, height: 28, color: AppColors.surfaceLight),
-          const SizedBox(width: 14),
-          Row(
-            children: [
-              const Text('💪', style: TextStyle(fontSize: 16)),
-              const SizedBox(width: 6),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Total workouts', style: TextStyle(color: AppColors.textSecondary, fontSize: 10)),
-                  Text('$total', style: TextStyle(color: AppColors.textPrimary, fontSize: 12.5, fontWeight: FontWeight.w800)),
-                ],
-              ),
-            ],
-          ),
-          if (badges.isNotEmpty) ...[
-            const SizedBox(width: 12),
-            Container(width: 1, height: 28, color: AppColors.surfaceLight),
-            const SizedBox(width: 8),
-            Expanded(
-              child: SizedBox(
-                height: 32,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: badges.length,
-                  separatorBuilder: (_, _) => const SizedBox(width: 6),
-                  itemBuilder: (_, i) {
-                    final b = badges[i];
-                    return Tooltip(
-                      message: b,
-                      child: Container(
-                        width: 30,
-                        height: 30,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: AppColors.surfaceLight.withValues(alpha: 0.6),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Text(_badgeEmoji(b), style: const TextStyle(fontSize: 14)),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-}
 
 class _GoalOption extends StatelessWidget {
   final String value;
