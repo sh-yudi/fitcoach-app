@@ -565,9 +565,9 @@ class _DailyMomentumCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              InkWell(
+              GestureDetector(
                 onTap: onSelectGoal,
-                borderRadius: BorderRadius.circular(10),
+                behavior: HitTestBehavior.opaque,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
@@ -591,9 +591,9 @@ class _DailyMomentumCard extends StatelessWidget {
                   ),
                 ),
               ),
-              InkWell(
+              GestureDetector(
                 onTap: onOpenStreak,
-                borderRadius: BorderRadius.circular(10),
+                behavior: HitTestBehavior.opaque,
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
@@ -619,9 +619,9 @@ class _DailyMomentumCard extends StatelessWidget {
           const SizedBox(height: 16),
 
           // ── Daily Target + Macro Progress (tappable → Diet) ──
-          InkWell(
+          GestureDetector(
             onTap: onOpenDiet,
-            borderRadius: BorderRadius.circular(12),
+            behavior: HitTestBehavior.opaque,
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -810,12 +810,12 @@ class _MetricHubCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(14),
       child: Container(
-        padding: const EdgeInsets.all(14),
+        padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(14),
           border: Border.all(color: AppColors.surfaceLight),
         ),
         child: Column(
@@ -826,12 +826,12 @@ class _MetricHubCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(icon, size: 16, color: AppColors.textSecondary),
-                    const SizedBox(width: 5),
+                    Icon(icon, size: 14, color: AppColors.textSecondary),
+                    const SizedBox(width: 4),
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: 12.5,
+                        fontSize: 11.5,
                         fontWeight: FontWeight.w700,
                         color: AppColors.textSecondary,
                       ),
@@ -839,56 +839,56 @@ class _MetricHubCard extends StatelessWidget {
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
                   decoration: BoxDecoration(
                     color: badgeColor.withValues(alpha: 0.14),
-                    borderRadius: BorderRadius.circular(6),
+                    borderRadius: BorderRadius.circular(4),
                   ),
                   child: Text(
                     category,
                     style: TextStyle(
                       color: badgeColor,
-                      fontSize: 10,
+                      fontSize: 9,
                       fontWeight: FontWeight.w800,
                     ),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Text(
               value,
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.w900,
                 color: AppColors.textPrimary,
                 height: 1.1,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               subtitle,
-              style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
+              style: TextStyle(color: AppColors.textSecondary, fontSize: 10),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
               decoration: BoxDecoration(
                 color: AppColors.surfaceLight.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: BorderRadius.circular(5),
               ),
               child: Row(
                 children: [
                   Expanded(
                     child: Text(
                       detailText,
-                      style: TextStyle(color: AppColors.textPrimary, fontSize: 10.5, fontWeight: FontWeight.w600),
+                      style: TextStyle(color: AppColors.textPrimary, fontSize: 9.5, fontWeight: FontWeight.w600),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
                   const SizedBox(width: 4),
-                  Icon(Icons.arrow_forward_ios, size: 9, color: AppColors.textSecondary),
+                  Icon(Icons.arrow_forward_ios, size: 8, color: AppColors.textSecondary),
                 ],
               ),
             ),
