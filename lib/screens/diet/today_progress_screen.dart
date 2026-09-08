@@ -66,8 +66,8 @@ class _TodayProgressScreenState extends State<TodayProgressScreen> {
     final visible = _diet!.meals.where((m) => !kWaterExclude.contains(m.name)).toList();
     final slots = <_WaterSlot>[];
     for (final m in visible) {
-      final beforeId = '${m.name}_before';
-      final afterId = '${m.name}_after';
+      final beforeId = waterBeforeId(m.name);
+      final afterId = waterAfterId(m.name);
       slots.add(_WaterSlot(
         id: beforeId,
         ml: '300–500 ml',
@@ -127,7 +127,7 @@ class _TodayProgressScreenState extends State<TodayProgressScreen> {
         children: [
           Row(
             children: [
-              const Icon(Icons.water_drop, color: Color(0xFF3DA5FF), size: 20),
+              const Icon(Icons.water_drop, color: AppColors.water, size: 20),
               const SizedBox(width: 8),
               Text(
                 'Water Intake (300–500 ml)',
@@ -147,7 +147,7 @@ class _TodayProgressScreenState extends State<TodayProgressScreen> {
               value: pct,
               minHeight: 8,
               backgroundColor: AppColors.water.withValues(alpha: 0.15),
-              valueColor: const AlwaysStoppedAnimation(Color(0xFF3DA5FF)),
+              valueColor: const AlwaysStoppedAnimation(AppColors.water),
             ),
           ),
           const SizedBox(height: 4),

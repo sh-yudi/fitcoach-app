@@ -4,6 +4,7 @@ import '../../services/api_client.dart';
 import '../../services/profile_photo.dart';
 import '../../services/session.dart';
 import '../../theme.dart';
+import '../../utils/helpers.dart';
 import '../../widgets/profile_avatar.dart';
 import '../home/home_shell.dart';
 import 'one_tap_consent.dart';
@@ -108,9 +109,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
       'veg': _veg,
       'eggFree': _veg && !_eggEater,
       if (_profilePhoto != null) 'profilePhoto': _profilePhoto,
-      if (_waist.text.isNotEmpty) 'waistCm': (double.parse(_waist.text) * 2.54).round(),
-      if (_neck.text.isNotEmpty) 'neckCm': (double.parse(_neck.text) * 2.54).round(),
-      if (_hip.text.isNotEmpty) 'hipCm': (double.parse(_hip.text) * 2.54).round(),
+      if (_waist.text.isNotEmpty) 'waistCm': inchesToCm(_waist.text),
+      if (_neck.text.isNotEmpty) 'neckCm': inchesToCm(_neck.text),
+      if (_hip.text.isNotEmpty) 'hipCm': inchesToCm(_hip.text),
     };
     try {
       final result = await ApiClient.instance.register(data);

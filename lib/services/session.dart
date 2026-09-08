@@ -1,5 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/models.dart';
+import 'api_client.dart';
+
 class Session {
   static const _tokenKey = 'auth_token';
   static const _emailKey = 'user_email';
@@ -70,6 +73,26 @@ class Session {
     } else {
       await prefs.setString(_rememberPhotoKey, photo);
     }
+  }
+
+  /// Issues a fresh one-tap token on the server and persists it locally
+  /// together with the avatar/name so the next launch can one-tap.
+  static Future<User> enableOneTap() async {
+    final result = await ApiClient.instance.enableOneTap();
+    await save(
+      await token() ?? '',
+      await email() ?? '',
+      name: result.user.name,
+      rememberToken: result.rememberToken,
+      photo: result.user.displayPhoto,
+    );
+    return result.user;
+  }
+
+  /// Revokes the one-tap token on the server and clears it on this device.
+  static Future<void> disableOneTap() async {
+    await ApiClient.instance.disableOneTap();
+    await clearOneTap();
   }
 
   // Logs out: clears the session but keeps the one-tap login token.

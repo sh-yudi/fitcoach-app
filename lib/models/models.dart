@@ -350,18 +350,3 @@ String toTitleCase(String input) {
       .map((w) => w.isEmpty ? w : w[0].toUpperCase() + w.substring(1))
       .join(' ');
 }
-
-class DeveloperInfo {
-  final String name;
-  final String role;
-  final String website;
-  final String email;
-  final String github;
-
-  DeveloperInfo.fromJson(Map<String, dynamic> j)
-      : name = j['name'] as String? ?? '',
-        role = j['role'] as String? ?? '',
-        website = j['website'] as String? ?? '',
-        email = j['email'] as String? ?? '',
-        github = j['github'] as String? ?? '';
-}

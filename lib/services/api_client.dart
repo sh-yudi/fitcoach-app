@@ -204,31 +204,16 @@ class ApiClient {
     await _request('POST', '/api/plans/workout/complete', body: {'day': day});
   }
 
-  Future<void> uncompleteWorkout(int day) async {
-    await _request('POST', '/api/plans/workout/uncomplete', body: {'day': day});
-  }
-
   Future<void> saveWorkoutTicks(int day, List<String> names) async {
     await _request('POST', '/api/plans/workout/ticks', body: {'day': day, 'names': names});
   }
 
-  Future<MealSchedule> getSchedule() async {
+  Future<({MealSchedule schedule, String workoutTime})> getSchedule() async {
     final j = await _request('GET', '/api/plans/schedule');
-    return MealSchedule.fromJson(j);
-  }
-
-  Future<Map<String, dynamic>> calculateBodyFat(Map<String, dynamic> params) async {
-    return _request('POST', '/api/plans/calculate-body-fat', body: params);
-  }
-
-  Future<Map<String, dynamic>> simulateTarget(Map<String, dynamic> params) async {
-    return _request('POST', '/api/plans/simulate-target', body: params);
-  }
-
-  // ---- Developer info (global constant) ----
-  Future<DeveloperInfo> getDeveloperInfo() async {
-    final j = await _request('GET', '/api/developer');
-    return DeveloperInfo.fromJson(j['developer'] as Map<String, dynamic>);
+    return (
+      schedule: MealSchedule.fromJson(j),
+      workoutTime: j['workoutTime'] as String? ?? '',
+    );
   }
 
   // ---- Diet scanning (needs longer timeout — Gemini API takes 10-30s) ----
