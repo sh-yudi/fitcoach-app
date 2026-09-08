@@ -70,11 +70,11 @@ class _HomeScreenState extends State<HomeScreen> {
       final totals = log['totals'];
       int cal = 0, pro = 0, carb = 0, fib = 0;
       if (totals is Map) {
-        int _parse(dynamic v) => v is num ? v.toInt() : int.tryParse(v?.toString() ?? '') ?? 0;
-        cal  = _parse(totals['calories']);
-        pro  = _parse(totals['protein']);
-        carb = _parse(totals['carbs']);
-        fib  = _parse(totals['fiber']);
+        int parse(dynamic v) => v is num ? v.toInt() : int.tryParse(v?.toString() ?? '') ?? 0;
+        cal  = parse(totals['calories']);
+        pro  = parse(totals['protein']);
+        carb = parse(totals['carbs']);
+        fib  = parse(totals['fiber']);
       }
       setState(() {
         _todayCalories = cal;
@@ -616,21 +616,19 @@ class _DailyMomentumCard extends StatelessWidget {
               ),
             ],
           ),
+
           const SizedBox(height: 16),
 
-          // ── Daily Target + Macro Progress (tappable → Diet) ──
-          GestureDetector(
-            onTap: onOpenDiet,
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceLight.withValues(alpha: 0.45),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: [
-                  // Calorie total row
+          // ── Daily Target + Macro Progress (Purely informational) ──
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceLight.withValues(alpha: 0.45),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                // Calorie total row
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -708,7 +706,6 @@ class _DailyMomentumCard extends StatelessWidget {
                   ]),
                 ],
               ),
-            ),
           ),
         ],
       ),
