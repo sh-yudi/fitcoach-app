@@ -20,7 +20,7 @@ class HomeShell extends StatefulWidget {
 
 class _HomeShellState extends State<HomeShell> {
   int _index = 0;
-  int _refreshToken = 0;
+  final int _refreshToken = 0;
   int _homeRefreshToken = 0;
   User? _user;
   Assessment? _assessment;

@@ -235,7 +235,7 @@ class ApiClient {
   Future<Map<String, dynamic>> scanFood(String base64Image, {String? mealName}) async {
     final j = await _request('POST', '/api/diet/scan', body: {
       'image': base64Image,
-      if (mealName != null) 'mealName': mealName,
+      'mealName': ?mealName,
     }, timeout: const Duration(seconds: 60));
     return j;
   }
