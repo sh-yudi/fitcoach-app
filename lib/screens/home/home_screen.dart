@@ -569,7 +569,7 @@ class _DailyMomentumCard extends StatelessWidget {
                 onTap: onSelectGoal,
                 behavior: HitTestBehavior.opaque,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.14),
                     borderRadius: BorderRadius.circular(10),
@@ -595,7 +595,7 @@ class _DailyMomentumCard extends StatelessWidget {
                 onTap: onOpenStreak,
                 behavior: HitTestBehavior.opaque,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFF9800).withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
@@ -752,19 +752,23 @@ class _MacroPill extends StatelessWidget {
         children: [
           Text(label, style: TextStyle(color: AppColors.textSecondary, fontSize: 10.5, fontWeight: FontWeight.w700)),
           const SizedBox(height: 4),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                '$consumed',
-                style: TextStyle(color: over ? AppColors.danger : color, fontSize: 14, fontWeight: FontWeight.w900),
-              ),
-              Text(
-                ' / $target$unit',
-                style: TextStyle(color: AppColors.textPrimary, fontSize: 10.5, fontWeight: FontWeight.w700),
-              ),
-            ],
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  '$consumed',
+                  style: TextStyle(color: over ? AppColors.danger : color, fontSize: 14, fontWeight: FontWeight.w900),
+                ),
+                Text(
+                  ' / $target$unit',
+                  style: TextStyle(color: AppColors.textPrimary, fontSize: 10.5, fontWeight: FontWeight.w700),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 6),
           ClipRRect(
