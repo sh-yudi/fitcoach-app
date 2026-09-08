@@ -46,18 +46,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     setState(() => _oneTapEnabled = enable);
     try {
       if (enable) {
-        final result = await ApiClient.instance.enableOneTap();
-        final email = await Session.email() ?? '';
-        await Session.save(
-          await Session.token() ?? '',
-          email,
-          name: result.user.name,
-          rememberToken: result.rememberToken,
-          photo: result.user.displayPhoto,
-        );
+        await Session.enableOneTap();
       } else {
-        await ApiClient.instance.disableOneTap();
-        await Session.clearOneTap();
+        await Session.disableOneTap();
       }
     } on ApiException catch (e) {
       if (!mounted) return;

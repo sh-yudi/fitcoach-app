@@ -107,7 +107,7 @@ class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateM
     for (final meal in _diet!.meals) {
       // ── Before water chip ──
       if (!kWaterExclude.contains(meal.name)) {
-        final id = '${meal.name}_before';
+        final id = waterBeforeId(meal.name);
         widgets.add(_WaterChip(
           ml: '300–500',
           label: 'Drink before ${mealTitle(meal.name)}',
@@ -122,7 +122,7 @@ class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateM
       widgets.add(const SizedBox(height: 8));
       // ── After water chip ──
       if (!kWaterExclude.contains(meal.name)) {
-        final id = '${meal.name}_after';
+        final id = waterAfterId(meal.name);
         widgets.add(_WaterChip(
           ml: '300–500',
           label: 'Drink after ${mealTitle(meal.name)}',
@@ -179,7 +179,7 @@ class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateM
                                     children: [
                                       Row(
                                         children: [
-                                          const Icon(Icons.water_drop, color: Color(0xFF3DA5FF), size: 18),
+                                          const Icon(Icons.water_drop, color: AppColors.water, size: 18),
                                           const SizedBox(width: 6),
                                           Text(
                                             '${_diet!.waterLiters} L',

@@ -12,22 +12,6 @@ String todayKey() {
   return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
 }
 
-String shiftTime(String time, int minutes) {
-  final m = RegExp(r'(\d{1,2}):(\d{2})\s*([AP]M)').firstMatch(time.trim());
-  if (m == null) return time;
-  var hour = int.parse(m.group(1)!);
-  final min = int.parse(m.group(2)!);
-  final ap = m.group(3)!.toUpperCase();
-  if (ap == 'PM' && hour != 12) hour += 12;
-  if (ap == 'AM' && hour == 12) hour = 0;
-  final total = ((hour * 60 + min + minutes) % 1440 + 1440) % 1440;
-  final h = total ~/ 60;
-  final m2 = total % 60;
-  final period = h >= 12 ? 'PM' : 'AM';
-  final h12 = h == 0 ? 12 : h > 12 ? h - 12 : h;
-  return '$h12:${m2.toString().padLeft(2, '0')} $period';
-}
-
 String mealTitle(String name) => switch (name) {
   'preworkout' => 'pre-workout snack',
   'postworkout' => 'post-workout meal',
@@ -40,6 +24,22 @@ double? parseNum(dynamic v) {
   if (v == null) return null;
   if (v is num) return v.toDouble();
   return double.tryParse(v.toString().replaceAll(',', '.'));
+}
+
+/// Reads the first matching numeric key from a map (num or numeric string).
+/// Used by the streak summaries on Home and the streak detail screen so they
+/// agree on the same defensive parsing.
+int intFrom(Object? m, List<String> keys) {
+  final d = m is Map ? m : const <String, dynamic>{};
+  for (final k in keys) {
+    final v = d[k];
+    if (v is num) return v.toInt();
+    if (v is String) {
+      final n = int.tryParse(v);
+      if (n != null) return n;
+    }
+  }
+  return 0;
 }
 
 DateTime parseDate(dynamic e) {
@@ -58,6 +58,21 @@ String formatValue(double? v, {String unit = ''}) {
 Future<Set<String>> loadWaterDone() async {
   final prefs = await SharedPreferences.getInstance();
   return prefs.getStringList('water_done_${todayKey()}')?.toSet() ?? {};
+}
+
+/// Water-chip ids used across the diet and Today's Progress screens. Keeping
+/// them in one place guarantees both screens toggle the same keys.
+String waterBeforeId(String mealName) => '${mealName}_before';
+
+String waterAfterId(String mealName) => '${mealName}_after';
+
+/// Converts an inch measurement to centimetres (rounded). Returns null when
+/// the input is blank or unparseable.
+int? inchesToCm(dynamic v) {
+  if (v == null) return null;
+  final n = v is num ? v.toDouble() : double.tryParse(v.toString());
+  if (n == null) return null;
+  return (n * 2.54).round();
 }
 
 Future<Set<String>> toggleWaterDone(Set<String> current, String id) async {

@@ -134,9 +134,8 @@ class NotificationService {
 
     try {
       final schedule = await ApiClient.instance.getSchedule();
-      final profile = await ApiClient.instance.getProfile();
       final calendar = await ApiClient.instance.getGymCalendar();
-      await _scheduleDays(s, schedule, profile.workoutTime, calendar);
+      await _scheduleDays(s, schedule.schedule, schedule.workoutTime, calendar);
     } catch (e, st) {
       debugPrint('NotificationService.sync error: $e\n$st');
     }

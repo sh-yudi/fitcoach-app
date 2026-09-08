@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../models/models.dart';
 import '../../services/api_client.dart';
 import '../../theme.dart';
+import '../../utils/helpers.dart';
 import '../../widgets/ad_banner.dart';
 import '../../widgets/body_composition_sheet.dart';
 import '../../widgets/personal_training_card.dart';
@@ -526,23 +527,10 @@ class _DailyMomentumCard extends StatelessWidget {
 
   String _goalTitle(String g) => g == 'cut' ? 'Fat loss phase' : g == 'bulk' ? 'Lean bulk phase' : 'Maintenance phase';
 
-  int _currentStreak() {
-    final d = streaks ?? const {};
-    for (final k in ['currentStreak', 'current', 'streak']) {
-      final v = d[k];
-      if (v is num) return v.toInt();
-      if (v is String) {
-        final n = int.tryParse(v);
-        if (n != null) return n;
-      }
-    }
-    return 0;
-  }
-
   @override
   Widget build(BuildContext context) {
     final a = assessment;
-    final streak = _currentStreak();
+    final streak = intFrom(streaks, ['currentStreak', 'current', 'streak']);
     final calTarget = a.calories > 0 ? a.calories : 1;
     final overCal = todayCalories > calTarget;
 

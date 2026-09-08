@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../services/api_client.dart';
 import '../../services/session.dart';
 import '../../theme.dart';
 
@@ -85,15 +84,7 @@ Future<void> maybePromptOneTapConsent(BuildContext context) async {
   await markOneTapPrompted();
   if (!agreed) return;
   try {
-    final result = await ApiClient.instance.enableOneTap();
-    final tokenResults = await Future.wait([Session.token(), Session.email()]);
-    await Session.save(
-      tokenResults[0] ?? '',
-      tokenResults[1] ?? '',
-      name: result.user.name,
-      rememberToken: result.rememberToken,
-      photo: result.user.displayPhoto,
-    );
+    await Session.enableOneTap();
   } catch (_) {
     // Non-fatal: one-tap login simply stays off.
   }

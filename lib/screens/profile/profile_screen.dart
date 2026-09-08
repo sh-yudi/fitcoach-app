@@ -5,6 +5,7 @@ import '../../services/api_client.dart';
 import '../../services/profile_photo.dart';
 import '../../services/session.dart';
 import '../../theme.dart';
+import '../../utils/helpers.dart';
 import '../../widgets/ad_banner.dart';
 import '../../widgets/profile_avatar.dart';
 import '../auth/login_screen.dart';
@@ -131,14 +132,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
       return;
     }
-    int? toCm(String text) {
-      final v = text.isNotEmpty ? double.tryParse(text) : null;
-      return v == null ? null : (v * 2.54).round();
-    }
-
-    final waistCm = toCm(_waist.text);
-    final neckCm = toCm(_neck.text);
-    final hipCm = toCm(_hip.text);
+    final waistCm = inchesToCm(_waist.text);
+    final neckCm = inchesToCm(_neck.text);
+    final hipCm = inchesToCm(_hip.text);
     final body = <String, dynamic>{
       'heightCm': heightCm,
       'weightKg': weightKg,
@@ -454,16 +450,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() => _oneTapEnabled = enable);
     try {
       if (enable) {
-        final result = await ApiClient.instance.enableOneTap();
-        await Session.save(
-          await Session.token() ?? '',
-          result.user.email,
-          name: result.user.name,
-          rememberToken: result.rememberToken,
-        );
+        await Session.enableOneTap();
       } else {
-        await ApiClient.instance.disableOneTap();
-        await Session.clearOneTap();
+        await Session.disableOneTap();
       }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

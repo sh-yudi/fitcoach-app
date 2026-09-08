@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/api_client.dart';
 import '../../theme.dart';
+import '../../utils/helpers.dart';
 
 class StreakDetailScreen extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -30,24 +31,11 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
     if (mounted) setState(() => _loading = false);
   }
 
-  int _int(List<String> keys) {
-    final d = _data ?? {};
-    for (final k in keys) {
-      final v = d[k];
-      if (v is num) return v.toInt();
-      if (v is String) {
-        final n = int.tryParse(v);
-        if (n != null) return n;
-      }
-    }
-    return 0;
-  }
-
   @override
   Widget build(BuildContext context) {
-    final current = _int(['currentStreak', 'current', 'streak']);
-    final longest = _int(['longestStreak', 'longest', 'bestStreak', 'best']);
-    final total = _int(['totalWorkouts', 'workouts', 'total']);
+    final current = intFrom(_data, ['currentStreak', 'current', 'streak']);
+    final longest = intFrom(_data, ['longestStreak', 'longest', 'bestStreak', 'best']);
+    final total = intFrom(_data, ['totalWorkouts', 'workouts', 'total']);
     final rawBadges = _data?['badges'];
     final List<Map<String, dynamic>> badgeList = rawBadges is List
         ? rawBadges.whereType<Map>().map((b) => Map<String, dynamic>.from(b)).toList()
