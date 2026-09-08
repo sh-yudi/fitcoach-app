@@ -7,7 +7,7 @@ import '../../widgets/ad_banner.dart';
 import '../../widgets/body_composition_sheet.dart';
 import '../../widgets/personal_training_card.dart';
 import '../../widgets/section_header.dart';
-import '../diet/diet_screen.dart';
+
 import 'streak_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -32,17 +32,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? _streaks;
-  // Today's logged macro totals (from /api/diet/logged → totals)
-  int _todayCalories = 0;
-  int _todayProtein  = 0;
-  int _todayCarbs    = 0;
-  int _todayFiber    = 0;
 
   @override
   void initState() {
     super.initState();
     _loadStreaks();
-    _loadTodayMacros();
   }
 
   @override
@@ -50,7 +44,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.didUpdateWidget(oldWidget);
     if (widget.refreshToken != oldWidget.refreshToken) {
       _loadStreaks();
-      _loadTodayMacros();
     }
   }
 
@@ -59,29 +52,6 @@ class _HomeScreenState extends State<HomeScreen> {
       final s = await ApiClient.instance.getStreaks();
       if (!mounted) return;
       setState(() => _streaks = s);
-    } catch (_) {}
-  }
-
-  Future<void> _loadTodayMacros() async {
-    try {
-      final log = await ApiClient.instance.getLoggedFood();
-      if (!mounted) return;
-      // The server returns a `totals` map with aggregated values for today
-      final totals = log['totals'];
-      int cal = 0, pro = 0, carb = 0, fib = 0;
-      if (totals is Map) {
-        int _parse(dynamic v) => v is num ? v.toInt() : int.tryParse(v?.toString() ?? '') ?? 0;
-        cal  = _parse(totals['calories']);
-        pro  = _parse(totals['protein']);
-        carb = _parse(totals['carbs']);
-        fib  = _parse(totals['fiber']);
-      }
-      setState(() {
-        _todayCalories = cal;
-        _todayProtein  = pro;
-        _todayCarbs    = carb;
-        _todayFiber    = fib;
-      });
     } catch (_) {}
   }
 
@@ -112,16 +82,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   user: u,
                   assessment: a,
                   streaks: _streaks,
-                  todayCalories: _todayCalories,
-                  todayProtein: _todayProtein,
-                  todayCarbs: _todayCarbs,
-                  todayFiber: _todayFiber,
                   onSelectGoal: () => _showGoalPicker(context, u, a),
                   onOpenStreak: () => Navigator.of(context).push(
                     MaterialPageRoute(builder: (_) => StreakDetailScreen(initialData: _streaks)),
-                  ),
-                  onOpenDiet: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const DietScreen()),
                   ),
                 ),
                 const SizedBox(height: 18),
@@ -503,25 +466,15 @@ class _DailyMomentumCard extends StatelessWidget {
   final User? user;
   final Assessment assessment;
   final Map<String, dynamic>? streaks;
-  final int todayCalories;
-  final int todayProtein;
-  final int todayCarbs;
-  final int todayFiber;
   final VoidCallback onSelectGoal;
   final VoidCallback onOpenStreak;
-  final VoidCallback onOpenDiet;
 
   const _DailyMomentumCard({
     required this.user,
     required this.assessment,
     required this.streaks,
-    required this.todayCalories,
-    required this.todayProtein,
-    required this.todayCarbs,
-    required this.todayFiber,
     required this.onSelectGoal,
     required this.onOpenStreak,
-    required this.onOpenDiet,
   });
 
   String _goalTitle(String g) => g == 'cut' ? 'Fat loss phase' : g == 'bulk' ? 'Lean bulk phase' : 'Maintenance phase';
@@ -543,8 +496,6 @@ class _DailyMomentumCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final a = assessment;
     final streak = _currentStreak();
-    final calTarget = a.calories > 0 ? a.calories : 1;
-    final overCal = todayCalories > calTarget;
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -615,170 +566,6 @@ class _DailyMomentumCard extends StatelessWidget {
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 16),
-
-          // ── Daily Target + Macro Progress (tappable → Diet) ──
-          GestureDetector(
-            onTap: onOpenDiet,
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceLight.withValues(alpha: 0.45),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: [
-                  // Calorie total row
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(children: [
-                        const Icon(Icons.local_fire_department, color: AppColors.macroCarbs, size: 18),
-                        const SizedBox(width: 6),
-                        Text('Daily Target',
-                            style: TextStyle(color: AppColors.textSecondary, fontSize: 13, fontWeight: FontWeight.w700)),
-                      ]),
-                      Row(children: [
-                        Text(
-                          '$todayCalories',
-                          style: TextStyle(
-                            color: overCal ? AppColors.danger : AppColors.primary,
-                            fontSize: 15, fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                        Text(
-                          ' / ${a.calories} kcal',
-                          style: TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w900),
-                        ),
-                      ]),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  // Calorie progress bar
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: (todayCalories / calTarget).clamp(0.0, 1.0),
-                      backgroundColor: AppColors.surfaceLight,
-                      color: overCal ? AppColors.danger : AppColors.macroCarbs,
-                      minHeight: 5,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // 4 macro pills with progress
-                  Row(children: [
-                    Expanded(
-                      child: _MacroPill(
-                        label: 'Protein',
-                        consumed: todayProtein,
-                        target: a.protein,
-                        color: AppColors.macroProtein,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: _MacroPill(
-                        label: 'Carbs',
-                        consumed: todayCarbs,
-                        target: a.carbs,
-                        color: AppColors.macroCarbs,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: _MacroPill(
-                        label: 'Fiber',
-                        consumed: todayFiber,
-                        target: a.fiber,
-                        color: AppColors.macroFiber,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: _MacroPill(
-                        label: 'Calories',
-                        consumed: todayCalories,
-                        target: a.calories,
-                        color: AppColors.macroCarbs,
-                        unit: 'kcal',
-                      ),
-                    ),
-                  ]),
-                ],
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-
-
-
-class _MacroPill extends StatelessWidget {
-  final String label;
-  final int consumed;
-  final int target;
-  final Color color;
-  final String unit;
-
-  const _MacroPill({
-    required this.label,
-    required this.consumed,
-    required this.target,
-    required this.color,
-    this.unit = 'g',
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final t = target > 0 ? target : 1;
-    final progress = (consumed / t).clamp(0.0, 1.0);
-    final over = consumed > t;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: color.withValues(alpha: 0.2)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: TextStyle(color: AppColors.textSecondary, fontSize: 10.5, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 4),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text(
-                  '$consumed',
-                  style: TextStyle(color: over ? AppColors.danger : color, fontSize: 14, fontWeight: FontWeight.w900),
-                ),
-                Text(
-                  ' / $target$unit',
-                  style: TextStyle(color: AppColors.textPrimary, fontSize: 10.5, fontWeight: FontWeight.w700),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 6),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(3),
-            child: LinearProgressIndicator(
-              value: progress,
-              backgroundColor: AppColors.surfaceLight,
-              color: over ? AppColors.danger : color,
-              minHeight: 4,
-            ),
           ),
         ],
       ),
