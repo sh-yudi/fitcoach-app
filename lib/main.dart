@@ -7,6 +7,7 @@ import 'services/api_client.dart';
 import 'services/notification_service.dart';
 import 'services/session.dart';
 import 'theme.dart';
+import 'widgets/app_pinch_zoom.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -88,7 +89,7 @@ class FitCoachApp extends StatelessWidget {
             themeMode: ThemeController.instance.mode,
             builder: (context, child) {
               AppColors.setBrightness(Theme.of(context).brightness);
-              return child!;
+              return AppPinchZoom(child: child!);
             },
             home: const SplashScreen(),
           ),
