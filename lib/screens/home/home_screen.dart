@@ -683,6 +683,7 @@ class _DailyMomentumCard extends StatelessWidget {
                   ]),
                 ],
               ),
+            ),
           ),
         ],
       ),
