@@ -10,6 +10,7 @@ import '../../widgets/personal_training_card.dart';
 import '../../widgets/section_header.dart';
 import '../diet/diet_screen.dart';
 import 'streak_detail_screen.dart';
+import '../../widgets/app_pinch_zoom.dart';
 
 class HomeScreen extends StatefulWidget {
   final User? user;
@@ -93,7 +94,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final firstName = u?.name.split(' ').first ?? 'there';
 
     return Scaffold(
-      body: SafeArea(
+      body: AppPinchZoom(
+        child: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
             await widget.onRefresh();
@@ -188,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _buildHeader(User? u, String firstName) {

@@ -7,6 +7,7 @@ import 'package:image_picker/image_picker.dart';
 import '../../models/models.dart';
 import '../../services/api_client.dart';
 import '../../theme.dart';
+import '../../widgets/app_pinch_zoom.dart';
 
 class DietScanScreen extends StatefulWidget {
   const DietScanScreen({super.key});
@@ -310,7 +311,8 @@ class _DietScanScreenState extends State<DietScanScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Scan Food')),
-      body: SafeArea(
+      body: AppPinchZoom(
+        child: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           children: [
@@ -493,7 +495,7 @@ class _DietScanScreenState extends State<DietScanScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 
   Widget _summaryRow(String label, String value, String target) {

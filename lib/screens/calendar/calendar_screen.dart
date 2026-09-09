@@ -6,6 +6,7 @@ import '../../theme.dart';
 import '../../utils/helpers.dart';
 import '../../widgets/ad_banner.dart';
 import '../../widgets/gym_check_in_sheet.dart';
+import '../../widgets/app_pinch_zoom.dart';
 
 class CalendarScreen extends StatefulWidget {
   const CalendarScreen({super.key, this.refreshToken = 0, this.initialCheckInDate});
@@ -137,7 +138,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Gym Calendar')),
-      body: SafeArea(
+      body: AppPinchZoom(
+        child: SafeArea(
         child: _loading
             ?  Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
             : ListView(
@@ -156,7 +158,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 ],
               ),
       ),
-    );
+    ));
   }
 
   Widget _buildSummary() {

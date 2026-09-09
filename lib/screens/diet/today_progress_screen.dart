@@ -4,6 +4,7 @@ import '../../models/models.dart';
 import '../../services/api_client.dart';
 import '../../theme.dart';
 import '../../utils/helpers.dart';
+import '../../widgets/app_pinch_zoom.dart';
 
 class TodayProgressScreen extends StatefulWidget {
   const TodayProgressScreen({super.key});
@@ -88,7 +89,8 @@ class _TodayProgressScreenState extends State<TodayProgressScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Today's Progress")),
-      body: _loading
+      body: AppPinchZoom(
+        child: _loading
           ? Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
           : _error != null
               ? Center(child: Text(_error!, style: TextStyle(color: AppColors.textSecondary)))
@@ -106,7 +108,7 @@ class _TodayProgressScreenState extends State<TodayProgressScreen> {
                     ],
                   ),
                 ),
-    );
+    ));
   }
 
   Widget _buildWaterProgress() {

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../services/api_client.dart';
 import '../../theme.dart';
 import '../../utils/helpers.dart';
+import '../../widgets/app_pinch_zoom.dart';
 
 class FastingScreen extends StatefulWidget {
   const FastingScreen({super.key});
@@ -171,7 +172,8 @@ class _FastingScreenState extends State<FastingScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Fasting')),
-      body: SafeArea(
+      body: AppPinchZoom(
+        child: SafeArea(
         child: _loading
             ? Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
             : RefreshIndicator(
@@ -214,7 +216,7 @@ class _FastingScreenState extends State<FastingScreen> {
                 ),
               ),
       ),
-    );
+    ));
   }
 
   Widget _buildStatusSection() {

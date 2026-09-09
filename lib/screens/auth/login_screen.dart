@@ -8,6 +8,7 @@ import '../../widgets/profile_avatar.dart';
 import '../home/home_shell.dart';
 import 'one_tap_consent.dart';
 import 'register_screen.dart';
+import '../../widgets/app_pinch_zoom.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -192,7 +193,8 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: AppPinchZoom(
+        child: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
@@ -324,7 +326,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ),
       ),
-    );
+    ));
   }
 }
 

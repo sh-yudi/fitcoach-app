@@ -9,6 +9,7 @@ import '../../utils/helpers.dart';
 import '../../widgets/ad_banner.dart';
 import '../../widgets/exercise_demo_sheet.dart';
 import '../../widgets/personal_training_card.dart';
+import '../../widgets/app_pinch_zoom.dart';
 
 class WorkoutScreen extends StatefulWidget {
   const WorkoutScreen({super.key, this.refreshToken = 0});
@@ -249,7 +250,8 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Training Program')),
-      body: SafeArea(
+      body: AppPinchZoom(
+        child: SafeArea(
         child: _loading
             ? Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
             : _error != null
@@ -314,7 +316,7 @@ class _WorkoutScreenState extends State<WorkoutScreen> {
                     ),
                   ),
       ),
-    );
+    ));
   }
 }
 
