@@ -82,6 +82,7 @@ class AppColors {
   static const Color macroProtein = Color(0xFF3DD68C);
   static const Color macroCarbs = Color(0xFFFFB020);
   static const Color macroFiber = Color(0xFF6C8CFF);
+  static const Color streak = Color(0xFFFF9800);      // streak/fire orange
   static const Color whatsapp = Color(0xFF25D366);
   static const Color avatarFallback = Color(0xFF2A2A3E);
   static const Color darkGreen = Color(0xFF24321A);

@@ -125,7 +125,7 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
 
             const SizedBox(height: 20),
             Row(children: [
-              Expanded(child: _StatCard(emoji: '🔥', label: 'Current Streak', value: '$current day${current == 1 ? '' : 's'}', color: const Color(0xFFFF9800))),
+              Expanded(child: _StatCard(emoji: '🔥', label: 'Current Streak', value: '$current day${current == 1 ? '' : 's'}', color: AppColors.streak)),
               const SizedBox(width: 12),
               Expanded(child: _StatCard(emoji: '🏆', label: 'Best Streak', value: '$longest day${longest == 1 ? '' : 's'}', color: const Color(0xFFFFC107))),
             ]),
@@ -211,9 +211,9 @@ class _MilestoneRow extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: reached ? const Color(0xFFFF9800).withValues(alpha: 0.1) : AppColors.surface,
+          color: reached ? AppColors.streak.withValues(alpha: 0.1) : AppColors.surface,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: reached ? const Color(0xFFFF9800).withValues(alpha: 0.4) : AppColors.surfaceLight),
+          border: Border.all(color: reached ? AppColors.streak.withValues(alpha: 0.4) : AppColors.surfaceLight),
         ),
         child: Row(children: [
           Text(emoji, style: const TextStyle(fontSize: 20)),
@@ -223,7 +223,7 @@ class _MilestoneRow extends StatelessWidget {
               Text(label, style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 13)),
               Text(
                 reached ? '✓ Unlocked' : '$days days',
-                style: TextStyle(color: reached ? const Color(0xFFFF9800) : AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w700),
+                style: TextStyle(color: reached ? AppColors.streak : AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w700),
               ),
             ]),
             const SizedBox(height: 6),
@@ -232,7 +232,7 @@ class _MilestoneRow extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: progress,
                 backgroundColor: AppColors.surfaceLight,
-                color: reached ? const Color(0xFFFF9800) : AppColors.primary,
+                color: reached ? AppColors.streak : AppColors.primary,
                 minHeight: 5,
               ),
             ),
@@ -270,9 +270,9 @@ class _BadgeTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: const Color(0xFFFF9800).withValues(alpha: 0.35)),
+          border: Border.all(color: AppColors.streak.withValues(alpha: 0.35)),
           gradient: LinearGradient(
-            colors: [const Color(0xFFFF9800).withValues(alpha: 0.08), AppColors.surface],
+            colors: [AppColors.streak.withValues(alpha: 0.08), AppColors.surface],
             begin: Alignment.topLeft, end: Alignment.bottomRight,
           ),
         ),

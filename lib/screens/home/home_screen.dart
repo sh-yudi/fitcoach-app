@@ -586,9 +586,9 @@ class _DailyMomentumCard extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFF9800).withValues(alpha: 0.12),
+                    color: AppColors.streak.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: const Color(0xFFFF9800).withValues(alpha: 0.3)),
+                    border: Border.all(color: AppColors.streak.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -596,9 +596,9 @@ class _DailyMomentumCard extends StatelessWidget {
                       const Text('🔥', style: TextStyle(fontSize: 12.5)),
                       const SizedBox(width: 4),
                       Text('$streak day${streak == 1 ? '' : 's'} streak',
-                          style: const TextStyle(color: Color(0xFFFFB74D), fontSize: 12.5, fontWeight: FontWeight.w800)),
+                          style: const TextStyle(color: AppColors.streak, fontSize: 12.5, fontWeight: FontWeight.w800)),
                       const SizedBox(width: 4),
-                      const Icon(Icons.chevron_right, color: Color(0xFFFFB74D), size: 13),
+                      const Icon(Icons.chevron_right, color: AppColors.streak, size: 13),
                     ],
                   ),
                 ),
@@ -701,14 +701,12 @@ class _MacroPill extends StatelessWidget {
   final int consumed;
   final int target;
   final Color color;
-  final String unit;
 
   const _MacroPill({
     required this.label,
     required this.consumed,
     required this.target,
     required this.color,
-    this.unit = 'g',
   });
 
   @override
@@ -741,7 +739,7 @@ class _MacroPill extends StatelessWidget {
                   style: TextStyle(color: over ? AppColors.danger : color, fontSize: 14, fontWeight: FontWeight.w900),
                 ),
                 Text(
-                  ' / $target$unit',
+                  ' / ${target}g',
                   style: TextStyle(color: AppColors.textPrimary, fontSize: 10.5, fontWeight: FontWeight.w700),
                 ),
               ],
