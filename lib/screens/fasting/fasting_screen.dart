@@ -45,9 +45,11 @@ class _FastingScreenState extends State<FastingScreen> {
     try {
       final data = await ApiClient.instance.getFasting();
       if (!mounted) return;
-      final active = data['active'] == true;
+      final nested = data['fasting'];
+      final map = nested is Map ? <String, dynamic>{...nested.cast<String, dynamic>(), 'history': data['history']} : data;
+      final active = map['active'] == true;
       setState(() {
-        _data = data;
+        _data = map;
         _loading = false;
         if (active) {
           _selectedProtocol = _currentProtocol;
@@ -93,7 +95,7 @@ class _FastingScreenState extends State<FastingScreen> {
   }
 
   DateTime? get _startedAt {
-    final s = _data?['startedAt'];
+    final s = _data?['startTime'] ?? _data?['startedAt'];
     if (s is num) return DateTime.fromMillisecondsSinceEpoch(s.toInt() * (s > 1e12 ? 1 : 1000));
     if (s is String && s.isNotEmpty) return DateTime.tryParse(s)?.toLocal();
     return null;
@@ -515,7 +517,7 @@ class _HistoryTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final completed = entry['completed'] == true || entry['completed'] == 1;
     final hours = parseNum(entry['durationHours']) ?? parseNum(entry['duration']) ?? parseNum(entry['hours']);
-    final start = _parseDate(entry['startedAt'] ?? entry['startTime'] ?? entry['date']);
+    final start = _parseDate(entry['startedAt'] ?? entry['startTime'] ?? entry['start'] ?? entry['date']);
     final protocol = entry['protocol']?.toString() ?? '';
     final dateLabel = start != null ? '${start.day} ${kMonths[start.month - 1]}, ${start.hour.toString().padLeft(2, '0')}:${start.minute.toString().padLeft(2, '0')}' : '';
 
