@@ -8,6 +8,7 @@ import '../../utils/helpers.dart';
 import '../../widgets/profile_avatar.dart';
 import '../home/home_shell.dart';
 import 'one_tap_consent.dart';
+import '../../widgets/app_pinch_zoom.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -140,7 +141,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(leading: _step > 0 ? IconButton(onPressed: _back, icon: const Icon(Icons.arrow_back)) : null),
-      body: SafeArea(
+      body: AppPinchZoom(
+        child: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
           child: Center(
@@ -194,7 +196,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _accountStep() {

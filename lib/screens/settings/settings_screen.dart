@@ -9,6 +9,7 @@ import '../../widgets/ad_banner.dart';
 import '../../widgets/profile_avatar.dart';
 import '../../widgets/section_header.dart';
 import '../auth/login_screen.dart';
+import '../../widgets/app_pinch_zoom.dart';
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
 
@@ -174,7 +175,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final s = _settings;
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
-      body: SafeArea(
+      body: AppPinchZoom(
+        child: SafeArea(
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
           children: [
@@ -316,7 +318,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 }
 

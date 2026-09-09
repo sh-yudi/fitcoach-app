@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../../services/api_client.dart';
 import '../../theme.dart';
 import '../../utils/helpers.dart';
+import '../../widgets/app_pinch_zoom.dart';
 
 class ProgressScreen extends StatefulWidget {
   const ProgressScreen({super.key});
@@ -118,7 +119,8 @@ class _ProgressScreenState extends State<ProgressScreen> {
         icon: const Icon(Icons.add),
         label: const Text('Log weight', style: TextStyle(fontWeight: FontWeight.w800)),
       ),
-      body: SafeArea(
+      body: AppPinchZoom(
+        child: SafeArea(
         child: _loading
             ? Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
             : RefreshIndicator(
@@ -172,7 +174,7 @@ class _ProgressScreenState extends State<ProgressScreen> {
                       ),
               ),
       ),
-    );
+    ));
   }
 
   List<double> _weightSeries() {

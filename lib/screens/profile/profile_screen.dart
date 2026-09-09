@@ -10,6 +10,7 @@ import '../../widgets/ad_banner.dart';
 import '../../widgets/profile_avatar.dart';
 import '../auth/login_screen.dart';
 import '../settings/settings_screen.dart';
+import '../../widgets/app_pinch_zoom.dart';
 
 class ProfileScreen extends StatefulWidget {
   final User? user;
@@ -544,7 +545,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      body: SafeArea(
+      body: AppPinchZoom(
+        child: SafeArea(
         child: u == null
             ?  Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
             : ListView(
@@ -836,7 +838,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
       ),
-    );
+    ));
   }
 }
 

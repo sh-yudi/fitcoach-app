@@ -7,7 +7,6 @@ import 'services/api_client.dart';
 import 'services/notification_service.dart';
 import 'services/session.dart';
 import 'theme.dart';
-import 'widgets/app_pinch_zoom.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -66,7 +65,9 @@ void _handleNotificationTap(String payload) {
   if (payload.startsWith('gym_checkin:')) {
     final date = payload.split(':').last;
     nav.push(
-      MaterialPageRoute(builder: (_) => CalendarScreen(initialCheckInDate: date)),
+      MaterialPageRoute(
+        builder: (_) => CalendarScreen(initialCheckInDate: date),
+      ),
     );
   }
 }
@@ -89,7 +90,7 @@ class FitCoachApp extends StatelessWidget {
             themeMode: ThemeController.instance.mode,
             builder: (context, child) {
               AppColors.setBrightness(Theme.of(context).brightness);
-              return AppPinchZoom(child: child!);
+              return child!;
             },
             home: const SplashScreen(),
           ),

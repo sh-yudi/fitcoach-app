@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/api_client.dart';
 import '../../theme.dart';
 import '../../utils/helpers.dart';
+import '../../widgets/app_pinch_zoom.dart';
 
 class StreakDetailScreen extends StatefulWidget {
   final Map<String, dynamic>? initialData;
@@ -75,7 +76,8 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
             ),
         ],
       ),
-      body: RefreshIndicator(
+      body: AppPinchZoom(
+        child: RefreshIndicator(
         onRefresh: _load,
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
@@ -154,7 +156,7 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
           ],
         ),
       ),
-    );
+    ));
   }
 }
 

@@ -9,6 +9,7 @@ import '../../widgets/ad_banner.dart';
 import '../../widgets/section_header.dart';
 import 'diet_scan_screen.dart';
 import 'today_progress_screen.dart';
+import '../../widgets/app_pinch_zoom.dart';
 
 class DietScreen extends StatefulWidget {
   const DietScreen({super.key, this.refreshToken = 0});
@@ -142,7 +143,8 @@ class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateM
       appBar: AppBar(
         title: const Text('Daily Diet Plan'),
       ),
-      body: SafeArea(
+      body: AppPinchZoom(
+        child: SafeArea(
         child: _loading
             ?  Center(child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5))
             : _error != null
@@ -220,7 +222,7 @@ class _DietScreenState extends State<DietScreen> with SingleTickerProviderStateM
                     ),
                   ),
       ),
-    );
+    ));
   }
 }
 
