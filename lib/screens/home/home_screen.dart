@@ -551,8 +551,10 @@ class _DailyMomentumCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Top Row: Goal Phase Chip + Tappable Streak Pill ──
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               GestureDetector(
                 onTap: onSelectGoal,
