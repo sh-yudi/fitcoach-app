@@ -14,7 +14,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   NotificationService.instance.init(onTap: _handleNotificationTap);
   ThemeController.instance.load();
-  runApp(const FitCoachApp());
+  runApp(const FyzziqApp());
 }
 
 /// Watches the app lifecycle: records when the app goes to the background so
@@ -72,8 +72,8 @@ void _handleNotificationTap(String payload) {
   }
 }
 
-class FitCoachApp extends StatelessWidget {
-  const FitCoachApp({super.key});
+class FyzziqApp extends StatelessWidget {
+  const FyzziqApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +82,7 @@ class FitCoachApp extends StatelessWidget {
       builder: (context, _) {
         return _LifecycleWrapper(
           child: MaterialApp(
-            title: 'FitCoach',
+            title: 'Fyzziq',
             debugShowCheckedModeBanner: false,
             navigatorKey: navigatorKey,
             theme: buildTheme(Brightness.light),

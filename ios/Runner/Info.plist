@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>FitCoach</string>
+	<string>Fyzziq</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -40,13 +40,13 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>FitCoach uses the camera so you can take a profile picture.</string>
+	<string>Fyzziq uses the camera so you can take a profile picture.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>Use Face ID to securely log in to your FitCoach account.</string>
+	<string>Use Face ID to securely log in to your Fyzziq account.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>FitCoach uses the microphone only if you record a video.</string>
+	<string>Fyzziq uses the microphone only if you record a video.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>FitCoach needs access to your photo library so you can set a profile picture.</string>
+	<string>Fyzziq needs access to your photo library so you can set a profile picture.</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>This app shows ads from Google. This requires using the device ID to deliver personalized ads.</string>
 	<key>UIApplicationSceneManifest</key>
