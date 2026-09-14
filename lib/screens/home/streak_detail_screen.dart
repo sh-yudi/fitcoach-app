@@ -43,11 +43,41 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
         : [];
 
     final milestones = [
-      (days: 1, label: 'First Step', emoji: '🎯'),
-      (days: 5, label: 'On Fire', emoji: '🔥'),
-      (days: 7, label: 'Week Warrior', emoji: '⚔️'),
-      (days: 14, label: 'Unstoppable', emoji: '💎'),
-      (days: 30, label: 'Month Master', emoji: '👑'),
+      (
+        days: 1,
+        label: 'First Step',
+        emoji: '🎯',
+        description: 'Complete your very first workout. Open the Workouts tab, pick any workout, and finish every set. One session — that\'s all it takes to ignite your journey!',
+        doneDescription: 'You crushed it on Day 1! The hardest part is starting — and you already did it. 🎉',
+      ),
+      (
+        days: 5,
+        label: 'On Fire',
+        emoji: '🔥',
+        description: 'Log a workout 5 days in a row without missing one. Even a 20-minute session counts — the key is to show up every single day and keep the fire burning!',
+        doneDescription: 'Five days straight — your body is adapting and your willpower is razor sharp. You\'re officially on fire! 🔥',
+      ),
+      (
+        days: 7,
+        label: 'Week Warrior',
+        emoji: '⚔️',
+        description: 'Complete a full 7-day streak. Plan your sessions the night before, lay out your gear, and treat each workout like an unbreakable appointment with yourself.',
+        doneDescription: 'A full week, zero excuses! You\'ve built a real habit that most people only dream about. ⚔️',
+      ),
+      (
+        days: 14,
+        label: 'Unstoppable',
+        emoji: '💎',
+        description: 'Stay consistent for 14 straight days. Two solid weeks means your body is in full adaptation mode — muscles are growing, endurance is rising. Push through rest-day temptations!',
+        doneDescription: 'Two weeks of zero breaks! At this point, working out is part of who you are — not just what you do. 💎',
+      ),
+      (
+        days: 30,
+        label: 'Month Master',
+        emoji: '👑',
+        description: 'Complete 30 consecutive days of workouts. Mix strength, cardio, and stretching to stay injury-free, and track your progress in the Progress tab to see how far you\'ve come!',
+        doneDescription: 'One full month — you are in the top 1% of people who commit and follow through. Absolute royalty! 👑',
+      ),
     ];
 
     return Scaffold(
@@ -90,7 +120,15 @@ class _StreakDetailScreenState extends State<StreakDetailScreen> {
             ...milestones.map((m) {
               final reached = longest >= m.days;
               final progress = (longest / m.days).clamp(0.0, 1.0);
-              return _MilestoneRow(emoji: m.emoji, label: m.label, days: m.days, reached: reached, progress: progress);
+              return _MilestoneRow(
+                emoji: m.emoji,
+                label: m.label,
+                days: m.days,
+                reached: reached,
+                progress: progress,
+                description: m.description,
+                doneDescription: m.doneDescription,
+              );
             }),
 
             const SizedBox(height: 20),
@@ -198,25 +236,36 @@ class _HeroStreakCard extends StatelessWidget {
 }
 
 class _MilestoneRow extends StatelessWidget {
-  final String emoji, label;
+  final String emoji, label, description, doneDescription;
   final int days;
   final bool reached;
   final double progress;
-  const _MilestoneRow({required this.emoji, required this.label, required this.days, required this.reached, required this.progress});
+  const _MilestoneRow({
+    required this.emoji,
+    required this.label,
+    required this.days,
+    required this.reached,
+    required this.progress,
+    required this.description,
+    required this.doneDescription,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: reached ? AppColors.streak.withValues(alpha: 0.1) : AppColors.surface,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: reached ? AppColors.streak.withValues(alpha: 0.4) : AppColors.surfaceLight),
         ),
-        child: Row(children: [
-          Text(emoji, style: const TextStyle(fontSize: 20)),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Text(emoji, style: const TextStyle(fontSize: 22)),
+          ),
           const SizedBox(width: 12),
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -234,6 +283,16 @@ class _MilestoneRow extends StatelessWidget {
                 backgroundColor: AppColors.surfaceLight,
                 color: reached ? AppColors.streak : AppColors.primary,
                 minHeight: 5,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              reached ? doneDescription : description,
+              style: TextStyle(
+                color: reached ? AppColors.streak.withValues(alpha: 0.85) : AppColors.textSecondary,
+                fontSize: 11.5,
+                height: 1.5,
+                fontStyle: reached ? FontStyle.normal : FontStyle.normal,
               ),
             ),
           ])),
