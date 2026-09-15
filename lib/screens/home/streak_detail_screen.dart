@@ -204,30 +204,42 @@ class _HeroStreakCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dark gradient in dark mode; warm amber gradient in light mode
+    final gradient = AppColors.isDark
+        ? const LinearGradient(
+            colors: [Color(0xFF3A2410), Color(0xFF7C4A12)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          )
+        : const LinearGradient(
+            colors: [Color(0xFFB45309), Color(0xFFD97706)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          );
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(colors: [Color(0xFF3A2410), Color(0xFF7C4A12)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+        gradient: gradient,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Row(children: [
         Container(
           width: 64, height: 64,
           alignment: Alignment.center,
-          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.2), borderRadius: BorderRadius.circular(16)),
           child: const Text('🔥', style: TextStyle(fontSize: 36)),
         ),
         const SizedBox(width: 16),
         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.baseline, textBaseline: TextBaseline.alphabetic, children: [
-            Text('$current', style: const TextStyle(color: Color(0xFFFFE8B0), fontSize: 40, fontWeight: FontWeight.w900, height: 1)),
+            Text('$current', style: const TextStyle(color: Color(0xFFFFEDD5), fontSize: 40, fontWeight: FontWeight.w900, height: 1)),
             const SizedBox(width: 8),
-            const Text('day streak', style: TextStyle(color: Color(0xFFF3DFC0), fontSize: 16, fontWeight: FontWeight.w700)),
+            const Text('day streak', style: TextStyle(color: Color(0xFFFED7AA), fontSize: 16, fontWeight: FontWeight.w700)),
           ]),
           const SizedBox(height: 4),
           Text(
             current > 0 ? 'Keep it up — work out today to extend it! 💪' : 'Complete a workout to start your streak!',
-            style: TextStyle(color: const Color(0xFFD9C6A6).withValues(alpha: 0.9), fontSize: 11.5),
+            style: const TextStyle(color: Color(0xFFFEF3C7), fontSize: 11.5),
           ),
         ])),
       ]),
@@ -252,14 +264,30 @@ class _MilestoneRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // In light mode a pale-orange background with orange text is low-contrast.
+    // Use a richer background tint and theme-aware text colours.
+    final cardBg = reached
+        ? AppColors.streak.withValues(alpha: AppColors.isDark ? 0.12 : 0.08)
+        : AppColors.surface;
+    final cardBorder = reached
+        ? AppColors.streak.withValues(alpha: AppColors.isDark ? 0.45 : 0.35)
+        : AppColors.surfaceLight;
+
+    // Reached description: orange text in dark mode, strong dark text in light mode
+    final descColor = reached
+        ? (AppColors.isDark
+            ? AppColors.streak.withValues(alpha: 0.9)
+            : const Color(0xFF92400E)) // deep amber — readable on white/pale-orange
+        : AppColors.textSecondary;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: reached ? AppColors.streak.withValues(alpha: 0.1) : AppColors.surface,
+          color: cardBg,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: reached ? AppColors.streak.withValues(alpha: 0.4) : AppColors.surfaceLight),
+          border: Border.all(color: cardBorder),
         ),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Padding(
@@ -270,9 +298,22 @@ class _MilestoneRow extends StatelessWidget {
           Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
               Text(label, style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 13)),
-              Text(
-                reached ? '✓ Unlocked' : '$days days',
-                style: TextStyle(color: reached ? AppColors.streak : AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w700),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: reached
+                    ? BoxDecoration(
+                        color: AppColors.streak.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(20),
+                      )
+                    : null,
+                child: Text(
+                  reached ? '✓ Unlocked' : '$days days',
+                  style: TextStyle(
+                    color: reached ? AppColors.streak : AppColors.textSecondary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
               ),
             ]),
             const SizedBox(height: 6),
@@ -289,10 +330,9 @@ class _MilestoneRow extends StatelessWidget {
             Text(
               reached ? doneDescription : description,
               style: TextStyle(
-                color: reached ? AppColors.streak.withValues(alpha: 0.85) : AppColors.textSecondary,
+                color: descColor,
                 fontSize: 11.5,
                 height: 1.5,
-                fontStyle: reached ? FontStyle.normal : FontStyle.normal,
               ),
             ),
           ])),
