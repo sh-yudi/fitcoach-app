@@ -683,17 +683,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       InkWell(
                         onTap: _showPhotoOptions,
-                        borderRadius: BorderRadius.circular(18),
+                        borderRadius: BorderRadius.circular(50),
                         child: Stack(
                           children: [
                             Container(
                               width: 56,
                               height: 56,
                               clipBehavior: Clip.antiAlias,
-                              decoration: BoxDecoration(
-                                color: AppColors.primary,
-                                borderRadius: BorderRadius.circular(18),
-                              ),
+                              decoration: const BoxDecoration(shape: BoxShape.circle),
                               child: ProfileAvatar(
                                 photoUrl: u.isPhotoUrl ? u.profilePhotoUrl : null,
                                 base64: u.isPhotoUrl ? null : u.profilePhoto,
