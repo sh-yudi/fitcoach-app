@@ -1,0 +1,5 @@
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon.jpg"
+  min_sdk_size: 21 # android min sdk requirement
