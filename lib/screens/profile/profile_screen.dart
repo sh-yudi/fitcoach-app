@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 
+import '../../config.dart';
 import '../../models/models.dart';
 import '../../services/api_client.dart';
 import '../../services/profile_photo.dart';
@@ -196,8 +197,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildFullPhoto(String? photoUrl, String? base64Photo, dynamic u) {
-    if (photoUrl != null) {
-      return Image.network(photoUrl, fit: BoxFit.contain,
+    if (photoUrl != null && photoUrl.isNotEmpty) {
+      final fullUrl = photoUrl.startsWith('http') ? photoUrl : '${AppConfig.apiBaseUrl}$photoUrl';
+      return Image.network(fullUrl, fit: BoxFit.contain,
           errorBuilder: (_, __, ___) => _fallbackIcon(u));
     }
     if (base64Photo != null && base64Photo.isNotEmpty) {
