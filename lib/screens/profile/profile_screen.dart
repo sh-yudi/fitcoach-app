@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import '../../models/models.dart';
@@ -101,6 +102,118 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
     }
   }
+
+  /// Bottom sheet: View photo / Change photo / Remove photo
+  void _showPhotoOptions() {
+    final u = widget.user;
+    final hasPhoto = u != null && (u.profilePhoto != null || u.isPhotoUrl);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36, height: 4,
+                margin: const EdgeInsets.only(bottom: 12),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceLight,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              if (hasPhoto)
+                ListTile(
+                  leading: Icon(Icons.visibility_outlined, color: AppColors.primary),
+                  title: Text('View photo', style: TextStyle(color: AppColors.textPrimary)),
+                  onTap: () { Navigator.pop(context); _viewPhoto(u); },
+                ),
+              ListTile(
+                leading: Icon(Icons.camera_alt_outlined, color: AppColors.primary),
+                title: Text('Change photo', style: TextStyle(color: AppColors.textPrimary)),
+                onTap: () { Navigator.pop(context); _changePhoto(); },
+              ),
+              if (hasPhoto)
+                ListTile(
+                  leading: const Icon(Icons.delete_outline, color: Colors.redAccent),
+                  title: const Text('Remove photo', style: TextStyle(color: Colors.redAccent)),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    setState(() => _saving = true);
+                    try {
+                      final user = await ApiClient.instance.updateProfile({'profilePhoto': ''});
+                      await Session.setRememberPhoto(user.displayPhoto);
+                      if (!mounted) return;
+                      setState(() => _saving = false);
+                      widget.onUpdated(user);
+                    } catch (_) {
+                      if (!mounted) return;
+                      setState(() => _saving = false);
+                    }
+                  },
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Full-screen photo viewer with pinch-to-zoom + edit shortcut in app bar
+  void _viewPhoto(dynamic u) {
+    final photoUrl   = u.isPhotoUrl ? u.profilePhotoUrl as String? : null;
+    final base64Photo = u.isPhotoUrl ? null : u.profilePhoto as String?;
+    Navigator.of(context).push(PageRouteBuilder(
+      opaque: false,
+      barrierColor: Colors.black87,
+      pageBuilder: (_, __, ___) => Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          foregroundColor: Colors.white,
+          title: const Text('Profile photo', style: TextStyle(color: Colors.white, fontSize: 16)),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.edit_outlined, color: Colors.white),
+              tooltip: 'Change photo',
+              onPressed: () { Navigator.pop(context); _changePhoto(); },
+            ),
+          ],
+        ),
+        body: Center(
+          child: InteractiveViewer(
+            child: _buildFullPhoto(photoUrl, base64Photo, u),
+          ),
+        ),
+      ),
+    ));
+  }
+
+  Widget _buildFullPhoto(String? photoUrl, String? base64Photo, dynamic u) {
+    if (photoUrl != null) {
+      return Image.network(photoUrl, fit: BoxFit.contain,
+          errorBuilder: (_, __, ___) => _fallbackIcon(u));
+    }
+    if (base64Photo != null && base64Photo.isNotEmpty) {
+      try {
+        final data = base64Photo.contains(',') ? base64Photo.split(',').last : base64Photo;
+        return Image.memory(base64Decode(data), fit: BoxFit.contain);
+      } catch (_) {}
+    }
+    return _fallbackIcon(u);
+  }
+
+  Widget _fallbackIcon(dynamic u) => Icon(
+    u?.gender == 'female' ? Icons.female : Icons.male,
+    size: 120, color: AppColors.primary,
+  );
+
 
   @override
   void dispose() {
@@ -555,7 +668,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   Row(
                     children: [
                       InkWell(
-                        onTap: _changePhoto,
+                        onTap: _showPhotoOptions,
                         borderRadius: BorderRadius.circular(18),
                         child: Stack(
                           children: [
