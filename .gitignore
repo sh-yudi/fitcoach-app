@@ -59,3 +59,5 @@ android/app/*.keystore
 .fvm/ExportOptions.plist
 FitCoach.ipa
 *.ipa
+.fvm/flutter_sdk
+ExportOptions.plist

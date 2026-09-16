@@ -273,7 +273,7 @@ class NotificationService {
 
     final details = const NotificationDetails(
       android: AndroidNotificationDetails(
-        'fitcoach_reminders',
+        'fyzziq_reminders',
         'Fyzziq Reminders',
         channelDescription: 'Meal, workout and gym check-in reminders',
         importance: Importance.high,
