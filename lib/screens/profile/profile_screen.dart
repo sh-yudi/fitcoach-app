@@ -87,6 +87,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _changePhoto() async {
     final base64 = await pickProfilePhoto(context);
     if (base64 == null || !mounted) return;
+    await _updatePhoto(base64);
+  }
+
+  Future<void> _updatePhoto(String base64) async {
     setState(() => _saving = true);
     try {
       final user = await ApiClient.instance.updateProfile({'profilePhoto': base64});
@@ -183,7 +187,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
             IconButton(
               icon: const Icon(Icons.edit_outlined, color: Colors.white),
               tooltip: 'Change photo',
-              onPressed: () { Navigator.pop(context); _changePhoto(); },
+              onPressed: () async {
+                // Show the picker dialog *over* this full-screen viewer
+                final base64 = await pickProfilePhoto(context);
+                if (base64 != null) {
+                  // If they picked a photo, pop the full-screen viewer and save
+                  if (context.mounted) Navigator.pop(context);
+                  _updatePhoto(base64);
+                }
+              },
             ),
           ],
         ),
