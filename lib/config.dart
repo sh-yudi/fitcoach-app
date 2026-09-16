@@ -8,7 +8,7 @@ class AppConfig {
 
   static String get apiBaseUrl {
     if (_defined.isNotEmpty) return _defined;
-    return 'https://fitcoach.veridianabode.in';
+    return 'https://fyzziq.veridianabode.in';
   }
 
   // AdMob settings --------------------------------------------------------
