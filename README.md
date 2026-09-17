@@ -1,8 +1,8 @@
-# FitCoach — Smart Fitness Trainer App
+# Fyzziq — Smart Fitness Trainer App
 
 A full-stack fitness application with smart food scanning, personalized diet & workout plans, and progress tracking.
 
-**Live:** https://fitcoach.veridianabode.in  
+**Live:** https://fyzziq.veridianabode.in  
 **Status:** Production (iOS + Android)
 
 ---
@@ -256,7 +256,7 @@ server/
 │       └── foodDatabase.js         # 50+ Indian foods + 30 barcoded items with micronutrients
 │
 └── data/
-    └── fitcoach.db                 # SQLite database
+    └── fyzziq.db                 # SQLite database
 ```
 
 ### Server Dependencies
@@ -416,7 +416,7 @@ docs: <description>      — Documentation
 | File | Reason |
 |---|---|
 | `.env` | Secrets (API keys, auth tokens) |
-| `data/fitcoach.db` | User data |
+| `data/fyzziq.db` | User data |
 | `node_modules/` | Dependencies |
 | `build/` | Flutter build artifacts |
 | `.dart_tool/` | Dart cache |
