@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:fitcoach_app/main.dart' as app;
-import 'package:fitcoach_app/screens/home/home_shell.dart';
-import 'package:fitcoach_app/services/session.dart';
-import 'package:fitcoach_app/services/api_client.dart';
+import 'package:fyzziq_app/main.dart' as app;
+import 'package:fyzziq_app/screens/home/home_shell.dart';
+import 'package:fyzziq_app/services/session.dart';
+import 'package:fyzziq_app/services/api_client.dart';
 import 'test_helpers.dart';
 
 void main() {

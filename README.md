@@ -390,8 +390,8 @@ server/
 ### Repositories
 | Repo | Branch |
 |---|---|
-| fitcoach-app | main |
-| fitcoach-server | main |
+| fyzziq-app | main |
+| fyzziq-server | main |
 
 ### Commit Convention
 ```
@@ -405,12 +405,12 @@ docs: <description>      — Documentation
 ### What to Commit
 | Location | Commit To | Notes |
 |---|---|---|
-| `app/lib/**` | fitcoach-app | Flutter source |
-| `app/pubspec.yaml` | fitcoach-app | Dependencies |
-| `server/app.js` | fitcoach-server | Routes, dashboard, config |
-| `server/src/**` | fitcoach-server | Business logic, routes |
-| `server/package.json` | fitcoach-server | Dependencies |
-| `server/ecosystem.config.cjs` | fitcoach-server | PM2 config |
+| `app/lib/**` | fyzziq-app | Flutter source |
+| `app/pubspec.yaml` | fyzziq-app | Dependencies |
+| `server/app.js` | fyzziq-server | Routes, dashboard, config |
+| `server/src/**` | fyzziq-server | Business logic, routes |
+| `server/package.json` | fyzziq-server | Dependencies |
+| `server/ecosystem.config.cjs` | fyzziq-server | PM2 config |
 
 ### What NOT to Commit
 | File | Reason |
